@@ -8,7 +8,7 @@ import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 const app = express();
 app.use(express.json());
 
-const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@localhost:27017/${DB_NAME}`;
+const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@127.0.0.1:27017/${DB_NAME}`;
 
 mongoose.connect(dbURI, {
   useNewUrlParser: true,
