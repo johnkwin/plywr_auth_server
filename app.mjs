@@ -1,13 +1,26 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const stripe = require('stripe')('your-stripe-secret-key');
+import express from 'express';
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import stripe from 'stripe';
+import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 
 const app = express();
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost:27017/yourdbname', { useNewUrlParser: true, useUnifiedTopology: true });
+const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@localhost:27017/${DB_NAME}`;
+
+mongoose.connect(dbURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => {
+  console.log('Connected to MongoDB');
+})
+.catch(err => {
+  console.error('Failed to connect to MongoDB:', err.message);
+  console.error('Error Details:', err);
+});
 
 const UserSchema = new mongoose.Schema({
     email: String,

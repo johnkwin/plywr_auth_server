@@ -1,0 +1,19 @@
+mongo -u root -p n9bT#tBAv35KwKb --authenticationDatabase admin
+
+use users
+db.createUser({
+  user: "plywr",
+  pwd: "n9bT#tBAv35KwKb",
+  roles: [ { role: "readWrite", db: "users" } ]
+})
+
+sudo apt install certbot python3-certbot-nginx -y
+sudo certbot certonly --standalone -d join-playware.com -d www.join-playware.com
+
+sudo mkdir /etc/ssl/join-playware.com
+sudo cp /etc/letsencrypt/live/join-playware.com.com/fullchain.pem /etc/ssl/join-playware.com/fullchain.pem
+sudo cp /etc/letsencrypt/live/join-playware.com.com/privkey.pem /etc/ssl/join-playware.com/privkey.pem
+
+
+sudo certbot certonly --webroot -w /var/www/html -d join-playware.com -d www.join-playware.com
+mongodb://plywr:n9bT#tBAv35KwKb@localhost:27017/users
