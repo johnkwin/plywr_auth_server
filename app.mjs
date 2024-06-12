@@ -6,6 +6,7 @@ import stripe from 'stripe';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 import flash from 'connect-flash';
+import adminRoutes from './admin/routes.js'; // Adjust the path as needed
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 
 const app = express();
@@ -72,66 +73,7 @@ app.post('/subscribe', async (req, res) => {
     res.send('Subscription successful');
 });
 
-// Middleware for checking authentication for admin routes
-function isAuthenticated(req, res, next) {
-    if (req.session.userId) {
-        return next();
-    }
-    res.redirect('/admin/login');
-}
-
-// Admin login page
-app.get('/admin/login', (req, res) => {
-    res.render('login', { message: req.flash('message') });
-});
-
-app.post('/admin/login', async (req, res) => {
-    const { email, password } = req.body;
-    const admin = await User.findOne({ email, role: 'admin' });
-    if (admin && await bcrypt.compare(password, admin.password)) {
-        req.session.userId = admin._id;
-        res.redirect('/admin/dashboard');
-    } else {
-        req.flash('message', 'Invalid credentials');
-        res.redirect('/admin/login');
-    }
-});
-
-// Admin dashboard
-app.get('/admin/dashboard', isAuthenticated, async (req, res) => {
-    const users = await User.find({});
-    res.render('dashboard', { users });
-});
-
-// Add or Edit User
-app.post('/admin/user', isAuthenticated, async (req, res) => {
-    const { id, email, password } = req.body;
-    if (id) {
-        // Edit existing user
-        const user = await User.findById(id);
-        user.email = email;
-        if (password) {
-            user.password = await bcrypt.hash(password, 10);
-        }
-        await user.save();
-    } else {
-        // Add new user
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({ email, password: hashedPassword });
-    }
-    res.redirect('/admin/dashboard');
-});
-
-// Delete User
-app.post('/admin/user/delete', isAuthenticated, async (req, res) => {
-    await User.findByIdAndDelete(req.body.id);
-    res.redirect('/admin/dashboard');
-});
-
-// Admin logout
-app.get('/admin/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/admin/login');
-});
+// Use admin routes
+app.use('/admin', adminRoutes);
 
 app.listen(3000, () => console.log('Server running on port 3000'));
