@@ -1,79 +1,69 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import stripe from 'stripe';
-import session from 'express-session';
-import bodyParser from 'body-parser';
-import flash from 'connect-flash';
-import adminRoutes from './admin/routes.js'; // Adjust the path as needed
-import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
+import User from '../models/User.mjs'; // Ensure User model uses ES module and has .mjs extension
 
-const app = express();
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
-app.use(flash());
+const router = express.Router();
 
-app.set('view engine', 'ejs');
-app.set('views', new URL('./views', import.meta.url).pathname);
+// Middleware for checking authentication for admin routes
+function isAuthenticated(req, res, next) {
+    if (req.session.userId) {
+        return next();
+    }
+    res.redirect('/admin/login');
+}
 
-const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@127.0.0.1:27017/${DB_NAME}`;
-
-mongoose.connect(dbURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => {
-  console.log('Connected to MongoDB');
-})
-.catch(err => {
-  console.error('Failed to connect to MongoDB:', err.message);
-  console.error('Error Details:', err);
+// Admin login page
+router.get('/login', (req, res) => {
+    res.render('login', { message: req.flash('message') });
 });
 
-const UserSchema = new mongoose.Schema({
-    email: String,
-    password: String,
-    subscriptionStatus: String,
-});
-
-const User = mongoose.model('User', UserSchema);
-
-app.post('/register', async (req, res) => {
+router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ email, password: hashedPassword });
-    await user.save();
-    res.send('User registered');
-});
-
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (user && await bcrypt.compare(password, user.password)) {
-        const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
-        res.json({ token });
+    const admin = await User.findOne({ email, role: 'admin' }); // Ensure your admin user has a role field
+    if (admin && await bcrypt.compare(password, admin.password)) {
+        req.session.userId = admin._id;
+        res.redirect('/admin/dashboard');
     } else {
-        res.status(400).send('Invalid credentials');
+        req.flash('message', 'Invalid credentials');
+        res.redirect('/admin/login');
     }
 });
 
-app.post('/subscribe', async (req, res) => {
-    const { token, planId } = req.body;
-    const customer = await stripe.customers.create({
-        email: req.user.email,
-        source: token,
-    });
-    const subscription = await stripe.subscriptions.create({
-        customer: customer.id,
-        items: [{ plan: planId }],
-    });
-    await User.findByIdAndUpdate(req.user._id, { subscriptionStatus: 'active' });
-    res.send('Subscription successful');
+// Admin dashboard
+router.get('/dashboard', isAuthenticated, async (req, res) => {
+    const users = await User.find({});
+    res.render('dashboard', { users });
 });
 
-// Use admin routes
-app.use('/admin', adminRoutes);
+// Add or Edit User
+router.post('/user', isAuthenticated, async (req, res) => {
+    const { id, email, password } = req.body;
+    if (id) {
+        // Edit existing user
+        const user = await User.findById(id);
+        user.email = email;
+        if (password) {
+            user.password = await bcrypt.hash(password, 10);
+        }
+        await user.save();
+    } else {
+        // Add new user
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await User.create({ email, password: hashedPassword });
+    }
+    res.redirect('/admin/dashboard');
+});
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+// Delete User
+router.post('/user/delete', isAuthenticated, async (req, res) => {
+    await User.findByIdAndDelete(req.body.id);
+    res.redirect('/admin/dashboard');
+});
+
+// Admin logout
+router.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/admin/login');
+});
+
+export default router;

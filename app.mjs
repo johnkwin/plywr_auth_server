@@ -2,12 +2,14 @@ import express from 'express';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import stripe from 'stripe';
+import Stripe from 'stripe';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 import flash from 'connect-flash';
-import adminRoutes from './admin/routes.js'; // Adjust the path as needed
+import adminRoutes from './admin/routes.mjs'; // Ensure this path is correct
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
+
+const stripe = Stripe('your-stripe-secret-key'); // Initialize Stripe with your secret key
 
 const app = express();
 app.use(express.json());
