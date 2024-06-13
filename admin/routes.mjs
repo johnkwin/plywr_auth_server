@@ -1,6 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import User from '../models/User.mjs'; // Ensure User model uses ES module and has .mjs extension
+import User from '../models/User.mjs';
 
 const router = express.Router();
 
@@ -19,7 +19,7 @@ router.get('/login', (req, res) => {
 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    const admin = await User.findOne({ email, role: 'admin' }); // Ensure your admin user has a role field
+    const admin = await User.findOne({ email, isAdmin: true });
     if (admin && await bcrypt.compare(password, admin.password)) {
         req.session.userId = admin._id;
         res.redirect('/admin/dashboard');
@@ -37,11 +37,12 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 
 // Add or Edit User
 router.post('/user', isAuthenticated, async (req, res) => {
-    const { id, email, password } = req.body;
+    const { id, email, password, isAdmin } = req.body;
     if (id) {
         // Edit existing user
         const user = await User.findById(id);
         user.email = email;
+        user.isAdmin = isAdmin === 'on'; // Checkbox value handling
         if (password) {
             user.password = await bcrypt.hash(password, 10);
         }
@@ -49,7 +50,7 @@ router.post('/user', isAuthenticated, async (req, res) => {
     } else {
         // Add new user
         const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({ email, password: hashedPassword });
+        await User.create({ email, password: hashedPassword, isAdmin: isAdmin === 'on' });
     }
     res.redirect('/admin/dashboard');
 });

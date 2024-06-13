@@ -3,38 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/styles.css"> <!-- Link to styles -->
 </head>
-<body>
-    <h2>Admin Dashboard</h2>
-    <a href="/admin/logout">Logout</a>
-    <h3>Users</h3>
-    <form action="/admin/user" method="POST">
-        <input type="hidden" name="id" id="userId">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password">
-        <br>
-        <button type="submit">Save User</button>
-    </form>
-    <h3>User List</h3>
-    <ul>
-        <% users.forEach(user => { %>
-            <li>
-                <%= user.email %> 
-                <button onclick="editUser('<%= user._id %>', '<%= user.email %>')">Edit</button>
-                <form action="/admin/user/delete" method="POST" style="display:inline;">
-                    <input type="hidden" name="id" value="<%= user._id %>">
-                    <button type="submit">Delete</button>
-                </form>
-            </li>
-        <% }); %>
-    </ul>
+<body class="dashboard-page">
+    <div class="dashboard-container">
+        <h2>Admin Dashboard</h2>
+        <a href="/admin/logout" class="logout-button">Logout</a>
+        <h3>Users</h3>
+        <form action="/admin/user" method="POST" class="user-form">
+            <input type="hidden" name="id" id="userId">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password">
+            <label for="isAdmin">Admin:</label>
+            <input type="checkbox" id="isAdmin" name="isAdmin">
+            <button type="submit">Save User</button>
+        </form>
+        <h3>User List</h3>
+        <ul class="user-list">
+            <% users.forEach(user => { %>
+                <li>
+                    <%= user.email %> - <%= user.isAdmin ? 'Admin' : 'User' %>
+                    <button class="edit-button" onclick="editUser('<%= user._id %>', '<%= user.email %>', <%= user.isAdmin %>)">Edit</button>
+                    <form action="/admin/user/delete" method="POST" class="delete-form">
+                        <input type="hidden" name="id" value="<%= user._id %>">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
     <script>
-        function editUser(id, email) {
+        function editUser(id, email, isAdmin) {
             document.getElementById('userId').value = id;
             document.getElementById('email').value = email;
+            document.getElementById('isAdmin').checked = isAdmin;
         }
     </script>
 </body>
