@@ -51,7 +51,23 @@ app.post('/login', async (req, res) => {
     res.status(400).send('Invalid credentials');
   }
 });
-
+app.post('/check-subscription', async (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    try {
+        const decoded = jwt.verify(token, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+        const user = await User.findById(decoded.userId);
+        if (!user || !user.isActiveSubscription) {
+            return res.status(401).json({ message: 'Subscription expired' });
+        }
+        res.json({ valid: true });
+    } catch (error) {
+        res.status(401).json({ message: 'Unauthorized' });
+    }
+});
 app.post('/subscribe', async (req, res) => {
   const { token, planId } = req.body;
   const customer = await stripe.customers.create({
