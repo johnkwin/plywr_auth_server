@@ -1,39 +1,48 @@
-/* General Styles */
-body {
-    font-family: Arial, sans-serif;
-    background: #2b2b2b; /* Dark background for contrast */
+/* General Reset */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Centering Flexbox */
+body {
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center;     /* Center vertically */
     height: 100vh;           /* Full viewport height */
-    overflow: hidden;        /* Hide overflow to prevent scroll */
+    background: #2b2b2b;     /* Dark background for contrast */
 }
 
 .login-page, .dashboard-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;           /* Ensure it takes full width */
+    height: 100%;          /* Ensure it takes full height */
+}
+
+.login-container, .dashboard-container {
     background: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     width: 400px;            /* Set a width for the container */
+    max-width: 90%;          /* Make sure it doesn't exceed screen width */
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Center content vertically */
     align-items: center;     /* Center content horizontally */
     text-align: center;      /* Center-align text */
 }
 
-.login-container, .dashboard-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;    /* Center content horizontally */
-}
-
 h2 {
     margin-bottom: 20px;
-    text-align: center;      /* Center-align text */
 }
 
 .login-form, .user-form {
@@ -46,6 +55,7 @@ h2 {
 label {
     margin-top: 10px;
     text-align: left;       /* Align labels left for better readability */
+    width: 100%;
 }
 
 input[type="email"], input[type="password"], input[type="text"], input[type="checkbox"] {
