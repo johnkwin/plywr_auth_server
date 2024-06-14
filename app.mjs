@@ -12,9 +12,7 @@ import adminRoutes from './admin/routes.mjs';
 import User from './models/User.mjs';
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 
-// Initialize Stripe with your secret key
 const stripe = Stripe('your-stripe-secret-key');
-
 const app = express();
 
 // Apply security headers
@@ -35,20 +33,19 @@ app.use(helmet({
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
-      'https://join-playware.com', // Main site
-      'http://localhost:3000'      // Local testing
+      'https://join-playware.com',
+      'http://localhost:3000'
     ];
 
-    // Allow requests from known origins or handle no origin (e.g., server-side scripts)
-    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'OPTIONS'], // Allow necessary methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow required headers
-  credentials: true // Allow credentials if needed
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 // Handle preflight (OPTIONS) requests globally
@@ -74,7 +71,7 @@ mongoose.connect(dbURI)
     console.error('Error Details:', err);
   });
 
-// Register route
+// Routes
 app.post('/register', async (req, res) => {
   const { email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -83,7 +80,6 @@ app.post('/register', async (req, res) => {
   res.send('User registered');
 });
 
-// Login route
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -95,7 +91,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Check subscription route
 app.post('/check-subscription', async (req, res) => {
   const token = req.headers.authorization.split(' ')[1];
   if (!token) {
@@ -114,7 +109,6 @@ app.post('/check-subscription', async (req, res) => {
   }
 });
 
-// Subscribe route
 app.post('/subscribe', async (req, res) => {
   const { token, planId } = req.body;
   const decoded = jwt.verify(req.headers.authorization.split(' ')[1], 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
