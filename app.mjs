@@ -6,6 +6,7 @@ import Stripe from 'stripe';
 import session from 'express-session';
 import bodyParser from 'body-parser';
 import flash from 'connect-flash';
+import cors from 'cors';
 import adminRoutes from './admin/routes.mjs'; // Ensure this path is correct
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 
@@ -19,6 +20,20 @@ app.use(flash());
 app.use(express.static(new URL('./public', import.meta.url).pathname));
 app.set('view engine', 'ejs');
 app.set('views', new URL('./views', import.meta.url).pathname);
+// Enable CORS for any Chrome extension
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || origin.startsWith('chrome-extension://')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+app.use(express.json());
 
 const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@127.0.0.1:27017/${DB_NAME}`;
 
