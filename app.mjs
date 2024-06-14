@@ -14,14 +14,7 @@ import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 const stripe = Stripe('your-stripe-secret-key'); // Initialize Stripe with your secret key
 
 const app = express();
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
-app.use(flash());
-app.use(express.static(new URL('./public', import.meta.url).pathname));
-app.set('view engine', 'ejs');
-app.set('views', new URL('./views', import.meta.url).pathname);
-// Enable CORS for any Chrome extension
+// Security headers with Helmet
 app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: true,
@@ -33,27 +26,15 @@ app.use(helmet({
     }
   }
 }));
+
+// CORS configuration
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
-      'https://join-playware.com',       // Main site
-      'http://localhost:3000'            // Local testing (adjust port as needed)
+      'https://join-playware.com',
+      'http://localhost:3000'
     ];
 
-    // Allow requests from known origins or handle no origin (e.g., server-side scripts)
-    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'OPTIONS'], // Allow necessary methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow required headers
-  credentials: true // Allow credentials if needed
-}));
-// Handle preflight (OPTIONS) requests
-app.options('*', cors({
-  origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
       callback(null, true);
     } else {
@@ -64,6 +45,20 @@ app.options('*', cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
+// Handle preflight (OPTIONS) requests globally
+app.options('*', cors());
+
+// Session and body parsing
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
+app.use(flash());
+
+// Static files and view engine
+app.use(express.static(new URL('./public', import.meta.url).pathname));
+app.set('view engine', 'ejs');
+app.set('views', new URL('./views', import.meta.url).pathname);
 app.use(express.json());
 
 const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@127.0.0.1:27017/${DB_NAME}`;
