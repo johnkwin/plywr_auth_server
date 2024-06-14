@@ -7,6 +7,7 @@ import session from 'express-session';
 import bodyParser from 'body-parser';
 import flash from 'connect-flash';
 import cors from 'cors';
+import helmet from 'helmet';
 import adminRoutes from './admin/routes.mjs'; // Ensure this path is correct
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 
@@ -21,6 +22,17 @@ app.use(express.static(new URL('./public', import.meta.url).pathname));
 app.set('view engine', 'ejs');
 app.set('views', new URL('./views', import.meta.url).pathname);
 // Enable CORS for any Chrome extension
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"]
+    }
+  }
+}));
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || origin.startsWith('chrome-extension://')) {
