@@ -35,7 +35,13 @@ app.use(helmet({
 }));
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || origin.startsWith('chrome-extension://')) {
+    const allowedOrigins = [
+      'https://join-playware.com',              // Allow your main site
+      'https://admin.join-playware.com',        // Allow admin dashboard
+    ];
+
+    // Allow requests from known origins or no origin (for local testing)
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -43,7 +49,7 @@ app.use(cors({
   },
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  credentials: true // Include credentials if needed
 }));
 app.use(express.json());
 
