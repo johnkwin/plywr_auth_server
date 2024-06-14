@@ -29,15 +29,15 @@ app.use(helmet({
   }
 }));
 
-// Enable CORS
+// CORS configuration
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
-      'https://join-playware.com',
-      'http://localhost:3000'
+      'https://join-playware.com', // Main site
+      'http://localhost:3000'      // Local testing
     ];
 
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
