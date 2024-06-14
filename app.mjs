@@ -9,37 +9,52 @@ import flash from 'connect-flash';
 import cors from 'cors';
 import helmet from 'helmet';
 import adminRoutes from './admin/routes.mjs';
+import User from './models/User.mjs';
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 
+// Initialize Stripe with your secret key
 const stripe = Stripe('your-stripe-secret-key');
+
 const app = express();
 
 // Apply security headers
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+      connectSrc: ["'self'", "https://join-playware.com"]
+    }
+  }
+}));
 
 // Enable CORS
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
-      'https://join-playware.com',
-      'http://localhost:3000'
+      'https://join-playware.com', // Main site
+      'http://localhost:3000'      // Local testing
     ];
 
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests from known origins or handle no origin (e.g., server-side scripts)
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  methods: ['GET', 'POST', 'OPTIONS'], // Allow necessary methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow required headers
+  credentials: true // Allow credentials if needed
 }));
 
 // Handle preflight (OPTIONS) requests globally
 app.options('*', cors());
 
-// Parsing and session management
+// Session and body parsing
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
@@ -59,9 +74,7 @@ mongoose.connect(dbURI)
     console.error('Error Details:', err);
   });
 
-import User from './models/User.mjs';
-
-// Routes
+// Register route
 app.post('/register', async (req, res) => {
   const { email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -70,6 +83,7 @@ app.post('/register', async (req, res) => {
   res.send('User registered');
 });
 
+// Login route
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -80,37 +94,49 @@ app.post('/login', async (req, res) => {
     res.status(400).send('Invalid credentials');
   }
 });
+
+// Check subscription route
 app.post('/check-subscription', async (req, res) => {
   const token = req.headers.authorization.split(' ')[1];
   if (!token) {
-      return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: 'Unauthorized' });
   }
   
   try {
-      const decoded = jwt.verify(token, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
-      const user = await User.findById(decoded.userId);
-      if (!user || !user.isActiveSubscription) {
-          return res.status(401).json({ message: 'Subscription expired' });
-      }
-      res.json({ valid: true });
+    const decoded = jwt.verify(token, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+    const user = await User.findById(decoded.userId);
+    if (!user || user.subscriptionStatus !== 'active') {
+      return res.status(401).json({ message: 'Subscription expired' });
+    }
+    res.json({ valid: true });
   } catch (error) {
-      res.status(401).json({ message: 'Unauthorized' });
+    res.status(401).json({ message: 'Unauthorized' });
   }
 });
+
+// Subscribe route
 app.post('/subscribe', async (req, res) => {
-const { token, planId } = req.body;
-const customer = await stripe.customers.create({
-  email: req.user.email,
-  source: token,
+  const { token, planId } = req.body;
+  const decoded = jwt.verify(req.headers.authorization.split(' ')[1], 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+  const user = await User.findById(decoded.userId);
+
+  if (!user) {
+    return res.status(401).json({ message: 'User not found' });
+  }
+
+  const customer = await stripe.customers.create({
+    email: user.email,
+    source: token,
+  });
+  const subscription = await stripe.subscriptions.create({
+    customer: customer.id,
+    items: [{ plan: planId }],
+  });
+  await User.findByIdAndUpdate(user._id, { subscriptionStatus: 'active' });
+  res.send('Subscription successful');
 });
-const subscription = await stripe.subscriptions.create({
-  customer: customer.id,
-  items: [{ plan: planId }],
-});
-await User.findByIdAndUpdate(req.user._id, { subscriptionStatus: 'active' });
-res.send('Subscription successful');
-});
-// Admin routes
+
+// Use admin routes
 app.use('/admin', adminRoutes);
 
 app.listen(3000, '0.0.0.0', () => console.log('Server running on port 3000'));
