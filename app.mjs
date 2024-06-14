@@ -8,15 +8,24 @@ import bodyParser from 'body-parser';
 import flash from 'connect-flash';
 import cors from 'cors';
 import helmet from 'helmet';
-import { createServer } from 'http';
+import fs from 'fs';
+import https from 'https';
+import { setupWebSocket } from './websocket.mjs';
 import adminRoutes from './admin/routes.mjs';
 import User from './models/User.mjs';
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
-import { setupWebSocket } from './websocket.mjs'; // Import the WebSocket setup function
 
 const stripe = Stripe('your-stripe-secret-key');
 const app = express();
-const server = createServer(app);
+
+// HTTPS server options
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/privkey.pem'), // Update with your key path
+  cert: fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/fullchain.pem') // Update with your cert path
+};
+
+// Create HTTPS server
+const server = https.createServer(options, app);
 
 // Setup WebSocket
 setupWebSocket(server);
