@@ -8,12 +8,16 @@ import bodyParser from 'body-parser';
 import flash from 'connect-flash';
 import cors from 'cors';
 import helmet from 'helmet';
+import { createServer } from 'http';
+import { WebSocketServer } from 'ws';
 import adminRoutes from './admin/routes.mjs';
 import User from './models/User.mjs';
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 
 const stripe = Stripe('your-stripe-secret-key');
 const app = express();
+const server = createServer(app);
+const wss = new WebSocketServer({ server });
 
 // Apply security headers
 app.use(helmet({
@@ -31,18 +35,16 @@ app.use(helmet({
 
 // Define allowed origins
 const allowedOrigins = [
-  'https://join-playware.com', // Main site
-  'http://localhost:3000',      // Local testing
+  'https://join-playware.com',
+  'http://localhost:3000',
   'https://localhost:3000',
   'http://0.0.0.0:3000',
   'https://0.0.0.0:3000'
 ];
 
-// Use dynamic origin function for CORS
 app.use(cors({
   origin: (origin, callback) => {
     console.log('CORS request from:', origin);
-    // Allow requests with no origin (like from server-side scripts) and those from allowed origins or Chrome extensions
     if (!origin || origin === 'null' || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
       callback(null, true);
     } else {
@@ -54,21 +56,16 @@ app.use(cors({
   credentials: true
 }));
 
-// Handle preflight (OPTIONS) requests globally
 app.options('*', cors());
-
-// Session and body parsing
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
 app.use(flash());
 
-// Static files and view engine
 app.use(express.static(new URL('./public', import.meta.url).pathname));
 app.set('view engine', 'ejs');
 app.set('views', new URL('./views', import.meta.url).pathname);
 
-// MongoDB connection
 const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@127.0.0.1:27017/${DB_NAME}`;
 mongoose.connect(dbURI)
   .then(() => console.log('Connected to MongoDB'))
@@ -77,7 +74,38 @@ mongoose.connect(dbURI)
     console.error('Error Details:', err);
   });
 
-// Routes
+const clients = new Map();
+
+wss.on('connection', (ws, req) => {
+  ws.on('message', (message) => {
+    const { token } = JSON.parse(message);
+    try {
+      const decoded = jwt.verify(token, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+      clients.set(decoded.userId, ws);
+    } catch (err) {
+      console.error('Invalid token:', err);
+    }
+  });
+  
+  ws.on('close', () => {
+    for (const [userId, clientWs] of clients.entries()) {
+      if (clientWs === ws) {
+        clients.delete(userId);
+        break;
+      }
+    }
+  });
+});
+
+// Function to notify a client
+function notifyClient(userId) {
+  const clientWs = clients.get(userId);
+  if (clientWs) {
+    clientWs.send(JSON.stringify({ action: 'logout' }));
+    clients.delete(userId);
+  }
+}
+
 app.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -146,8 +174,6 @@ app.post('/subscribe', async (req, res) => {
   res.send('Subscription successful');
 });
 
-// Use admin routes
 app.use('/admin', adminRoutes);
 
-// Start server
-app.listen(3000, '0.0.0.0', () => console.log('Server running on port 3000'));
+server.listen(3000, '0.0.0.0', () => console.log('Server running on port 3000'));
