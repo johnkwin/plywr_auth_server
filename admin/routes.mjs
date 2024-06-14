@@ -1,70 +1,142 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import User from '../models/User.mjs';
+import jwt from 'jsonwebtoken';
+import Stripe from 'stripe';
+import session from 'express-session';
+import bodyParser from 'body-parser';
+import flash from 'connect-flash';
+import cors from 'cors';
+import helmet from 'helmet';
+import adminRoutes from './admin/routes.mjs';
+import User from './models/User.mjs';
+import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 
-const router = express.Router();
+// Initialize Stripe with your secret key
+const stripe = Stripe('your-stripe-secret-key');
 
-// Middleware for checking authentication for admin routes
-function isAuthenticated(req, res, next) {
-    if (req.session.userId) {
-        return next();
+const app = express();
+
+// Apply security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+      connectSrc: ["'self'", "https://join-playware.com"]
     }
-    res.redirect('/admin/login');
-}
+  }
+}));
 
-// Admin login page
-router.get('/login', (req, res) => {
-    res.render('login', { message: req.flash('message') });
-});
+// Enable CORS
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'https://join-playware.com', // Main site
+      'http://localhost:3000'      // Local testing
+    ];
 
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    const admin = await User.findOne({ email, isAdmin: true });
-    if (admin && await bcrypt.compare(password, admin.password)) {
-        req.session.userId = admin._id;
-        res.redirect('/admin/dashboard');
+    // Allow requests from known origins or handle no origin (e.g., server-side scripts)
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
+      callback(null, true);
     } else {
-        req.flash('message', 'Invalid credentials');
-        res.redirect('/admin/login');
+      callback(new Error('Not allowed by CORS'));
     }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'], // Allow necessary methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow required headers
+  credentials: true // Allow credentials if needed
+}));
+
+// Handle preflight (OPTIONS) requests globally
+app.options('*', cors());
+
+// Session and body parsing
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
+app.use(flash());
+
+// Static files and view engine
+app.use(express.static(new URL('./public', import.meta.url).pathname));
+app.set('view engine', 'ejs');
+app.set('views', new URL('./views', import.meta.url).pathname);
+
+// MongoDB connection
+const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@127.0.0.1:27017/${DB_NAME}`;
+mongoose.connect(dbURI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => {
+    console.error('Failed to connect to MongoDB:', err.message);
+    console.error('Error Details:', err);
+  });
+
+// Register route
+app.post('/register', async (req, res) => {
+  const { email, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = new User({ email, password: hashedPassword });
+  await user.save();
+  res.send('User registered');
 });
 
-// Admin dashboard
-router.get('/dashboard', isAuthenticated, async (req, res) => {
-    const users = await User.find({});
-    res.render('dashboard', { users });
+// Login route
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (user && await bcrypt.compare(password, user.password)) {
+    const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+    res.json({ token });
+  } else {
+    res.status(400).send('Invalid credentials');
+  }
 });
 
-// Add or Edit User
-router.post('/user', isAuthenticated, async (req, res) => {
-    const { id, email, password, isAdmin } = req.body;
-    if (id) {
-        // Edit existing user
-        const user = await User.findById(id);
-        user.email = email;
-        user.isAdmin = isAdmin === 'on'; // Checkbox value handling
-        if (password) {
-            user.password = await bcrypt.hash(password, 10);
-        }
-        await user.save();
-    } else {
-        // Add new user
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({ email, password: hashedPassword, isAdmin: isAdmin === 'on' });
+// Check subscription route
+app.post('/check-subscription', async (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+    const user = await User.findById(decoded.userId);
+    if (!user || user.subscriptionStatus !== 'active') {
+      return res.status(401).json({ message: 'Subscription expired' });
     }
-    res.redirect('/admin/dashboard');
+    res.json({ valid: true });
+  } catch (error) {
+    res.status(401).json({ message: 'Unauthorized' });
+  }
 });
 
-// Delete User
-router.post('/user/delete', isAuthenticated, async (req, res) => {
-    await User.findByIdAndDelete(req.body.id);
-    res.redirect('/admin/dashboard');
+// Subscribe route
+app.post('/subscribe', async (req, res) => {
+  const { token, planId } = req.body;
+  const decoded = jwt.verify(req.headers.authorization.split(' ')[1], 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+  const user = await User.findById(decoded.userId);
+
+  if (!user) {
+    return res.status(401).json({ message: 'User not found' });
+  }
+
+  const customer = await stripe.customers.create({
+    email: user.email,
+    source: token,
+  });
+  const subscription = await stripe.subscriptions.create({
+    customer: customer.id,
+    items: [{ plan: planId }],
+  });
+  await User.findByIdAndUpdate(user._id, { subscriptionStatus: 'active' });
+  res.send('Subscription successful');
 });
 
-// Admin logout
-router.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/admin/login');
-});
+// Use admin routes
+app.use('/admin', adminRoutes);
 
-export default router;
+app.listen(3000, '0.0.0.0', () => console.log('Server running on port 3000'));
