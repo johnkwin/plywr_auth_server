@@ -36,20 +36,20 @@ app.use(helmet({
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
-      'https://join-playware.com',              // Allow your main site
-      'https://admin.join-playware.com',        // Allow admin dashboard
+      'https://join-playware.com',       // Main site
+      'http://localhost:3000'            // Local testing (adjust port as needed)
     ];
 
-    // Allow requests from known origins or no origin (for local testing)
+    // Allow requests from known origins or handle no origin (e.g., server-side scripts)
     if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true // Include credentials if needed
+  methods: ['GET', 'POST', 'OPTIONS'], // Allow necessary methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow required headers
+  credentials: true // Allow credentials if needed
 }));
 // Handle preflight (OPTIONS) requests
 app.options('*', cors({
