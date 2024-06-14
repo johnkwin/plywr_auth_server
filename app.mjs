@@ -21,7 +21,7 @@ app.use(helmet({
     useDefaults: true,
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "blob:"],
+      imgSrc: ["'self'", "data:", "blob:"], // Allow data and blob URIs for images
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:"],
       styleSrc: ["'self'", "'unsafe-inline'", "https:"],
       connectSrc: ["'self'", "https://join-playware.com"]
@@ -30,17 +30,17 @@ app.use(helmet({
 }));
 
 // CORS configuration
+const allowedOrigins = [
+  'https://join-playware.com', // Main site
+  'http://localhost:3000',      // Local testing
+  'https://localhost:3000',
+  'http://0.0.0.0:3000',
+  'https://0.0.0.0:3000'
+];
+
+// Use dynamic origin function for CORS to handle both Chrome extension and web requests
 app.use(cors({
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      'https://join-playware.com', // Main site
-      'http://join-playware.com', // Main site
-      'http://localhost:3000',      // Local testing  
-      'https://localhost:3000', 
-      'https://0.0.0.0:3000', 
-      'http://0.0.0.0:3000'      // Local testing
-    ];
-
     if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
       callback(null, true);
     } else {
@@ -77,21 +77,31 @@ mongoose.connect(dbURI)
 
 // Routes
 app.post('/register', async (req, res) => {
-  const { email, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = new User({ email, password: hashedPassword });
-  await user.save();
-  res.send('User registered');
+  try {
+    const { email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ email, password: hashedPassword });
+    await user.save();
+    res.send('User registered');
+  } catch (error) {
+    res.status(500).send('Server error');
+    console.error(error);
+  }
 });
 
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (user && await bcrypt.compare(password, user.password)) {
-    const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
-    res.json({ token });
-  } else {
-    res.status(400).send('Invalid credentials');
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (user && await bcrypt.compare(password, user.password)) {
+      const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+      res.json({ token });
+    } else {
+      res.status(400).send('Invalid credentials');
+    }
+  } catch (error) {
+    res.status(500).send('Server error');
+    console.error(error);
   }
 });
 

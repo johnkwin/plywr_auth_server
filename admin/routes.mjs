@@ -18,14 +18,19 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    const admin = await User.findOne({ email, isAdmin: true });
-    if (admin && await bcrypt.compare(password, admin.password)) {
-        req.session.userId = admin._id;
-        res.redirect('/admin/dashboard');
-    } else {
-        req.flash('message', 'Invalid credentials');
-        res.redirect('/admin/login');
+    try {
+        const { email, password } = req.body;
+        const admin = await User.findOne({ email, isAdmin: true });
+        if (admin && await bcrypt.compare(password, admin.password)) {
+            req.session.userId = admin._id;
+            res.redirect('/admin/dashboard');
+        } else {
+            req.flash('message', 'Invalid credentials');
+            res.redirect('/admin/login');
+        }
+    } catch (error) {
+        res.status(500).send('Server error');
+        console.error(error);
     }
 });
 
@@ -37,28 +42,38 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 
 // Add or Edit User
 router.post('/user', isAuthenticated, async (req, res) => {
-    const { id, email, password, isAdmin } = req.body;
-    if (id) {
-        // Edit existing user
-        const user = await User.findById(id);
-        user.email = email;
-        user.isAdmin = isAdmin === 'on'; // Checkbox value handling
-        if (password) {
-            user.password = await bcrypt.hash(password, 10);
+    try {
+        const { id, email, password, isAdmin } = req.body;
+        if (id) {
+            // Edit existing user
+            const user = await User.findById(id);
+            user.email = email;
+            user.isAdmin = isAdmin === 'on'; // Checkbox value handling
+            if (password) {
+                user.password = await bcrypt.hash(password, 10);
+            }
+            await user.save();
+        } else {
+            // Add new user
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await User.create({ email, password: hashedPassword, isAdmin: isAdmin === 'on' });
         }
-        await user.save();
-    } else {
-        // Add new user
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({ email, password: hashedPassword, isAdmin: isAdmin === 'on' });
+        res.redirect('/admin/dashboard');
+    } catch (error) {
+        res.status(500).send('Server error');
+        console.error(error);
     }
-    res.redirect('/admin/dashboard');
 });
 
 // Delete User
 router.post('/user/delete', isAuthenticated, async (req, res) => {
-    await User.findByIdAndDelete(req.body.id);
-    res.redirect('/admin/dashboard');
+    try {
+        await User.findByIdAndDelete(req.body.id);
+        res.redirect('/admin/dashboard');
+    } catch (error) {
+        res.status(500).send('Server error');
+        console.error(error);
+    }
 });
 
 // Admin logout
