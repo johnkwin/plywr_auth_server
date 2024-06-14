@@ -1,7 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.mjs';
-import { notifyClient } from '../app.mjs'; // Ensure this import path is correct
+import { notifyClient } from '../websocket.mjs'; // Ensure this import path is correct
 
 const router = express.Router();
 

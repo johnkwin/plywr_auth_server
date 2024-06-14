@@ -9,17 +9,18 @@ import flash from 'connect-flash';
 import cors from 'cors';
 import helmet from 'helmet';
 import { createServer } from 'http';
-import { WebSocketServer } from 'ws';
 import adminRoutes from './admin/routes.mjs';
 import User from './models/User.mjs';
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
+import { setupWebSocket } from './websocket.mjs'; // Import the WebSocket setup function
 
 const stripe = Stripe('your-stripe-secret-key');
 const app = express();
 const server = createServer(app);
-const wss = new WebSocketServer({ server });
 
-// Apply security headers
+// Setup WebSocket
+setupWebSocket(server);
+
 app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: true,
@@ -33,7 +34,6 @@ app.use(helmet({
   }
 }));
 
-// Define allowed origins
 const allowedOrigins = [
   'https://join-playware.com',
   'http://localhost:3000',
@@ -73,38 +73,6 @@ mongoose.connect(dbURI)
     console.error('Failed to connect to MongoDB:', err.message);
     console.error('Error Details:', err);
   });
-
-const clients = new Map();
-
-wss.on('connection', (ws, req) => {
-  ws.on('message', (message) => {
-    const { token } = JSON.parse(message);
-    try {
-      const decoded = jwt.verify(token, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
-      clients.set(decoded.userId, ws);
-    } catch (err) {
-      console.error('Invalid token:', err);
-    }
-  });
-  
-  ws.on('close', () => {
-    for (const [userId, clientWs] of clients.entries()) {
-      if (clientWs === ws) {
-        clients.delete(userId);
-        break;
-      }
-    }
-  });
-});
-
-// Function to notify a client
-function notifyClient(userId) {
-  const clientWs = clients.get(userId);
-  if (clientWs) {
-    clientWs.send(JSON.stringify({ action: 'logout' }));
-    clients.delete(userId);
-  }
-}
 
 app.post('/register', async (req, res) => {
   try {
