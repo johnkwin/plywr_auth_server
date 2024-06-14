@@ -29,7 +29,7 @@ app.use(helmet({
   }
 }));
 
-// CORS configuration
+// Define allowed origins
 const allowedOrigins = [
   'https://join-playware.com', // Main site
   'http://localhost:3000',      // Local testing
@@ -38,9 +38,10 @@ const allowedOrigins = [
   'https://0.0.0.0:3000'
 ];
 
-// Use dynamic origin function for CORS to handle both Chrome extension and web requests
+// Use dynamic origin function for CORS
 app.use(cors({
   origin: (origin, callback) => {
+    console.log('CORS request from:', origin);
     if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
       callback(null, true);
     } else {
@@ -51,6 +52,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
 
 // Handle preflight (OPTIONS) requests globally
 app.options('*', cors());
@@ -147,4 +149,5 @@ app.post('/subscribe', async (req, res) => {
 // Use admin routes
 app.use('/admin', adminRoutes);
 
+// Start server
 app.listen(3000, '0.0.0.0', () => console.log('Server running on port 3000'));
