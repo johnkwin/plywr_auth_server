@@ -21,7 +21,7 @@ app.use(helmet({
     useDefaults: true,
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "blob:"], // Allow data and blob URIs for images
+      imgSrc: ["'self'", "data:", "blob:"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:"],
       styleSrc: ["'self'", "'unsafe-inline'", "https:"],
       connectSrc: ["'self'", "https://join-playware.com"]
@@ -42,7 +42,8 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     console.log('CORS request from:', origin);
-    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
+    // Allow requests with no origin (like from server-side scripts) and those from allowed origins or Chrome extensions
+    if (!origin || origin === 'null' || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -52,7 +53,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
-
 
 // Handle preflight (OPTIONS) requests globally
 app.options('*', cors());
