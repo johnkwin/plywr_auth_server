@@ -34,7 +34,11 @@ app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
       'https://join-playware.com', // Main site
-      'http://localhost:3000'      // Local testing
+      'http://join-playware.com', // Main site
+      'http://localhost:3000',      // Local testing  
+      'https://localhost:3000', 
+      'https://0.0.0.0:3000', 
+      'http://0.0.0.0:3000'      // Local testing
     ];
 
     if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
