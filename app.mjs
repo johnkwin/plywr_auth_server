@@ -20,8 +20,8 @@ const app = express();
 
 // HTTPS server options
 const options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/privkey.pem'), // Update with your key path
-  cert: fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/fullchain.pem') // Update with your cert path
+  key: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/privkey.pem'), // Update with your key path
+  cert: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/fullchain.pem') // Update with your cert path
 };
 
 // Create HTTPS server
