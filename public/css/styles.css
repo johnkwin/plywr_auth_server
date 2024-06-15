@@ -126,3 +126,40 @@ button:hover {
     color: #dc3545;
     text-align: center;
 }
+.dashboard-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.user-form, .user-list {
+    margin-top: 20px;
+}
+.user-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+.user-form label {
+    display: block;
+    margin: 10px 0 5px;
+}
+.user-form input, .user-form select, .user-form button {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+.logout-button {
+    display: block;
+    margin-bottom: 20px;
+    text-align: right;
+}
+.edit-button, .delete-button {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 5px 10px;
+}
