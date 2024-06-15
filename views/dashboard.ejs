@@ -4,6 +4,44 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .dashboard-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .user-form, .user-list {
+            margin-top: 20px;
+        }
+        .user-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .user-form label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        .user-form input, .user-form select, .user-form button {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        .logout-button {
+            display: block;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        .edit-button, .delete-button {
+            margin-left: 10px;
+            padding: 5px 10px;
+        }
+    </style>
 </head>
 <body class="dashboard-page">
     <div class="dashboard-container">
@@ -11,7 +49,7 @@
         <a href="/admin/logout" class="logout-button">Logout</a>
 
         <h3>Users</h3>
-        <form action="/admin/user" method="POST" class="user-form">
+        <form action="/admin/user" method="POST" class="user-form" id="user-form">
             <input type="hidden" name="id" id="userId">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
@@ -34,7 +72,7 @@
                 <li>
                     <span><%= user.email %> - <%= user.isAdmin ? 'Admin' : 'User' %> - <%= user.subscriptionStatus %></span>
                     <div>
-                        <button class="edit-button" onclick="editUser('<%= user._id %>', '<%= user.email %>', <%= user.isAdmin %>, '<%= user.subscriptionStatus %>')">Edit</button>
+                        <button class="edit-button" data-id="<%= user._id %>" data-email="<%= user.email %>" data-isadmin="<%= user.isAdmin %>" data-subscriptionstatus="<%= user.subscriptionStatus %>">Edit</button>
                         <form action="/admin/user/delete" method="POST" class="delete-form" style="display:inline;">
                             <input type="hidden" name="id" value="<%= user._id %>">
                             <button type="submit" class="delete-button">Delete</button>
@@ -44,13 +82,6 @@
             <% }); %>
         </ul>
     </div>
-    <script>
-        function editUser(id, email, isAdmin, subscriptionStatus) {
-            document.getElementById('userId').value = id;
-            document.getElementById('email').value = email;
-            document.getElementById('isAdmin').checked = isAdmin;
-            document.getElementById('subscriptionStatus').value = subscriptionStatus;
-        }
-    </script>
+    <script src="/js/admin.js"></script> <!-- External JavaScript file -->
 </body>
 </html>
