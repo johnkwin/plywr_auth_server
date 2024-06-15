@@ -37,27 +37,40 @@ router.post('/login', async (req, res) => {
 
 // Admin dashboard
 router.get('/dashboard', isAuthenticated, async (req, res) => {
-    const users = await User.find({});
-    res.render('dashboard', { users });
+    try {
+        const users = await User.find({});
+        res.render('dashboard', { users });
+    } catch (error) {
+        res.status(500).send('Server error');
+        console.error(error);
+    }
 });
 
 // Add or Edit User
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
-        const { id, email, password, isAdmin } = req.body;
+        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
         if (id) {
             // Edit existing user
             const user = await User.findById(id);
-            user.email = email;
-            user.isAdmin = isAdmin === 'on'; // Checkbox value handling
-            if (password) {
-                user.password = await bcrypt.hash(password, 10);
+            if (user) {
+                user.email = email;
+                user.isAdmin = isAdmin === 'on'; // Checkbox value handling
+                user.subscriptionStatus = subscriptionStatus || user.subscriptionStatus;
+                if (password) {
+                    user.password = await bcrypt.hash(password, 10);
+                }
+                await user.save();
             }
-            await user.save();
         } else {
             // Add new user
             const hashedPassword = await bcrypt.hash(password, 10);
-            await User.create({ email, password: hashedPassword, isAdmin: isAdmin === 'on' });
+            await User.create({
+                email,
+                password: hashedPassword,
+                isAdmin: isAdmin === 'on',
+                subscriptionStatus
+            });
         }
         res.redirect('/admin/dashboard');
     } catch (error) {

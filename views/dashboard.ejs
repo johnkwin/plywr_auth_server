@@ -9,6 +9,7 @@
     <div class="dashboard-container">
         <h2>Admin Dashboard</h2>
         <a href="/admin/logout" class="logout-button">Logout</a>
+
         <h3>Users</h3>
         <form action="/admin/user" method="POST" class="user-form">
             <input type="hidden" name="id" id="userId">
@@ -18,27 +19,37 @@
             <input type="password" id="password" name="password">
             <label for="isAdmin">Admin:</label>
             <input type="checkbox" id="isAdmin" name="isAdmin">
+            <label for="subscriptionStatus">Subscription Status:</label>
+            <select id="subscriptionStatus" name="subscriptionStatus">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <!-- Add more options if necessary -->
+            </select>
             <button type="submit">Save User</button>
         </form>
+
         <h3>User List</h3>
         <ul class="user-list">
             <% users.forEach(user => { %>
                 <li>
-                    <%= user.email %> - <%= user.isAdmin ? 'Admin' : 'User' %>
-                    <button class="edit-button" onclick="editUser('<%= user._id %>', '<%= user.email %>', <%= user.isAdmin %>)">Edit</button>
-                    <form action="/admin/user/delete" method="POST" class="delete-form">
-                        <input type="hidden" name="id" value="<%= user._id %>">
-                        <button type="submit" class="delete-button">Delete</button>
-                    </form>
+                    <span><%= user.email %> - <%= user.isAdmin ? 'Admin' : 'User' %> - <%= user.subscriptionStatus %></span>
+                    <div>
+                        <button class="edit-button" onclick="editUser('<%= user._id %>', '<%= user.email %>', <%= user.isAdmin %>, '<%= user.subscriptionStatus %>')">Edit</button>
+                        <form action="/admin/user/delete" method="POST" class="delete-form" style="display:inline;">
+                            <input type="hidden" name="id" value="<%= user._id %>">
+                            <button type="submit" class="delete-button">Delete</button>
+                        </form>
+                    </div>
                 </li>
             <% }); %>
         </ul>
     </div>
     <script>
-        function editUser(id, email, isAdmin) {
+        function editUser(id, email, isAdmin, subscriptionStatus) {
             document.getElementById('userId').value = id;
             document.getElementById('email').value = email;
             document.getElementById('isAdmin').checked = isAdmin;
+            document.getElementById('subscriptionStatus').value = subscriptionStatus;
         }
     </script>
 </body>
