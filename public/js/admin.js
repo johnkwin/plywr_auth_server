@@ -1,59 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive meta tag -->
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body class="dashboard-page">
-    <div class="dashboard-container">
-        <h2>Admin Dashboard</h2>
-        <a href="/admin/logout" class="logout-button">Logout</a>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('search-input');
+    const userList = document.getElementById('user-list');
 
-        <h3>Users</h3>
-        <form action="/admin/user" method="POST" class="user-form" id="user-form">
-            <input type="hidden" name="id" id="userId">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password">
-            <label for="isAdmin">Admin:</label>
-            <input type="checkbox" id="isAdmin" name="isAdmin">
-            <label for="subscriptionStatus">Subscription Status:</label>
-            <select id="subscriptionStatus" name="subscriptionStatus">
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <!-- Add more options if necessary -->
-            </select>
-            <button type="submit">Save User</button>
-        </form>
+    searchInput.addEventListener('input', searchUsers);
 
-        <h3>User List</h3>
-        <ul class="user-list">
-            <% users.forEach(user => { %>
-                <li>
-                    <span><%= user.email %> - <%= user.isAdmin ? 'Admin' : 'User' %> - <%= user.subscriptionStatus %></span>
-                    <div>
-                        <button class="edit-button" data-id="<%= user._id %>" data-email="<%= user.email %>" data-isadmin="<%= user.isAdmin %>" data-subscriptionstatus="<%= user.subscriptionStatus %>">Edit</button>
-                        <form action="/admin/user/delete" method="POST" class="delete-form">
-                            <input type="hidden" name="id" value="<%= user._id %>">
-                            <button type="submit" class="delete-button">Delete</button>
-                        </form>
-                    </div>
-                </li>
-            <% }); %>
-        </ul>
-    </div>
-    <script>
-        document.querySelectorAll('.edit-button').forEach(button => {
-            button.addEventListener('click', function() {
-                document.getElementById('userId').value = this.dataset.id;
-                document.getElementById('email').value = this.dataset.email;
-                document.getElementById('isAdmin').checked = this.dataset.isadmin === 'true';
-                document.getElementById('subscriptionStatus').value = this.dataset.subscriptionstatus;
+    function searchUsers() {
+        const query = searchInput.value.trim();
+        fetch(`/admin/search-users?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(users => {
+                userList.innerHTML = '';
+                users.forEach(user => {
+                    const userItem = document.createElement('li');
+                    userItem.innerHTML = `
+                        <span>
+                            <input type="email" value="${user.email}" class="user-email" data-id="${user._id}">
+                            <input type="checkbox" ${user.isAdmin ? 'checked' : ''} class="user-isAdmin" data-id="${user._id}">
+                            <select class="user-subscriptionStatus" data-id="${user._id}">
+                                <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
+                                <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
+                            </select>
+                        </span>
+                        <button class="confirm-button" data-id="${user._id}">Confirm</button>
+                    `;
+                    userList.appendChild(userItem);
+                });
+                attachEventListeners();
+            });
+    }
+
+    function attachEventListeners() {
+        document.querySelectorAll('.confirm-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = this.dataset.id;
+                const email = document.querySelector(`.user-email[data-id="${userId}"]`).value;
+                const isAdmin = document.querySelector(`.user-isAdmin[data-id="${userId}"]`).checked;
+                const subscriptionStatus = document.querySelector(`.user-subscriptionStatus[data-id="${userId}"]`).value;
+
+                fetch(`/admin/update-user/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, isAdmin, subscriptionStatus })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('User updated successfully!');
+                        } else {
+                            alert('Failed to update user.');
+                        }
+                    });
             });
         });
-    </script>
-</body>
-</html>
+    }
+});

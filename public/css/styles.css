@@ -171,3 +171,34 @@ h3 {
         width: 100%;
     }
 }
+/* Additional CSS for search and inline editing */
+#search-input {
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 20px;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.user-list input[type="email"],
+.user-list input[type="checkbox"],
+.user-list select {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    margin-right: 5px;
+}
+
+.confirm-button {
+    background: #28a745;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm-button:hover {
+    background: #218838;
+}
