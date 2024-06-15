@@ -12,13 +12,12 @@ html, body {
     font-family: Arial, sans-serif;
 }
 
-/* Centering Flexbox */
 body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #f4f4f9; /* Light background for a clean look */
-    padding: 20px;
+    height: 100vh;
+    background: #f0f0f0;
 }
 
 .dashboard-page {
@@ -26,6 +25,7 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
+    height: 100%;
 }
 
 .dashboard-container {
@@ -33,161 +33,108 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 800px; /* Ensure it doesn't exceed screen width */
-    display: flex;
-    flex-direction: column;
-}
-
-h2 {
-    margin-bottom: 20px;
-    font-size: 1.5em;
-    color: #333;
-}
-
-a.logout-button {
-    background: #dc3545;
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    text-decoration: none;
+    width: 90%;
+    max-width: 800px;
     text-align: center;
-    align-self: flex-end; /* Align logout button to the right */
+}
+
+h2, h3 {
     margin-bottom: 20px;
 }
 
-a.logout-button:hover {
-    background: #c82333;
-}
-
-.user-form {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-    gap: 15px; /* Space between form elements */
-}
-
-.user-form label {
-    text-align: left;
-    font-weight: bold;
-}
-
-.user-form input[type="email"],
-.user-form input[type="password"],
-.user-form input[type="checkbox"],
-.user-form select,
-.user-form button {
+input[type="text"], input[type="email"], select {
     padding: 10px;
+    width: 100%;
+    max-width: 250px;
+    margin-bottom: 10px;
+    font-size: 1em;
     border: 1px solid #ddd;
     border-radius: 5px;
-    width: 100%;
-    font-size: 1em;
+    box-sizing: border-box;
 }
 
-.user-form input[type="checkbox"] {
-    width: auto;
+input[type="text"]#search-input {
+    max-width: 600px;
 }
 
-.user-form button {
+button, .toggle-admin {
+    margin-top: 10px;
+    padding: 10px;
     background: #007bff;
     color: #fff;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100px;
 }
 
-.user-form button:hover {
+button:hover {
     background: #0056b3;
 }
 
-h3 {
-    font-size: 1.2em;
-    color: #333;
-    margin-bottom: 15px;
+.toggle-admin.on {
+    background: #28a745;
+}
+
+.toggle-admin.off {
+    background: #dc3545;
+}
+
+.logout-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #dc3545;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    width: 100%;
+    max-width: 100px;
+    box-sizing: border-box;
+}
+
+.logout-button:hover {
+    background: #c82333;
+}
+
+.user-list-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 2px solid #ddd;
+    font-weight: bold;
 }
 
 .user-list {
     list-style-type: none;
     padding: 0;
     width: 100%;
-    margin-top: 10px;
 }
 
-.user-list li {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
+.user-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px; /* Space between list elements */
-}
-
-.user-list li span {
-    flex: 1; /* Allow span to take up remaining space */
-    word-break: break-all;
-}
-
-.user-list li div {
-    display: flex;
-    gap: 10px; /* Space between buttons */
-}
-
-.edit-button, .delete-button {
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #f4f4f9;
-    cursor: pointer;
-    color: #333;
-}
-
-.edit-button:hover, .delete-button:hover {
-    background: #e2e2e9;
-}
-
-@media (max-width: 768px) {
-    .dashboard-container {
-        padding: 10px;
-    }
-
-    .user-form, .user-list li {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .user-list li div {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .edit-button, .delete-button {
-        width: 100%;
-        margin-top: 5px;
-    }
-
-    .logout-button {
-        width: 100%;
-    }
-}
-/* Additional CSS for search and inline editing */
-#search-input {
     padding: 10px;
-    width: 100%;
-    margin-bottom: 20px;
-    font-size: 1em;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 5px;
+    margin: 10px 0;
+    background: #fff;
 }
 
-.user-list input[type="email"],
-.user-list input[type="checkbox"],
-.user-list select {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 5px;
-    margin-right: 5px;
+.user-item span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.user-item input[type="email"], .user-item select, .user-item .toggle-admin {
+    max-width: 200px;
+    margin-right: 10px;
 }
 
 .confirm-button {
@@ -197,8 +144,36 @@ h3 {
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
+    display: none; /* Hidden by default */
 }
 
 .confirm-button:hover {
     background: #218838;
+}
+
+@media (max-width: 600px) {
+    .dashboard-container {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .user-list-header, .user-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-item span {
+        width: 100%;
+    }
+
+    .user-item input[type="email"], .user-item select, .user-item .toggle-admin {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .confirm-button {
+        width: 100%;
+        max-width: 100%;
+    }
 }
