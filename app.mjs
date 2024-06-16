@@ -70,7 +70,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
 app.use(flash());
-
 app.use(express.static(new URL('./public', import.meta.url).pathname));
 app.set('view engine', 'ejs');
 app.set('views', new URL('./views', import.meta.url).pathname);

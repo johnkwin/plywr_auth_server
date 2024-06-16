@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserPassword = document.getElementById('newUserPassword');
     const newUserForm = document.getElementById('newUserForm');
     const newUserAdmin = document.getElementById('newUserAdmin');
-    const newUserSubscriptionStatus = document.getElementById('newUserSubscriptionStatus');
+    const newUserSubscriptionStatus = document.getElementById('new-user-subscription-status');
 
     if (searchUsers) {
         searchUsers.addEventListener('input', handleSearch);
@@ -27,13 +27,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        console.error('Error adding user:', response);
+                        throw new Error('Error adding user');
+                    }
+                })
                 .then(data => {
                     console.log('User added:', data);
                     newUserEmail.value = '';
                     newUserPassword.value = '';
-                    newUserForm.style.display = 'none';
-                    handleSearch({ target: { value: '' } });
+                    newUserForm.style.display = 'none'; // Hide the form after adding a user
+                    handleSearch({ target: { value: '' } }); // Refresh user list
                 })
                 .catch(error => console.error('Error adding user:', error));
             } else {
@@ -51,29 +58,35 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (userList) {
-        userList.addEventListener('click', handleUserChange);
+        userList.addEventListener('input', handleUserChange);
         userList.addEventListener('change', handleUserChange);
-        userList.addEventListener('click', confirmChanges);
     }
 
     function handleSearch(event) {
         const query = event.target.value;
         if (query.trim() === '') {
-            userList.innerHTML = '';
-            newUserForm.style.display = 'block';
+            userList.innerHTML = ''; // Clear list if query is empty
+            newUserForm.style.display = 'block'; // Show new user form
             return;
         }
 
         fetch(`/admin/search-users?q=${encodeURIComponent(query)}`)
-            .then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    console.error('Error searching users:', response);
+                    throw new Error('Error searching users');
+                }
+            })
             .then(users => {
-                userList.innerHTML = '';
-                newUserForm.style.display = 'none';
+                userList.innerHTML = ''; // Clear the list before updating
+                newUserForm.style.display = 'none'; // Hide new user form
 
                 users.forEach(user => {
                     const listItem = document.createElement('div');
                     listItem.className = 'user-list-item';
-                    listItem.dataset.userid = user._id;
+                    listItem.dataset.userid = user._id; // Add user ID to dataset
                     listItem.innerHTML = `
                         <input type="text" value="${user.email}" readonly>
                         <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
@@ -91,11 +104,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleUserChange(event) {
-        if (event.target.matches('select[data-userid]')) {
-            const selectElement = event.target;
-            const confirmButton = selectElement.nextElementSibling;
-
-            if (selectElement.value === 'delete') {
+        const target = event.target;
+        if (target.matches('select[data-userid]') || target.matches('.toggle-button')) {
+            const listItem = target.closest('.user-list-item');
+            const confirmButton = listItem.querySelector('.confirm-changes-button');
+            if (target.value === 'delete') {
                 confirmButton.textContent = 'Confirm Deletion';
                 confirmButton.classList.add('confirm-deletion');
             } else {
@@ -103,28 +116,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 confirmButton.classList.remove('confirm-deletion');
             }
             confirmButton.style.display = 'inline-block';
-        } else if (event.target.matches('.toggle-button')) {
-            const button = event.target;
-            button.classList.toggle('active');
-            button.classList.toggle('off');
-            button.textContent = button.classList.contains('active') ? 'On' : 'Off';
-
-            const confirmButton = button.nextElementSibling.nextElementSibling;
-            confirmButton.style.display = 'inline-block';
         }
     }
 
-    function confirmChanges(event) {
+    userList.addEventListener('click', function (event) {
         if (event.target.matches('.confirm-changes-button')) {
-            const button = event.target;
-            const listItem = button.closest('.user-list-item');
-            const userId = listItem.dataset.userid;
-            const isAdminButton = listItem.querySelector('.toggle-button');
-            const subscriptionSelect = listItem.querySelector('select');
-            const isAdmin = isAdminButton.classList.contains('active');
-            const subscriptionStatus = subscriptionSelect.value;
+            confirmChanges(event.target);
+        }
+    });
 
-            fetch(`/admin/update-user/${encodeURIComponent(userId)}`, {
+    function confirmChanges(button) {
+        const listItem = button.closest('.user-list-item');
+        const userId = listItem.dataset.userid;
+        const isAdminButton = listItem.querySelector('.toggle-button');
+        const subscriptionSelect = listItem.querySelector('select');
+        const isAdmin = isAdminButton.classList.contains('active');
+        const subscriptionStatus = subscriptionSelect.value;
+
+        if (subscriptionStatus === 'delete') {
+            fetch(`/admin/user/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: userId })
+            })
+            .then(response => {
+                if (response.ok) {
+                    listItem.remove(); // Remove the user from the list
+                } else {
+                    console.error('Error deleting user:', response);
+                    throw new Error('Error deleting user');
+                }
+            })
+            .catch(error => console.error('Error deleting user:', error));
+        } else {
+            fetch(`/admin/update-user/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -132,13 +159,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify({ isAdmin, subscriptionStatus })
             })
             .then(response => {
-                if (!response.ok) {
+                if (response.ok) {
+                    button.style.display = 'none'; // Hide confirm button
+                } else {
+                    console.error('Error updating user:', response);
                     throw new Error('Error updating user');
                 }
-                button.style.display = 'none';
             })
             .catch(error => console.error('Error updating user:', error));
         }
     }
 });
-
