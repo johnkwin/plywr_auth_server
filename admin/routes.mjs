@@ -5,7 +5,6 @@ import { notifyClient } from '../websocket.mjs';
 
 const router = express.Router();
 
-// Middleware for checking authentication for admin routes
 function isAuthenticated(req, res, next) {
     if (req.session.userId) {
         return next();
@@ -13,7 +12,6 @@ function isAuthenticated(req, res, next) {
     res.redirect('/admin/login');
 }
 
-// Admin login page
 router.get('/login', (req, res) => {
     res.render('login', { message: req.flash('message') });
 });
@@ -35,56 +33,48 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Admin dashboard
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     const users = await User.find({});
     res.render('dashboard', { users });
 });
 
-// Add or Edit User
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
         if (id) {
-            // Edit existing user
             const user = await User.findById(id);
             user.email = email;
-            user.isAdmin = isAdmin === 'true'; // Ensure boolean
+            user.isAdmin = isAdmin === 'on';
             if (password) {
                 user.password = await bcrypt.hash(password, 10);
             }
             user.subscriptionStatus = subscriptionStatus;
             await user.save();
+            res.json({ success: true });
         } else {
-            // Add new user
             const hashedPassword = await bcrypt.hash(password, 10);
             await User.create({
                 email,
                 password: hashedPassword,
-                isAdmin: isAdmin === 'true',
+                isAdmin: isAdmin === 'on',
                 subscriptionStatus: subscriptionStatus
             });
+            res.json({ success: true });
         }
-        res.redirect('/admin/dashboard');
     } catch (error) {
-        res.status(500).send('Server error');
+        res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
 });
 
-// Update or edit user
 router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
-    const { id } = req.params;
-    const { email, isAdmin, subscriptionStatus, password } = req.body;
     try {
+        const { id } = req.params;
+        const { isAdmin, subscriptionStatus } = req.body;
         const user = await User.findById(id);
         if (user) {
-            user.email = email;
-            user.isAdmin = isAdmin === 'true'; // Ensure boolean
+            user.isAdmin = isAdmin === 'true';
             user.subscriptionStatus = subscriptionStatus;
-            if (password) {
-                user.password = await bcrypt.hash(password, 10);
-            }
             await user.save();
             notifyClient(user._id.toString());
             res.json({ success: true });
@@ -97,8 +87,6 @@ router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
     }
 });
 
-
-// Search users
 router.get('/search-users', isAuthenticated, async (req, res) => {
     const query = req.query.q;
     try {
@@ -107,27 +95,27 @@ router.get('/search-users', isAuthenticated, async (req, res) => {
         }).select('email isAdmin subscriptionStatus');
         res.json(users);
     } catch (error) {
-        res.status(500).send('Server error');
+        res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
 });
 
-// Delete User
 router.post('/user/delete', isAuthenticated, async (req, res) => {
     try {
         const user = await User.findById(req.body.id);
         if (user) {
             await User.findByIdAndDelete(req.body.id);
             notifyClient(user._id.toString());
+            res.json({ success: true });
+        } else {
+            res.status(404).json({ success: false, message: 'User not found' });
         }
-        res.redirect('/admin/dashboard');
     } catch (error) {
-        res.status(500).send('Server error');
+        res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
 });
 
-// Admin logout
 router.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/admin/login');

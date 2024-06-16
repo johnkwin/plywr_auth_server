@@ -29,14 +29,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
                 })
-                .then(response => {
-                    if (response.ok) {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
                         newUserEmail.value = '';
                         newUserPassword.value = '';
                         newUserForm.style.display = 'none'; // Hide the form after adding a user
                         handleSearch({ target: { value: '' } }); // Refresh user list
                     } else {
-                        console.error('Error adding user:', response);
+                        console.error('Error adding user:', data.message);
                     }
                 })
                 .catch(error => console.error('Error adding user:', error));
@@ -147,11 +148,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ id: userId })
             })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
                     listItem.remove(); // Remove the user from the list
                 } else {
-                    console.error('Error deleting user:', response);
+                    console.error('Error deleting user:', data.message);
                 }
             })
             .catch(error => console.error('Error deleting user:', error));
@@ -163,11 +165,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ isAdmin, subscriptionStatus })
             })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
                     button.style.display = 'none'; // Hide confirm button
                 } else {
-                    console.error('Error updating user:', response);
+                    console.error('Error updating user:', data.message);
                 }
             })
             .catch(error => console.error('Error updating user:', error));
