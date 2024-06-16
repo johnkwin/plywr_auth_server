@@ -124,9 +124,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (selectElement.value === 'delete') {
             confirmButton.textContent = 'Confirm Deletion';
             confirmButton.classList.add('confirm-deletion');
+            confirmButton.style.backgroundColor = '#dc3545';
         } else {
             confirmButton.textContent = 'Confirm Changes';
             confirmButton.classList.remove('confirm-deletion');
+            confirmButton.style.backgroundColor = '#28a745';
         }
         confirmButton.style.display = 'inline-block';
     }

@@ -67,6 +67,19 @@ router.post('/user', isAuthenticated, async (req, res) => {
     }
 });
 
+router.get('/search-users', isAuthenticated, async (req, res) => {
+    const query = req.query.q;
+    try {
+        const users = await User.find({
+            email: { $regex: query, $options: 'i' }
+        }).select('email isAdmin subscriptionStatus');
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+        console.error(error);
+    }
+});
+
 router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
     try {
         const { id } = req.params;
@@ -81,19 +94,6 @@ router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
-    }
-});
-
-router.get('/search-users', isAuthenticated, async (req, res) => {
-    const query = req.query.q;
-    try {
-        const users = await User.find({
-            email: { $regex: query, $options: 'i' }
-        }).select('email isAdmin subscriptionStatus');
-        res.json(users);
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
