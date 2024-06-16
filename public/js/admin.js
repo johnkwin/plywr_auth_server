@@ -27,20 +27,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
                 })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json(); // Properly parse JSON
-                    } else {
-                        console.error('Error adding user:', response);
-                        throw new Error('Error adding user');
-                    }
-                })
+                .then(response => response.json())
                 .then(data => {
                     console.log('User added:', data);
                     newUserEmail.value = '';
                     newUserPassword.value = '';
-                    newUserForm.style.display = 'none'; // Hide the form after adding a user
-                    handleSearch({ target: { value: '' } }); // Refresh user list
+                    newUserForm.style.display = 'none';
+                    handleSearch({ target: { value: '' } });
                 })
                 .catch(error => console.error('Error adding user:', error));
             } else {
@@ -66,28 +59,21 @@ document.addEventListener('DOMContentLoaded', function () {
     function handleSearch(event) {
         const query = event.target.value;
         if (query.trim() === '') {
-            userList.innerHTML = ''; // Clear list if query is empty
-            newUserForm.style.display = 'block'; // Show new user form
+            userList.innerHTML = '';
+            newUserForm.style.display = 'block';
             return;
         }
 
         fetch(`/admin/search-users?q=${encodeURIComponent(query)}`)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    console.error('Error searching users:', response);
-                    throw new Error('Error searching users');
-                }
-            })
+            .then(response => response.json())
             .then(users => {
-                userList.innerHTML = ''; // Clear the list before updating
-                newUserForm.style.display = 'none'; // Hide new user form
+                userList.innerHTML = '';
+                newUserForm.style.display = 'none';
 
                 users.forEach(user => {
                     const listItem = document.createElement('div');
                     listItem.className = 'user-list-item';
-                    listItem.dataset.userid = user._id; // Add user ID to dataset
+                    listItem.dataset.userid = user._id;
                     listItem.innerHTML = `
                         <input type="text" value="${user.email}" readonly>
                         <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
@@ -123,8 +109,8 @@ document.addEventListener('DOMContentLoaded', function () {
             button.classList.toggle('off');
             button.textContent = button.classList.contains('active') ? 'On' : 'Off';
 
-            const confirmButton = button.nextElementSibling.nextElementSibling; // Find the confirm button
-            confirmButton.style.display = 'inline-block'; // Show the confirm button
+            const confirmButton = button.nextElementSibling.nextElementSibling;
+            confirmButton.style.display = 'inline-block';
         }
     }
 
@@ -147,12 +133,12 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => {
                 if (!response.ok) {
-                    console.error('Error updating user:', response);
                     throw new Error('Error updating user');
                 }
-                button.style.display = 'none'; // Hide confirm button
+                button.style.display = 'none';
             })
             .catch(error => console.error('Error updating user:', error));
         }
     }
 });
+
