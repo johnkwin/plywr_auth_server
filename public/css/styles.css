@@ -166,8 +166,7 @@ select {
     border-radius: 5px;
     cursor: pointer;
     visibility: hidden;
-    position: relative;
-    left: 10px;
+    margin-left: auto;
 }
 
 .confirm-changes-button.visible {

@@ -73,12 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const isAdmin = listItem.querySelector('.toggle-button').classList.contains('active');
         const subscriptionStatus = listItem.querySelector('select').value;
 
-        await fetch('/admin/update-user', {
-            method: 'POST',
+        const response = await fetch(`/admin/user/${userId}`, {
+            method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: userId, isAdmin, subscriptionStatus })
+            body: JSON.stringify({ isAdmin, subscriptionStatus })
         });
 
-        button.classList.remove('visible');
+        if (response.ok) {
+            button.classList.remove('visible');
+        } else {
+            console.error('Failed to update user');
+        }
     };
 });
