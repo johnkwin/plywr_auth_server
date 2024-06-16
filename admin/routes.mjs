@@ -48,15 +48,13 @@ router.post('/user', isAuthenticated, async (req, res) => {
         if (id) {
             // Edit existing user
             const user = await User.findById(id);
-            if (user) {
-                user.email = email;
-                user.isAdmin = isAdmin === 'true'; // Handle boolean value
-                if (password) {
-                    user.password = await bcrypt.hash(password, 10);
-                }
-                user.subscriptionStatus = subscriptionStatus;
-                await user.save();
+            user.email = email;
+            user.isAdmin = isAdmin === 'true'; // Ensure boolean
+            if (password) {
+                user.password = await bcrypt.hash(password, 10);
             }
+            user.subscriptionStatus = subscriptionStatus;
+            await user.save();
         } else {
             // Add new user
             const hashedPassword = await bcrypt.hash(password, 10);
@@ -73,22 +71,16 @@ router.post('/user', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
-// Update user route (updated to use PATCH instead of POST)
-router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
-    const { id } = req.params;
-    const { email, isAdmin, subscriptionStatus, password } = req.body;
 
+// Update user
+router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
     try {
+        const { id } = req.params;
+        const { isAdmin, subscriptionStatus } = req.body;
         const user = await User.findById(id);
         if (user) {
-            user.email = email;
-            user.isAdmin = isAdmin === 'true'; // Ensure boolean value
+            user.isAdmin = isAdmin === 'true'; // Ensure boolean
             user.subscriptionStatus = subscriptionStatus;
-
-            if (password) {
-                user.password = await bcrypt.hash(password, 10);
-            }
-
             await user.save();
             notifyClient(user._id.toString());
             res.json({ success: true });
@@ -100,7 +92,6 @@ router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
-
 
 // Search users
 router.get('/search-users', isAuthenticated, async (req, res) => {
