@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.confirmChanges = async (button) => {
         const userId = button.getAttribute('data-userid');
         const listItem = button.parentNode;
-        const isAdmin = listItem.querySelector('.toggle-button').classList.contains('active');
+        const isAdmin = listItem.querySelector('.toggle-button').classList.contains('active').toString();
         const subscriptionStatus = listItem.querySelector('select').value;
 
         const response = await fetch(`/admin/user/${userId}`, {
