@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserEmail = document.getElementById('newUserEmail');
     const newUserPassword = document.getElementById('newUserPassword');
     const newUserForm = document.getElementById('newUserForm');
-    let changesToConfirm = {}; // Track changes to confirm
+    const newUserAdmin = document.getElementById('new-user-admin');
+    const newUserSubscriptionStatus = document.getElementById('new-user-subscription-status');
 
     function handleSearch(event) {
         const query = event.target.value;
@@ -105,30 +106,40 @@ document.addEventListener('DOMContentLoaded', function () {
     saveNewUserButton.addEventListener('click', function () {
         const email = newUserEmail.value.trim();
         const password = newUserPassword.value.trim();
-        const isAdmin = document.getElementById('new-user-admin').classList.contains('active');
-        const subscriptionStatus = document.getElementById('new-user-subscription-status').value;
+        const isAdmin = newUserAdmin.classList.contains('active');
+        const subscriptionStatus = newUserSubscriptionStatus.value;
 
-        fetch('/admin/user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
-        })
-        .then(response => {
-            if (response.ok) {
-                newUserEmail.value = '';
-                newUserPassword.value = '';
-                newUserForm.style.display = 'none'; // Hide the form after adding a user
-                handleSearch({ target: { value: '' } }); // Refresh user list
-            } else {
-                console.error('Error adding user:', response);
-            }
-        })
-        .catch(error => console.error('Error adding user:', error));
+        if (email && password) {
+            fetch('/admin/user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
+            })
+            .then(response => {
+                if (response.ok) {
+                    newUserEmail.value = '';
+                    newUserPassword.value = '';
+                    newUserForm.style.display = 'none'; // Hide the form after adding a user
+                    handleSearch({ target: { value: '' } }); // Refresh user list
+                } else {
+                    console.error('Error adding user:', response);
+                }
+            })
+            .catch(error => console.error('Error adding user:', error));
+        } else {
+            alert('Please fill out all fields.');
+        }
     });
 
-    // Toggle admin status
+    // Toggle admin status for new user
+    newUserAdmin.addEventListener('click', function () {
+        newUserAdmin.classList.toggle('active');
+        newUserAdmin.textContent = newUserAdmin.classList.contains('active') ? 'On' : 'Off';
+    });
+
+    // Toggle admin status for existing users
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('toggle-button')) {
             const button = event.target;
