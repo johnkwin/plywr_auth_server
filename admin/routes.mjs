@@ -73,25 +73,26 @@ router.post('/user', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
-
 // Update user
 router.post('/update-user/:id', isAuthenticated, async (req, res) => {
     try {
         const { id } = req.params;
-        const { isAdmin, subscriptionStatus } = req.body;
+        const { isAdmin, subscriptionStatus, email } = req.body;
         const user = await User.findById(id);
         if (user) {
+            user.email = email;
             user.isAdmin = isAdmin === 'true';
             user.subscriptionStatus = subscriptionStatus;
             await user.save();
             notifyClient(user._id.toString());
-            res.json({ success: true });
+            console.log('User updated:', user); // Debugging
+            res.json({ success: true, user });
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error', error });
+        console.error('Error updating user:', error); // Debugging
     }
 });
 
