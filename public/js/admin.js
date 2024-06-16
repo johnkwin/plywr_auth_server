@@ -138,39 +138,21 @@ document.addEventListener('DOMContentLoaded', function () {
             const isAdmin = isAdminButton.classList.contains('active');
             const subscriptionStatus = subscriptionSelect.value;
 
-            if (subscriptionStatus === 'delete') {
-                fetch(`/admin/user/delete`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ id: userId })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        listItem.remove(); // Remove the user from the list
-                    } else {
-                        console.error('Error deleting user:', response);
-                    }
-                })
-                .catch(error => console.error('Error deleting user:', error));
-            } else {
-                fetch(`/admin/update-user/${userId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ isAdmin, subscriptionStatus })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        button.style.display = 'none'; // Hide confirm button
-                    } else {
-                        console.error('Error updating user:', response);
-                    }
-                })
-                .catch(error => console.error('Error updating user:', error));
-            }
+            fetch(`/admin/update-user/${encodeURIComponent(userId)}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ isAdmin, subscriptionStatus })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Error updating user:', response);
+                    throw new Error('Error updating user');
+                }
+                button.style.display = 'none'; // Hide confirm button
+            })
+            .catch(error => console.error('Error updating user:', error));
         }
     }
 });
