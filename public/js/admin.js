@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (userList) {
         userList.addEventListener('click', handleUserChange);
         userList.addEventListener('change', handleUserChange);
-        userList.addEventListener('click', event => confirmChanges(event.target));
+        userList.addEventListener('click', confirmChanges);
     }
 
     function handleSearch(event) {
@@ -123,11 +123,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const subscriptionStatus = subscriptionSelect.value;
     
         if (subscriptionStatus === 'delete') {
-            fetch(`/admin/user/${userId}`, {
-                method: 'DELETE',
+            fetch(`/admin/user/delete`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ id: userId })
             })
             .then(response => {
                 if (response.ok) {
@@ -139,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Error deleting user:', error));
         } else {
-            fetch(`/admin/user/${userId}`, {
+            fetch(`/admin/update-user/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
