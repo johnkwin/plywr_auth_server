@@ -80,6 +80,9 @@ button:hover {
 .logout-button {
     width: auto; /* Adjust width for logout button */
     background: #dc3545; /* Red background for logout */
+    position: absolute; /* Positioning to the top right */
+    top: 10px;
+    right: 10px;
 }
 
 .logout-button:hover {
@@ -177,4 +180,28 @@ button:hover {
 .user-list-item span {
     flex: 1;
     text-align: center;
+}
+
+/* New User Form Adjustments */
+.new-user-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.new-user-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.new-user-options button, .new-user-options select {
+    width: auto;
+    padding: 10px;
+    margin-top: 0;
+    margin-left: 10px;
+}
+
+.new-user-options .toggle-button {
+    margin-left: 0;
 }
