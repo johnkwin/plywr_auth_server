@@ -25,15 +25,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 users.forEach(user => {
                     const listItem = document.createElement('div');
                     listItem.className = 'user-list-item';
+                    listItem.dataset.userid = user._id; // Add user ID to dataset
                     listItem.innerHTML = `
                         <input type="text" value="${user.email}" readonly>
-                        <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}" data-userid="${user._id}">${user.isAdmin ? 'On' : 'Off'}</button>
-                        <select data-userid="${user._id}" onchange="handleUserChange(event)">
+                        <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
+                        <select data-userid="${user._id}">
                             <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
                             <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
                             <option value="delete" class="delete-option">Delete</option>
                         </select>
-                        <button class="confirm-changes-button" data-userid="${user._id}" style="display: none;">Confirm Changes</button>
+                        <button class="confirm-changes-button" style="display: none;">Confirm Changes</button>
                     `;
                     userList.appendChild(listItem);
                 });
@@ -42,62 +43,72 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleUserChange(event) {
-        const selectElement = event.target;
-        const userId = selectElement.getAttribute('data-userid');
-        const confirmButton = selectElement.nextElementSibling;
-        if (!confirmButton) return;
-        
-        if (selectElement.value === 'delete') {
-            confirmButton.textContent = 'Confirm Deletion';
-            confirmButton.classList.add('confirm-deletion');
-        } else {
-            confirmButton.textContent = 'Confirm Changes';
-            confirmButton.classList.remove('confirm-deletion');
+        if (event.target.matches('select[data-userid]')) {
+            const selectElement = event.target;
+            const confirmButton = selectElement.nextElementSibling;
+
+            if (selectElement.value === 'delete') {
+                confirmButton.textContent = 'Confirm Deletion';
+                confirmButton.classList.add('confirm-deletion');
+            } else {
+                confirmButton.textContent = 'Confirm Changes';
+                confirmButton.classList.remove('confirm-deletion');
+            }
+            confirmButton.style.display = 'inline-block';
+        } else if (event.target.matches('.toggle-button')) {
+            const button = event.target;
+            button.classList.toggle('active');
+            button.classList.toggle('off');
+            button.textContent = button.classList.contains('active') ? 'On' : 'Off';
+
+            const confirmButton = button.nextElementSibling.nextElementSibling; // Find the confirm button
+            confirmButton.style.display = 'inline-block'; // Show the confirm button
         }
-        confirmButton.style.display = 'inline-block';
     }
 
     function confirmChanges(event) {
-        const button = event.target;
-        const userId = button.getAttribute('data-userid');
-        const listItem = button.closest('.user-list-item');
-        const isAdminButton = listItem.querySelector('.toggle-button');
-        const subscriptionSelect = listItem.querySelector('select');
-        const isAdmin = isAdminButton.classList.contains('active');
-        const subscriptionStatus = subscriptionSelect.value;
+        if (event.target.matches('.confirm-changes-button')) {
+            const button = event.target;
+            const listItem = button.closest('.user-list-item');
+            const userId = listItem.dataset.userid;
+            const isAdminButton = listItem.querySelector('.toggle-button');
+            const subscriptionSelect = listItem.querySelector('select');
+            const isAdmin = isAdminButton.classList.contains('active');
+            const subscriptionStatus = subscriptionSelect.value;
 
-        if (subscriptionStatus === 'delete') {
-            fetch(`/admin/user/delete`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id: userId })
-            })
-            .then(response => {
-                if (response.ok) {
-                    listItem.remove(); // Remove the user from the list
-                } else {
-                    console.error('Error deleting user:', response);
-                }
-            })
-            .catch(error => console.error('Error deleting user:', error));
-        } else {
-            fetch(`/admin/update-user/${userId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ isAdmin, subscriptionStatus })
-            })
-            .then(response => {
-                if (response.ok) {
-                    button.style.display = 'none'; // Hide confirm button
-                } else {
-                    console.error('Error updating user:', response);
-                }
-            })
-            .catch(error => console.error('Error updating user:', error));
+            if (subscriptionStatus === 'delete') {
+                fetch(`/admin/user/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: userId })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        listItem.remove(); // Remove the user from the list
+                    } else {
+                        console.error('Error deleting user:', response);
+                    }
+                })
+                .catch(error => console.error('Error deleting user:', error));
+            } else {
+                fetch(`/admin/update-user/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ isAdmin, subscriptionStatus })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        button.style.display = 'none'; // Hide confirm button
+                    } else {
+                        console.error('Error updating user:', response);
+                    }
+                })
+                .catch(error => console.error('Error updating user:', error));
+            }
         }
     }
 
@@ -133,27 +144,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Toggle admin status for new user
     newUserAdmin.addEventListener('click', function () {
         newUserAdmin.classList.toggle('active');
+        newUserAdmin.classList.toggle('off');
         newUserAdmin.textContent = newUserAdmin.classList.contains('active') ? 'On' : 'Off';
     });
 
-    // Toggle admin status for existing users
-    document.addEventListener('click', function (event) {
-        if (event.target.classList.contains('toggle-button')) {
-            const button = event.target;
-            button.classList.toggle('active');
-            button.classList.toggle('off');
-            button.textContent = button.classList.contains('active') ? 'On' : 'Off';
-            handleUserChange({ target: button.nextElementSibling }); // Trigger user change
-        }
-    });
-
-    // Confirm changes
-    document.addEventListener('click', function (event) {
-        if (event.target.classList.contains('confirm-changes-button')) {
-            confirmChanges(event);
-        }
-    });
+    userList.addEventListener('click', handleUserChange);
+    userList.addEventListener('change', handleUserChange);
+    userList.addEventListener('click', confirmChanges);
 });
