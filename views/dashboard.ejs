@@ -6,33 +6,48 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body class="dashboard-page">
-    <div class="dashboard-container">
+    <div class="container">
         <a href="/admin/logout" class="logout-button">Logout</a>
         <h2>Admin Dashboard</h2>
+        
         <div>
-            <input type="text" id="search-users" placeholder="Search users by email">
+            <h3>Users</h3>
+            <input type="text" placeholder="Search users..." id="search-users" oninput="handleSearch(this.value)">
         </div>
-        <div class="user-list-header">
-            <span>Email</span>
-            <span>Password</span>
-            <span>Admin</span>
-            <span>Subscription Status</span>
-            <span>Actions</span>
-        </div>
+        
         <div class="new-user-form">
-            <input type="email" id="new-user-email" placeholder="Email">
-            <input type="password" id="new-user-password" placeholder="Password">
+            <input type="email" placeholder="New User Email" id="new-user-email">
+            <input type="password" placeholder="Password" id="new-user-password">
             <div class="new-user-options">
-                <button id="new-user-admin" class="toggle-button off" onclick="toggleAdmin(this)">Off</button>
-                <select id="new-user-subscription-status">
+                <button class="toggle-button off" id="new-user-admin">Off</button>
+                <select id="new-user-subscription">
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>
             </div>
-            <button id="save-new-user" onclick="createUser()">Save New User</button>
+            <button onclick="createUser()">Save User</button>
         </div>
-        <ul class="user-list" id="user-list"></ul>
+        
+        <div class="user-list-header">
+            <span>Email</span>
+            <span>Admin</span>
+            <span>Subscription Status</span>
+        </div>
+        
+        <ul class="user-list" id="user-list">
+            <% users.forEach(user => { %>
+                <li class="user-list-item">
+                    <input type="text" value="<%= user.email %>" readonly>
+                    <button class="toggle-button <%= user.isAdmin ? 'active' : 'off' %>" data-userid="<%= user._id %>" onclick="toggleAdmin(this)"><%= user.isAdmin ? 'On' : 'Off' %></button>
+                    <select data-userid="<%= user._id %>" onchange="markChanged(this)">
+                        <option value="active" <%= user.subscriptionStatus === 'active' ? 'selected' : '' %>>Active</option>
+                        <option value="inactive" <%= user.subscriptionStatus === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                    </select>
+                    <button class="confirm-changes-button" data-userid="<%= user._id %>" onclick="confirmChanges(this)">Confirm Changes</button>
+                </li>
+            <% }); %>
+        </ul>
     </div>
-    <script src="/js/admin.js"></script>
+    <script src="/js/admin.js"></script> <!-- External JavaScript file -->
 </body>
 </html>
