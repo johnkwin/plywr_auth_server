@@ -51,13 +51,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (userList) {
-        userList.addEventListener('click', handleUserChange);
-        userList.addEventListener('change', handleUserChange);
-        userList.addEventListener('click', function(event) {
+        userList.addEventListener('click', function (event) {
+            handleUserChange(event);
             if (event.target.matches('.confirm-changes-button')) {
                 confirmChanges(event.target);
             }
         });
+        userList.addEventListener('change', handleUserChange);
     }
 
     function handleSearch(event) {
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Error deleting user:', error));
         } else {
-            fetch(`/admin/update-user/${userId}`, {
+            fetch(`/admin/user/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
