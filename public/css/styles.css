@@ -205,3 +205,49 @@ button:hover {
 .new-user-options .toggle-button {
     margin-left: 0;
 }
+/* Additional CSS for updated layout */
+.user-list-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    font-weight: bold;
+}
+
+.user-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.user-list-item input[type="text"], .user-list-item input[type="password"], .user-list-item select {
+    flex: 1;
+    margin: 0 5px;
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.user-list-item .confirm-changes-button {
+    display: none;
+    margin-left: 10px;
+    padding: 5px 10px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.user-list-item .confirm-changes-button:hover {
+    background: #218838;
+}
+
+.new-user-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
