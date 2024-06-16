@@ -1,75 +1,99 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('search');
-    const userForm = document.getElementById('user-form');
-    const userList = document.getElementById('user-list');
+document.addEventListener('DOMContentLoaded', () => {
+    const searchBar = document.getElementById('searchBar');
+    const userForm = document.getElementById('new-user-form');
+    const userListContainer = document.getElementById('user-list-container');
 
-    // Search functionality
-    searchInput.addEventListener('input', function() {
-        const query = searchInput.value.toLowerCase();
-        const userItems = document.querySelectorAll('.user-item');
-        userItems.forEach(item => {
-            const email = item.querySelector('.user-email').value.toLowerCase();
-            if (email.includes(query)) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    });
+    searchBar.addEventListener('input', handleSearch);
 
-    // Create new user functionality
-    document.getElementById('create-user-button').addEventListener('click', function() {
-        userForm.reset();
-        document.getElementById('userId').value = '';
-        userForm.scrollIntoView({ behavior: 'smooth' });
-    });
+    function handleSearch() {
+        const query = searchBar.value.trim().toLowerCase();
+        fetch(`/admin/search-users?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(users => renderUserList(users))
+            .catch(err => console.error('Error searching users:', err));
+    }
 
-    // Inline editing and save functionality
-    userList.addEventListener('input', function(event) {
-        const item = event.target.closest('.user-item');
-        if (item) {
-            item.querySelector('.save-button').style.display = 'inline-block';
-        }
-    });
+    function renderUserList(users) {
+        userListContainer.innerHTML = ''; // Clear previous results
 
-    userList.addEventListener('click', function(event) {
-        const target = event.target;
+        users.forEach(user => {
+            const userItem = document.createElement('div');
+            userItem.className = 'user-item';
 
-        if (target.classList.contains('admin-toggle-button')) {
-            const isAdmin = target.getAttribute('data-isadmin') === 'true';
-            target.setAttribute('data-isadmin', !isAdmin);
-            target.textContent = !isAdmin ? 'On' : 'Off';
-            target.style.background = !isAdmin ? '#28a745' : '#dc3545';
-            target.closest('.user-item').querySelector('.save-button').style.display = 'inline-block';
-        }
+            const emailInput = document.createElement('input');
+            emailInput.type = 'email';
+            emailInput.value = user.email;
+            emailInput.dataset.originalValue = user.email;
 
-        if (target.classList.contains('save-button')) {
-            const item = target.closest('.user-item');
-            const userId = item.getAttribute('data-id');
-            const email = item.querySelector('.user-email').value;
-            const isAdmin = item.querySelector('.admin-toggle-button').getAttribute('data-isadmin') === 'true';
-            const subscriptionStatus = item.querySelector('.subscription-select').value;
-
-            fetch(`/admin/user`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    id: userId,
-                    email: email,
-                    isAdmin: isAdmin,
-                    subscriptionStatus: subscriptionStatus
-                })
-            }).then(response => {
-                if (response.ok) {
-                    target.style.display = 'none';
-                } else {
-                    alert('Error saving changes');
-                }
-            }).catch(error => {
-                console.error('Error:', error);
+            const adminButton = document.createElement('button');
+            adminButton.textContent = user.isAdmin ? 'On' : 'Off';
+            adminButton.dataset.originalValue = user.isAdmin;
+            adminButton.classList.add(user.isAdmin ? 'admin-on' : 'admin-off');
+            adminButton.addEventListener('click', () => {
+                user.isAdmin = !user.isAdmin;
+                adminButton.textContent = user.isAdmin ? 'On' : 'Off';
+                adminButton.classList.toggle('admin-on');
+                adminButton.classList.toggle('admin-off');
+                showConfirmButton();
             });
-        }
-    });
+
+            const subscriptionSelect = document.createElement('select');
+            ['active', 'inactive'].forEach(status => {
+                const option = document.createElement('option');
+                option.value = status;
+                option.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                if (user.subscriptionStatus === status) {
+                    option.selected = true;
+                }
+                subscriptionSelect.appendChild(option);
+            });
+            subscriptionSelect.dataset.originalValue = user.subscriptionStatus;
+
+            emailInput.addEventListener('input', showConfirmButton);
+            subscriptionSelect.addEventListener('change', showConfirmButton);
+
+            const userControls = document.createElement('div');
+            userControls.className = 'user-controls';
+            userControls.appendChild(emailInput);
+            userControls.appendChild(adminButton);
+            userControls.appendChild(subscriptionSelect);
+
+            const confirmButton = document.createElement('button');
+            confirmButton.textContent = 'Confirm Changes';
+            confirmButton.className = 'confirm-button hidden';
+            confirmButton.addEventListener('click', () => {
+                updateUser(user._id, {
+                    email: emailInput.value,
+                    isAdmin: user.isAdmin,
+                    subscriptionStatus: subscriptionSelect.value
+                });
+                confirmButton.classList.add('hidden');
+            });
+
+            userItem.appendChild(userControls);
+            userItem.appendChild(confirmButton);
+
+            userListContainer.appendChild(userItem);
+        });
+    }
+
+    function showConfirmButton() {
+        const confirmButton = this.closest('.user-item').querySelector('.confirm-button');
+        confirmButton.classList.remove('hidden');
+    }
+
+    function updateUser(id, data) {
+        fetch(`/admin/user/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(updatedUser => {
+                console.log('User updated:', updatedUser);
+            })
+            .catch(err => console.error('Error updating user:', err));
+    }
 });

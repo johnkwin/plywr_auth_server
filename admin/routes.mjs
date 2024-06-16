@@ -75,6 +75,26 @@ router.post('/update-user/:id', isAuthenticated, async (req, res) => {
     }
 });
 
+// Update user details endpoint
+router.put('/user/:id', isAuthenticated, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { email, isAdmin, subscriptionStatus } = req.body;
+        const user = await User.findById(id);
+        if (user) {
+            user.email = email;
+            user.isAdmin = isAdmin;
+            user.subscriptionStatus = subscriptionStatus;
+            await user.save();
+            res.json(user);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+        console.error(error);
+    }
+});
 // Delete User
 router.post('/user/delete', isAuthenticated, async (req, res) => {
     try {
