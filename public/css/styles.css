@@ -19,7 +19,7 @@ body {
     background: #2b2b2b;
 }
 
-.login-page, .dashboard-page {
+.dashboard-page {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,7 +27,7 @@ body {
     height: 100%;
 }
 
-.login-container, .dashboard-container {
+.dashboard-container {
     background: #fff;
     padding: 20px;
     border-radius: 8px;
@@ -38,33 +38,11 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    position: relative; /* Ensure absolute elements are relative to this container */
+    position: relative;
 }
 
 h2 {
     margin-bottom: 20px;
-}
-
-input[type="email"], input[type="password"], input[type="text"], select {
-    padding: 8px;
-    margin-top: 5px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-button {
-    padding: 10px;
-    background: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-button:hover {
-    background: #0056b3;
 }
 
 .logout-button {
@@ -84,31 +62,112 @@ button:hover {
     background: #c82333;
 }
 
+.user-search {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.user-search input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+.new-user-form {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.new-user-form input[type="email"], .new-user-form input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+.new-user-form .new-user-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.new-user-form .toggle-button {
+    flex: 1;
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.new-user-form .toggle-button.off {
+    background: #6c757d;
+}
+
+.new-user-form .toggle-button.active {
+    background: #28a745;
+}
+
+.new-user-form select {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.new-user-form button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.new-user-form button:hover {
+    background: #0056b3;
+}
+
 .user-list {
+    width: 100%;
     list-style-type: none;
     padding: 0;
+}
+
+.user-list-header, .user-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.user-list-header {
+    background: #f8f9fa;
+    font-weight: bold;
 }
 
 .user-list-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    position: relative; /* Ensure absolute elements are relative to this container */
-    width: 100%; /* Full width */
+    padding: 10px 0;
 }
 
 .user-list-item input[type="text"], .user-list-item select {
     flex: 2;
     margin-right: 10px;
+    padding: 8px;
 }
 
 .user-list-item .toggle-button {
     flex: 1;
-    padding: 5px 10px;
+    padding: 8px 10px;
     margin-right: 10px;
     background: #007bff;
     color: #fff;
@@ -128,7 +187,7 @@ button:hover {
 
 .user-list-item select {
     flex: 1;
-    padding: 5px;
+    padding: 8px;
     margin-right: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -136,7 +195,7 @@ button:hover {
 
 .user-list-item .confirm-changes-button {
     flex: 1;
-    padding: 5px 10px;
+    padding: 8px 10px;
     background: #28a745;
     color: #fff;
     border: none;
@@ -144,32 +203,9 @@ button:hover {
     cursor: pointer;
     text-align: center;
     display: none;
-    position: absolute; /* Positioned outside the list item */
-    right: -120px; /* Adjust this value as needed */
+    margin-left: 10px;
 }
 
 .user-list-item .confirm-changes-button:hover {
     background: #218838;
-}
-
-.new-user-form {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-}
-
-.new-user-form input[type="email"], .new-user-form input[type="password"] {
-    margin-bottom: 10px;
-}
-
-.new-user-form .new-user-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-}
-
-.new-user-form button {
-    margin-top: 10px;
-    width: 100%;
 }
