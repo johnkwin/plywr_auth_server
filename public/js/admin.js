@@ -53,7 +53,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (userList) {
         userList.addEventListener('click', handleUserChange);
         userList.addEventListener('change', handleUserChange);
-        userList.addEventListener('click', confirmChanges);
+        userList.addEventListener('click', function(event) {
+            if (event.target.matches('.confirm-changes-button')) {
+                confirmChanges(event.target);
+            }
+        });
     }
 
     function handleSearch(event) {
@@ -109,19 +113,19 @@ document.addEventListener('DOMContentLoaded', function () {
             button.classList.toggle('off');
             button.textContent = button.classList.contains('active') ? 'On' : 'Off';
 
-            const confirmButton = button.nextElementSibling.nextElementSibling;
+            const confirmButton = button.closest('.user-list-item').querySelector('.confirm-changes-button');
             confirmButton.style.display = 'inline-block';
         }
     }
 
     function confirmChanges(button) {
-        const listItem = button.parentNode.parentNode; // Use parentNode to traverse up the DOM tree
+        const listItem = button.closest('.user-list-item');
         const userId = listItem.dataset.userid;
         const isAdminButton = listItem.querySelector('.toggle-button');
         const subscriptionSelect = listItem.querySelector('select');
         const isAdmin = isAdminButton.classList.contains('active');
         const subscriptionStatus = subscriptionSelect.value;
-    
+
         if (subscriptionStatus === 'delete') {
             fetch(`/admin/user/delete`, {
                 method: 'POST',
@@ -132,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => {
                 if (response.ok) {
-                    listItem.remove(); // Remove the user from the list
+                    listItem.remove();
                 } else {
                     console.error('Error deleting user:', response);
                     throw new Error('Error deleting user');
@@ -149,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => {
                 if (response.ok) {
-                    button.style.display = 'none'; // Hide confirm button
+                    button.style.display = 'none';
                 } else {
                     console.error('Error updating user:', response);
                     throw new Error('Error updating user');
@@ -159,4 +163,3 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
-
