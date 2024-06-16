@@ -34,10 +34,12 @@ body {
     width: 100%;
     max-width: 600px;
     text-align: center;
+    position: relative;
 }
 
 .dashboard-container h2 {
     color: #f0f0f0;
+    margin-bottom: 20px;
 }
 
 .logout-button {
@@ -66,6 +68,8 @@ input[type="email"], input[type="password"], input[type="text"], select {
     margin: 10px 0;
     border-radius: 5px;
     border: 1px solid #ccc;
+    background: #444;
+    color: #fff;
 }
 
 button {
@@ -89,7 +93,7 @@ button:hover {
     margin: 0;
 }
 
-.user-list li {
+.user-list .user-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -100,38 +104,66 @@ button:hover {
     color: #f0f0f0;
 }
 
-.user-list span {
+.user-item input {
     flex: 1;
-    text-align: left;
-    margin-left: 10px;
-}
-
-.user-list .edit-button, .user-list .delete-button {
-    background: #007bff;
+    margin-right: 10px;
+    background: #555;
     color: #fff;
-    border: none;
+    border: 1px solid #666;
     border-radius: 5px;
     padding: 5px 10px;
+}
+
+.user-item select {
+    margin-left: 10px;
+    margin-right: 10px;
+    background: #555;
+    color: #fff;
+    border: 1px solid #666;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.user-controls {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.user-list .edit-button, .user-list .delete-button, .user-list .confirm-button {
+    padding: 5px 10px;
+    border-radius: 5px;
     cursor: pointer;
-    margin: 0 5px;
+    margin-left: 5px;
+    font-size: 14px;
+}
+
+.user-list .confirm-button {
+    background: #28a745;
+    color: #fff;
+    display: none;
+}
+
+.user-list .confirm-button.hidden {
+    display: none;
+}
+
+.user-list .edit-button {
+    background: #007bff;
+    color: #fff;
 }
 
 .user-list .delete-button {
     background: #dc3545;
+    color: #fff;
 }
 
-.user-list .edit-button:hover {
-    background: #0056b3;
+.user-list .admin-on {
+    background: #28a745;
 }
 
-.user-list .delete-button:hover {
-    background: #c82333;
-}
-
-.user-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.user-list .admin-off {
+    background: #6c757d;
 }
 
 .search-bar {
@@ -140,4 +172,6 @@ button:hover {
     margin-bottom: 20px;
     border-radius: 5px;
     border: 1px solid #ccc;
+    background: #444;
+    color: #fff;
 }

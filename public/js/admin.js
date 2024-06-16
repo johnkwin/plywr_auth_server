@@ -7,10 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleSearch() {
         const query = searchBar.value.trim().toLowerCase();
-        fetch(`/admin/search-users?q=${encodeURIComponent(query)}`)
-            .then(response => response.json())
-            .then(users => renderUserList(users))
-            .catch(err => console.error('Error searching users:', err));
+        if (query) {
+            fetch(`/admin/search-users?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(users => {
+                    renderUserList(users);
+                    userForm.style.display = 'none'; // Hide new user form during search
+                })
+                .catch(err => console.error('Error searching users:', err));
+        } else {
+            userListContainer.innerHTML = ''; // Clear user list
+            userForm.style.display = 'block'; // Show new user form when search is cleared
+        }
     }
 
     function renderUserList(users) {
