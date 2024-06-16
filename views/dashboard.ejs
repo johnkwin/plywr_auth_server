@@ -6,33 +6,32 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body class="dashboard-page">
-    <div class="container">
-        <h2>Admin Dashboard</h2>
+    <div class="dashboard-container">
         <a href="/admin/logout" class="logout-button">Logout</a>
-        <div>
-            <input type="text" id="search-users" placeholder="Search users by email">
-        </div>
-        <div class="user-list-header">
-            <span>Email</span>
-            <span>Password</span>
-            <span>Admin</span>
-            <span>Subscription Status</span>
-            <span>Actions</span>
-        </div>
+        <h2>Admin Dashboard</h2>
+
         <div class="new-user-form">
-            <input type="email" id="new-user-email" placeholder="Email">
-            <input type="password" id="new-user-password" placeholder="Password">
-            <div class="new-user-options">
+            <h3>New User</h3>
+            <label for="new-user-email">Email:</label>
+            <input type="email" id="new-user-email" required>
+            <label for="new-user-password">Password:</label>
+            <input type="password" id="new-user-password">
+            <div class="row">
                 <button id="new-user-admin" class="toggle-button off">Off</button>
-                <select id="new-user-subscription-status">
+                <select id="new-user-subscription">
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>
             </div>
-            <button id="save-new-user">Save New User</button>
+            <button onclick="createUser()">Create User</button>
         </div>
-        <ul class="user-list" id="user-list"></ul>
+
+        <input type="text" id="search-users" placeholder="Search users...">
+
+        <ul class="user-list" id="user-list">
+            <!-- User items will be dynamically injected here -->
+        </ul>
     </div>
-    <script src="/js/admin.js"></script>
+    <script src="/js/admin.js"></script> <!-- External JavaScript file -->
 </body>
 </html>
