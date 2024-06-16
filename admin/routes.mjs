@@ -73,28 +73,34 @@ router.post('/user', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
-// Update user
-router.post('/update-user/:id', isAuthenticated, async (req, res) => {
+// Update user route (updated to use PATCH instead of POST)
+router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
+    const { id } = req.params;
+    const { email, isAdmin, subscriptionStatus, password } = req.body;
+
     try {
-        const { id } = req.params;
-        const { isAdmin, subscriptionStatus, email } = req.body;
         const user = await User.findById(id);
         if (user) {
             user.email = email;
-            user.isAdmin = isAdmin === 'true';
+            user.isAdmin = isAdmin === 'true'; // Ensure boolean value
             user.subscriptionStatus = subscriptionStatus;
+
+            if (password) {
+                user.password = await bcrypt.hash(password, 10);
+            }
+
             await user.save();
             notifyClient(user._id.toString());
-            console.log('User updated:', user); // Debugging
-            res.json({ success: true, user });
+            res.json({ success: true });
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error', error });
-        console.error('Error updating user:', error); // Debugging
+        res.status(500).json({ success: false, message: 'Server error' });
+        console.error(error);
     }
 });
+
 
 // Search users
 router.get('/search-users', isAuthenticated, async (req, res) => {

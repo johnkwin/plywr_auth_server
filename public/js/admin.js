@@ -114,11 +114,15 @@ document.addEventListener('DOMContentLoaded', function () {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email, isAdmin, subscriptionStatus })
+            body: JSON.stringify({ isAdmin, subscriptionStatus })
         })
             .then(response => response.json())
-            .then(() => {
-                button.style.display = 'none';
+            .then(data => {
+                if (data.success) {
+                    button.style.display = 'none';
+                } else {
+                    console.error('Failed to update user:', data.message);
+                }
             })
             .catch(error => {
                 console.error('Error updating user:', error);
