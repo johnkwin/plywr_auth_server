@@ -17,8 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         newUserForm.style.display = 'none';
         const response = await fetch(`/admin/search-users?q=${query}`);
-        const users = await response.json();
-        populateUserList(users);
+        if (response.ok) {
+            const users = await response.json();
+            populateUserList(users);
+        }
     }
 
     // Populate user list

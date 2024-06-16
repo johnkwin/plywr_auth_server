@@ -75,39 +75,51 @@ h2 {
 
 .user-list {
     margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .user-list-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 10px;
     background: #f8f9fa;
     border: 1px solid #dee2e6;
     border-radius: 5px;
-    margin-bottom: 10px;
 }
 
-.user-list-item input[type="text"], .user-list-item select {
-    flex: 1;
+.user-list-item input[type="text"] {
+    flex: 2;
     padding: 10px;
-    margin-right: 10px;
     border: 1px solid #dee2e6;
     border-radius: 5px;
+    margin-right: 10px;
 }
 
 .toggle-button {
-    flex: 0;
+    flex: 1;
     background: #007bff;
     color: #fff;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
+    margin-right: 10px;
+    min-width: 80px; /* Ensure a minimum width */
+    text-align: center;
 }
 
 .toggle-button.active {
     background: #28a745;
+}
+
+select {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin-right: 10px;
 }
 
 .confirm-changes-button {
@@ -118,6 +130,7 @@ h2 {
     border-radius: 5px;
     cursor: pointer;
     visibility: hidden;
+    margin-left: 10px;
 }
 
 .confirm-changes-button.visible {
