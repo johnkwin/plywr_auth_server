@@ -52,16 +52,8 @@ body {
     background: #c82333;
 }
 
-h2, h3 {
+h2 {
     margin-bottom: 20px;
-}
-
-.search-bar {
-    width: 80%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
 }
 
 .user-form {
@@ -74,24 +66,11 @@ h2, h3 {
     margin: 10px 0 5px;
 }
 
-.user-form input, .save-user-button {
+.user-form input, .user-form button {
     display: block;
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-}
-
-.save-user-button {
-    background: #007bff;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-}
-
-.save-user-button:hover {
-    background: #0056b3;
 }
 
 .user-list {
@@ -116,19 +95,18 @@ h2, h3 {
     border: 1px solid #dee2e6;
     border-radius: 5px;
     margin-right: 10px;
-    background: #e9ecef;
 }
 
 .toggle-button {
     flex: 1;
-    background: #6c757d;
+    background: #007bff;
     color: #fff;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     margin-right: 10px;
-    min-width: 60px;
+    min-width: 80px; /* Ensure a minimum width */
     text-align: center;
 }
 
