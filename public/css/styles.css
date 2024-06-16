@@ -79,12 +79,8 @@ button:hover {
 
 /* Special button styles */
 .logout-button {
-    width: auto; /* Adjust width for logout button */
     background: #dc3545; /* Red background for logout */
     position: absolute; /* Positioning to the top right */
-    top: 10px;
-    right: 10px;
-    padding: 5px 10px; /* Smaller padding for logout */
 }
 
 .logout-button:hover {
