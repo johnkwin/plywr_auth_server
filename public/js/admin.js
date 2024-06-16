@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function confirmChanges(button) {
-        const listItem = button.closest('.user-list-item');
+        const listItem = button.parentNode.parentNode; // Use parentNode to traverse up the DOM tree
         const userId = listItem.dataset.userid;
         const isAdminButton = listItem.querySelector('.toggle-button');
         const subscriptionSelect = listItem.querySelector('select');
