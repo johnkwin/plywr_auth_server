@@ -1,101 +1,79 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search');
-    const userForm = document.getElementById('user-form');
+    const userForm = document.getElementById('new-user-form');
     const userList = document.getElementById('user-list');
 
     searchInput.addEventListener('input', handleSearch);
+    userList.addEventListener('click', handleUserActions);
 
-    async function handleSearch() {
-        const query = searchInput.value.trim();
-
-        if (query === '') {
-            userList.innerHTML = '';
-            userForm.style.display = 'block';
-            return;
-        }
-
-        try {
-            const response = await fetch(`/admin/search-users?q=${query}`);
-            const users = await response.json();
-
-            userList.innerHTML = '';
+    function handleSearch(event) {
+        const query = event.target.value.trim();
+        if (query) {
             userForm.style.display = 'none';
-
-            users.forEach(user => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <span>${user.email}</span>
-                    <input type="checkbox" ${user.isAdmin ? 'checked' : ''} data-id="${user._id}" class="admin-toggle">
-                    <select data-id="${user._id}" class="subscription-status">
-                        <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
-                        <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
-                    </select>
-                    <button class="confirm-button" data-id="${user._id}" style="display:none;">Confirm Changes</button>
-                `;
-                userList.appendChild(li);
-            });
-
-            document.querySelectorAll('.admin-toggle').forEach(toggle => {
-                toggle.addEventListener('change', handleAdminToggle);
-            });
-
-            document.querySelectorAll('.subscription-status').forEach(select => {
-                select.addEventListener('change', handleSubscriptionChange);
-            });
-
-            document.querySelectorAll('.confirm-button').forEach(button => {
-                button.addEventListener('click', handleConfirmChanges);
-            });
-        } catch (error) {
-            console.error('Error searching users:', error);
+            fetch(`/admin/search-users?q=${query}`)
+                .then(response => response.json())
+                .then(users => {
+                    userList.innerHTML = users.map(user => `
+                        <li class="user-item">
+                            <input type="text" class="user-email" value="${user.email}" readonly>
+                            <button class="admin-toggle ${user.isAdmin ? 'on' : 'off'}" data-id="${user._id}" data-isadmin="${user.isAdmin}">${user.isAdmin ? 'On' : 'Off'}</button>
+                            <select class="subscription-status" data-id="${user._id}">
+                                <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
+                                <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
+                            </select>
+                            <button class="confirm-button" data-id="${user._id}">Confirm Changes</button>
+                        </li>`).join('');
+                })
+                .catch(error => console.error('Error searching users:', error));
+        } else {
+            userForm.style.display = 'flex';
+            userList.innerHTML = '';
         }
     }
 
-    async function handleAdminToggle(event) {
-        const checkbox = event.target;
-        const userId = checkbox.dataset.id;
-        const isAdmin = checkbox.checked;
-
-        const confirmButton = checkbox.nextElementSibling.nextElementSibling;
-        confirmButton.style.display = 'inline-block';
-
-        checkbox.dataset.isadmin = isAdmin;
+    function handleUserActions(event) {
+        const target = event.target;
+        if (target.classList.contains('admin-toggle')) {
+            toggleAdmin(target);
+        } else if (target.classList.contains('confirm-button')) {
+            handleConfirmChanges(event);
+        }
     }
 
-    async function handleSubscriptionChange(event) {
-        const select = event.target;
-        const userId = select.dataset.id;
-        const subscriptionStatus = select.value;
-
-        const confirmButton = select.nextElementSibling;
-        confirmButton.style.display = 'inline-block';
-
-        select.dataset.subscriptionstatus = subscriptionStatus;
+    function toggleAdmin(button) {
+        const isAdmin = button.dataset.isadmin === 'true';
+        button.dataset.isadmin = isAdmin ? 'false' : 'true';
+        button.textContent = isAdmin ? 'Off' : 'On';
+        button.classList.toggle('on', !isAdmin);
+        button.classList.toggle('off', isAdmin);
     }
 
     async function handleConfirmChanges(event) {
         const button = event.target;
         const userId = button.dataset.id;
-        const isAdmin = document.querySelector(`.admin-toggle[data-id="${userId}"]`).dataset.isadmin === 'true';
-        const subscriptionStatus = document.querySelector(`.subscription-status[data-id="${userId}"]`).dataset.subscriptionstatus;
+        const listItem = button.closest('.user-item');
+        const email = listItem.querySelector('.user-email').value;
+        const isAdmin = listItem.querySelector('.admin-toggle').dataset.isadmin === 'true';
+        const subscriptionStatus = listItem.querySelector('.subscription-status').value;
 
         try {
-            await fetch(`/admin/user`, {
+            const response = await fetch('/admin/update-user', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    id: userId,
-                    isAdmin,
-                    subscriptionStatus
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: userId, email, isAdmin, subscriptionStatus })
             });
-
-            button.style.display = 'none';
-            alert('Changes saved successfully.');
+            if (response.ok) {
+                button.style.display = 'none';
+            } else {
+                console.error('Error updating user');
+            }
         } catch (error) {
-            console.error('Error saving changes:', error);
+            console.error('Error updating user:', error);
         }
     }
+
+    userList.addEventListener('change', function(event) {
+        const confirmButton = event.target.closest('.user-item').querySelector('.confirm-button');
+        confirmButton.style.display = 'inline-block';
+    });
 });

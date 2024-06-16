@@ -11,23 +11,36 @@
             <h2>Admin Dashboard</h2>
             <a href="/admin/logout" class="logout-button">Logout</a>
         </div>
-
         <div class="search-container">
-            <input type="text" id="search" placeholder="Search users..." oninput="handleSearch()">
+            <h3>Users</h3>
+            <input type="text" id="search" placeholder="Search users...">
         </div>
-
-        <form action="/admin/user" method="POST" class="user-form" id="user-form">
-            <input type="hidden" name="id" id="userId">
-            <label for="newUserEmail">New User Email:</label>
-            <input type="email" id="newUserEmail" name="email" required>
-            <label for="newUserPassword">Password:</label>
-            <input type="password" id="newUserPassword" name="password">
-            <button type="submit">Save User</button>
+        <form action="/admin/user" method="POST" class="user-form" id="new-user-form">
+            <label for="newUserEmail">New User Email</label>
+            <input type="email" id="newUserEmail" name="email" placeholder="New User Email" required>
+            <label for="newUserPassword">Password</label>
+            <input type="password" id="newUserPassword" name="password" placeholder="Password" required>
+            <button type="submit" class="save-button">Save User</button>
         </form>
-
-        <h3>Users</h3>
-        <ul class="user-list" id="user-list"></ul>
+        <div class="user-list-header">
+            <span>Email</span>
+            <span>Admin</span>
+            <span>Subscription Status</span>
+        </div>
+        <ul class="user-list" id="user-list">
+            <% users.forEach(user => { %>
+                <li class="user-item">
+                    <input type="text" class="user-email" value="<%= user.email %>" readonly>
+                    <button class="admin-toggle" data-id="<%= user._id %>" data-isadmin="<%= user.isAdmin %>"><%= user.isAdmin ? 'On' : 'Off' %></button>
+                    <select class="subscription-status" data-id="<%= user._id %>">
+                        <option value="active" <%= user.subscriptionStatus === 'active' ? 'selected' : '' %>>Active</option>
+                        <option value="inactive" <%= user.subscriptionStatus === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                    </select>
+                    <button class="confirm-button" data-id="<%= user._id %>">Confirm Changes</button>
+                </li>
+            <% }); %>
+        </ul>
     </div>
-    <script src="/js/admin.js"></script>
+    <script src="/js/admin.js"></script> <!-- External JavaScript file -->
 </body>
 </html>
