@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 adminButton.textContent = user.isAdmin ? 'On' : 'Off';
                 adminButton.classList.toggle('admin-on');
                 adminButton.classList.toggle('admin-off');
-                showConfirmButton();
+                showConfirmButton(userItem);
             });
 
             const subscriptionSelect = document.createElement('select');
@@ -57,8 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             subscriptionSelect.dataset.originalValue = user.subscriptionStatus;
 
-            emailInput.addEventListener('input', showConfirmButton);
-            subscriptionSelect.addEventListener('change', showConfirmButton);
+            emailInput.addEventListener('input', () => showConfirmButton(userItem));
+            subscriptionSelect.addEventListener('change', () => showConfirmButton(userItem));
 
             const userControls = document.createElement('div');
             userControls.className = 'user-controls';
@@ -85,8 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function showConfirmButton() {
-        const confirmButton = this.closest('.user-item').querySelector('.confirm-button');
+    function showConfirmButton(userItem) {
+        const confirmButton = userItem.querySelector('.confirm-button');
         confirmButton.classList.remove('hidden');
     }
 
