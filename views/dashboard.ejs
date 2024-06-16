@@ -10,18 +10,24 @@
         <a href="/admin/logout" class="logout-button">Logout</a>
         <h2>Admin Dashboard</h2>
 
-        <h3>Users</h3>
         <input type="text" id="searchUsers" class="search-bar" placeholder="Search users..." oninput="handleSearch()">
 
         <form action="/admin/user" method="POST" class="user-form" id="newUserForm">
-            <label for="newUserEmail">New User Email</label>
-            <input type="email" id="newUserEmail" name="email" placeholder="New User Email">
+            <h3>New User</h3>
+            <label for="newUserEmail">Email</label>
+            <input type="email" id="newUserEmail" name="email" placeholder="New User Email" required>
             <label for="newUserPassword">Password</label>
-            <input type="password" id="newUserPassword" name="password" placeholder="Password">
+            <input type="password" id="newUserPassword" name="password" placeholder="Password" required>
             <button type="submit" class="save-user-button">Save User</button>
         </form>
 
         <div class="user-list" id="userList">
+            <div class="user-list-header">
+                <span>Email</span>
+                <span>Admin</span>
+                <span>Subscription Status</span>
+                <span>Actions</span>
+            </div>
             <!-- Dynamically populated user list -->
         </div>
     </div>

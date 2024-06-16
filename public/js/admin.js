@@ -44,7 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Clear user list
     function clearUserList() {
-        userList.innerHTML = '';
+        userList.innerHTML = `
+            <div class="user-list-header">
+                <span>Email</span>
+                <span>Admin</span>
+                <span>Subscription Status</span>
+                <span>Actions</span>
+            </div>`;
     }
 
     // Toggle admin status
