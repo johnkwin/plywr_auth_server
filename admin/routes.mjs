@@ -72,15 +72,19 @@ router.post('/user', isAuthenticated, async (req, res) => {
     }
 });
 
-// Update user
+// Update or edit user
 router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
+    const { id } = req.params;
+    const { email, isAdmin, subscriptionStatus, password } = req.body;
     try {
-        const { id } = req.params;
-        const { isAdmin, subscriptionStatus } = req.body;
         const user = await User.findById(id);
         if (user) {
+            user.email = email;
             user.isAdmin = isAdmin === 'true'; // Ensure boolean
             user.subscriptionStatus = subscriptionStatus;
+            if (password) {
+                user.password = await bcrypt.hash(password, 10);
+            }
             await user.save();
             notifyClient(user._id.toString());
             res.json({ success: true });
@@ -92,6 +96,7 @@ router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
+
 
 // Search users
 router.get('/search-users', isAuthenticated, async (req, res) => {

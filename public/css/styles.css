@@ -334,3 +334,58 @@ h2 {
 .logout-button:hover {
     background: #c82333;
 }
+.user-list-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.user-list-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.user-list-item input[type="text"] {
+    flex: 2;
+    margin-right: 10px;
+}
+
+.user-list-item .toggle-button {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.user-list-item select {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.user-list-item .confirm-changes-button {
+    flex: 1;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    display: none;
+}
+
+.user-list-item .confirm-changes-button.confirm-deletion {
+    background: #dc3545;
+}
+
+.user-list-item .confirm-changes-button:hover {
+    background: #218838;
+}
+
+.user-list-item .confirm-changes-button.confirm-deletion:hover {
+    background: #c82333;
+}
