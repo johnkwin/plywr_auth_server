@@ -74,12 +74,15 @@ router.post('/user', isAuthenticated, async (req, res) => {
 // Update user
 router.post('/update-user/:id', isAuthenticated, async (req, res) => {
     try {
-        const { email, isAdmin, subscriptionStatus } = req.body;
-        const user = await User.findById(req.params.id);
+        const { id, email, isAdmin, subscriptionStatus, password } = req.body;
+        const user = await User.findById(id);
         if (user) {
             user.email = email;
-            user.isAdmin = isAdmin;
+            user.isAdmin = isAdmin === 'true'; // Ensure boolean
             user.subscriptionStatus = subscriptionStatus;
+            if (password) {
+                user.password = await bcrypt.hash(password, 10);
+            }
             await user.save();
             notifyClient(user._id.toString());
             res.json({ success: true });

@@ -18,29 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function toggleAdmin(button) {
     const isAdmin = button.classList.contains('active');
-
-    if (isAdmin) {
-        button.classList.remove('active');
-        button.classList.add('off');
-        button.textContent = 'Off';
-    } else {
-        button.classList.remove('off');
-        button.classList.add('active');
-        button.textContent = 'On';
-    }
+    button.classList.toggle('active');
+    button.classList.toggle('off');
+    button.textContent = isAdmin ? 'Off' : 'On';
     markChanged(button);
 }
 
 function toggleNewUserAdmin(button) {
-    if (button.classList.contains('active')) {
-        button.classList.remove('active');
-        button.classList.add('off');
-        button.textContent = 'Off';
-    } else {
-        button.classList.remove('off');
-        button.classList.add('active');
-        button.textContent = 'On';
-    }
+    button.classList.toggle('active');
+    button.classList.toggle('off');
+    button.textContent = button.classList.contains('active') ? 'On' : 'Off';
 }
 
 function markChanged(element) {
@@ -60,24 +47,29 @@ function confirmChanges(button) {
     const isAdmin = userItem.querySelector('.toggle-button').classList.contains('active');
     const subscriptionStatus = userItem.querySelector('select').value;
     const newPassword = userItem.querySelector('input[type="password"]').value;
+    const email = userItem.querySelector('input[type="text"]').value;
 
-    const body = { id: userId, isAdmin, subscriptionStatus };
+    const body = { id: userId, isAdmin, subscriptionStatus, email };
     if (newPassword) {
         body.password = newPassword;
     }
 
-    fetch('/admin/update-user', {
+    fetch(`/admin/update-user/${userId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(body)
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
-        console.log('User updated:', data);
-        userItem.classList.remove('changed');
-        button.style.display = 'none';
+        if (data.success) {
+            console.log('User updated:', data);
+            userItem.classList.remove('changed');
+            button.style.display = 'none';
+        } else {
+            console.error('Error updating user:', data.message);
+        }
     })
     .catch(error => {
         console.error('Error updating user:', error);
@@ -103,21 +95,22 @@ function handleSearch(query) {
                 const listItem = document.createElement('li');
                 listItem.classList.add('user-list-item');
                 listItem.innerHTML = `
-                    <input type="text" value="${user.email}" readonly>
+                    <input type="text" value="${user.email}">
                     <input type="password" placeholder="New Password">
                     <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}" data-userid="${user._id}">On</button>
                     <select data-userid="${user._id}">
                         <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
                         <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
                     </select>
-                    <button class="confirm-changes-button" data-userid="${user._id}">Confirm Changes</button>
+                    <button class="confirm-changes-button" data-userid="${user._id}" style="display: none;">Confirm Changes</button>
                 `;
                 userList.appendChild(listItem);
 
                 // Attach event listeners
                 listItem.querySelector('.toggle-button').addEventListener('click', (e) => toggleAdmin(e.target));
-                listItem.querySelector('input[type="password"]').addEventListener('input', (e) => markChanged(e.target));
                 listItem.querySelector('select').addEventListener('change', (e) => markChanged(e.target));
+                listItem.querySelector('input[type="text"]').addEventListener('input', (e) => markChanged(e.target));
+                listItem.querySelector('input[type="password"]').addEventListener('input', (e) => markChanged(e.target));
                 listItem.querySelector('.confirm-changes-button').addEventListener('click', (e) => confirmChanges(e.target));
             });
         })
@@ -130,19 +123,24 @@ function createUser() {
     const email = document.getElementById('new-user-email').value;
     const password = document.getElementById('new-user-password').value;
     const isAdmin = document.getElementById('new-user-admin').classList.contains('active');
-    const subscriptionStatus = document.getElementById('new-user-subscription-status').value;
+    const subscriptionStatus = document.getElementById('new-user-subscription').value;
 
     fetch('/admin/user', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
     })
     .then(response => response.text())
     .then(data => {
         console.log('User created:', data);
-        handleSearch('');
+        document.getElementById('new-user-email').value = '';
+        document.getElementById('new-user-password').value = '';
+        document.getElementById('new-user-admin').classList.remove('active');
+        document.getElementById('new-user-admin').classList.add('off');
+        document.getElementById('new-user-admin').textContent = 'Off';
+        document.getElementById('new-user-subscription').value = 'active';
     })
     .catch(error => {
         console.error('Error creating user:', error);
