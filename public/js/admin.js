@@ -123,12 +123,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const subscriptionStatus = subscriptionSelect.value;
     
         if (subscriptionStatus === 'delete') {
-            fetch(`/admin/user/delete`, {
-                method: 'POST',
+            fetch(`/admin/user/${userId}`, {
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id: userId })
             })
             .then(response => {
                 if (response.ok) {
@@ -140,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Error deleting user:', error));
         } else {
-            fetch(`/admin/update-user/${userId}`, {
+            fetch(`/admin/user/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -159,5 +158,4 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
-
 
