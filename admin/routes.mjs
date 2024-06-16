@@ -122,6 +122,7 @@ router.patch('/user/:id', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
+
 router.post('/user/delete', isAuthenticated, async (req, res) => {
     try {
         const user = await User.findById(req.body.id);
