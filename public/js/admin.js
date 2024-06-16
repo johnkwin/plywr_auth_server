@@ -5,15 +5,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserEmail = document.getElementById('newUserEmail');
     const newUserPassword = document.getElementById('newUserPassword');
     const newUserForm = document.getElementById('newUserForm');
-    const newUserAdmin = document.getElementById('new-user-admin');
-    const newUserSubscriptionStatus = document.getElementById('new-user-subscription-status');
+    const newUserAdmin = document.getElementById('newUserAdmin');  // Updated ID reference
+    const newUserSubscriptionStatus = document.getElementById('newUserSubscriptionStatus');
 
-    // Search users
     if (searchUsers) {
         searchUsers.addEventListener('input', handleSearch);
     }
 
-    // Save new user
     if (saveNewUserButton) {
         saveNewUserButton.addEventListener('click', function () {
             const email = newUserEmail.value.trim();
@@ -47,7 +45,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Toggle admin status for new user
     if (newUserAdmin) {
         newUserAdmin.addEventListener('click', function () {
             newUserAdmin.classList.toggle('active');
@@ -56,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Handle user list interactions
     if (userList) {
         userList.addEventListener('click', function (event) {
             if (event.target.matches('.confirm-changes-button')) {
@@ -73,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Handle search input
     function handleSearch(event) {
         const query = event.target.value;
         if (query.trim() === '') {
@@ -108,7 +103,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error searching users:', error));
     }
 
-    // Toggle admin status for existing user
     function toggleAdmin(button) {
         button.classList.toggle('active');
         button.classList.toggle('off');
@@ -118,7 +112,6 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmButton.style.display = 'inline-block'; // Show the confirm button
     }
 
-    // Mark user as changed
     function markChanged(selectElement) {
         const confirmButton = selectElement.nextElementSibling;
         if (selectElement.value === 'delete') {
@@ -133,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmButton.style.display = 'inline-block';
     }
 
-    // Confirm changes for user
     function confirmChanges(button) {
         const listItem = button.closest('.user-list-item');
         const userId = listItem.dataset.userid;

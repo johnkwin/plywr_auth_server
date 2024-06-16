@@ -15,17 +15,15 @@
             <input type="text" id="searchUsers" placeholder="Search users...">
         </div>
 
-        <div id="newUserForm" class="new-user-form">
+        <div id="newUserForm">
             <h3>New User</h3>
             <input type="email" id="newUserEmail" placeholder="New User Email">
             <input type="password" id="newUserPassword" placeholder="Password">
-            <div class="new-user-options">
-                <button id="newUserAdmin" class="toggle-button off">Off</button>
-                <select id="newUserSubscriptionStatus">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
-            </div>
+            <button id="newUserAdmin" class="toggle-button off">Off</button>
+            <select id="newUserSubscriptionStatus">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
             <button id="saveNewUser">Save User</button>
         </div>
 
@@ -37,7 +35,6 @@
                 <span>Subscription Status</span>
                 <span>Actions</span>
             </div>
-            <ul class="user-list-items"></ul>
         </div>
     </div>
     <script src="/js/admin.js"></script>
