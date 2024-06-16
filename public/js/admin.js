@@ -1,3 +1,23 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search-users');
+    const userList = document.getElementById('user-list');
+    const newUserForm = document.querySelector('.new-user-form');
+    const newUserAdmin = document.getElementById('new-user-admin');
+
+    searchInput.addEventListener('input', () => {
+        if (searchInput.value.length === 0) {
+            userList.innerHTML = '';
+            newUserForm.style.display = 'flex';
+        } else {
+            handleSearch(searchInput.value);
+        }
+    });
+
+    newUserAdmin.addEventListener('click', () => {
+        toggleNewUserAdmin(newUserAdmin);
+    });
+});
+
 // Toggle admin status
 function toggleAdmin(button) {
     const userId = button.dataset.userid;
@@ -15,6 +35,19 @@ function toggleAdmin(button) {
     markChanged(button);
 }
 
+// Toggle new user admin status
+function toggleNewUserAdmin(button) {
+    if (button.classList.contains('active')) {
+        button.classList.remove('active');
+        button.classList.add('off');
+        button.textContent = 'Off';
+    } else {
+        button.classList.remove('off');
+        button.classList.add('active');
+        button.textContent = 'On';
+    }
+}
+
 // Mark user as changed
 function markChanged(element) {
     const userItem = element.closest('.user-list-item');
@@ -23,7 +56,7 @@ function markChanged(element) {
     }
 }
 
-// Confirm changes for user
+// Confirm changes
 function confirmChanges(button) {
     const userId = button.dataset.userid;
     const userItem = button.closest('.user-list-item');
@@ -34,7 +67,6 @@ function confirmChanges(button) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token // Add token if needed
         },
         body: JSON.stringify({ id: userId, isAdmin, subscriptionStatus })
     })
@@ -70,7 +102,7 @@ function handleSearch(query) {
                 listItem.classList.add('user-list-item');
                 listItem.innerHTML = `
                     <input type="text" value="${user.email}" readonly>
-                    <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}" data-userid="${user._id}" onclick="toggleAdmin(this)">${user.isAdmin ? 'On' : 'Off'}</button>
+                    <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}" data-userid="${user._id}">${user.isAdmin ? 'On' : 'Off'}</button>
                     <select data-userid="${user._id}" onchange="markChanged(this)">
                         <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
                         <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>

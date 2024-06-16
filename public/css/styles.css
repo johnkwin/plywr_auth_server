@@ -26,8 +26,9 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Stronger shadow for more depth */
-    width: 400px; /* Set a standard width for the container */
+    width: 600px; /* Adjusted width for better layout */
     max-width: 90%; /* Ensure it doesn't exceed the screen width */
+    position: relative;
 }
 
 /* Container for different pages */
@@ -83,6 +84,7 @@ button:hover {
     position: absolute; /* Positioning to the top right */
     top: 10px;
     right: 10px;
+    padding: 5px 10px; /* Smaller padding for logout */
 }
 
 .logout-button:hover {
@@ -91,7 +93,7 @@ button:hover {
 
 /* Toggle Button for Admin On/Off */
 .toggle-button {
-    width: auto;
+    width: 80px;
     padding: 10px;
     background: #28a745; /* Green for On state */
     color: #fff;
@@ -150,11 +152,12 @@ button:hover {
 .user-list-item button.confirm-changes-button {
     display: none; /* Hidden by default */
     background: #17a2b8; /* Teal color for Confirm Changes */
+    margin-left: 10px; /* Align Confirm Changes button */
+    white-space: nowrap; /* Prevent wrapping */
 }
 
 .user-list-item.changed button.confirm-changes-button {
     display: inline-block; /* Show when a change is detected */
-    margin-left: 10px;
 }
 
 .user-list-item select {
@@ -193,6 +196,7 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 10px;
 }
 
 .new-user-options button, .new-user-options select {
