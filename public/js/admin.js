@@ -8,6 +8,56 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserAdmin = document.getElementById('new-user-admin');
     const newUserSubscriptionStatus = document.getElementById('new-user-subscription-status');
 
+    if (searchUsers) {
+        searchUsers.addEventListener('input', handleSearch);
+    }
+
+    if (saveNewUserButton) {
+        saveNewUserButton.addEventListener('click', function () {
+            const email = newUserEmail.value.trim();
+            const password = newUserPassword.value.trim();
+            const isAdmin = newUserAdmin.classList.contains('active');
+            const subscriptionStatus = newUserSubscriptionStatus.value;
+
+            if (email && password) {
+                fetch('/admin/user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        newUserEmail.value = '';
+                        newUserPassword.value = '';
+                        newUserForm.style.display = 'none'; // Hide the form after adding a user
+                        handleSearch({ target: { value: '' } }); // Refresh user list
+                    } else {
+                        console.error('Error adding user:', response);
+                    }
+                })
+                .catch(error => console.error('Error adding user:', error));
+            } else {
+                alert('Please fill out all fields.');
+            }
+        });
+    }
+
+    if (newUserAdmin) {
+        newUserAdmin.addEventListener('click', function () {
+            newUserAdmin.classList.toggle('active');
+            newUserAdmin.classList.toggle('off');
+            newUserAdmin.textContent = newUserAdmin.classList.contains('active') ? 'On' : 'Off';
+        });
+    }
+
+    if (userList) {
+        userList.addEventListener('click', handleUserChange);
+        userList.addEventListener('change', handleUserChange);
+        userList.addEventListener('click', confirmChanges);
+    }
+
     function handleSearch(event) {
         const query = event.target.value;
         if (query.trim() === '') {
@@ -111,46 +161,4 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-
-    searchUsers.addEventListener('input', handleSearch);
-
-    saveNewUserButton.addEventListener('click', function () {
-        const email = newUserEmail.value.trim();
-        const password = newUserPassword.value.trim();
-        const isAdmin = newUserAdmin.classList.contains('active');
-        const subscriptionStatus = newUserSubscriptionStatus.value;
-
-        if (email && password) {
-            fetch('/admin/user', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
-            })
-            .then(response => {
-                if (response.ok) {
-                    newUserEmail.value = '';
-                    newUserPassword.value = '';
-                    newUserForm.style.display = 'none'; // Hide the form after adding a user
-                    handleSearch({ target: { value: '' } }); // Refresh user list
-                } else {
-                    console.error('Error adding user:', response);
-                }
-            })
-            .catch(error => console.error('Error adding user:', error));
-        } else {
-            alert('Please fill out all fields.');
-        }
-    });
-
-    newUserAdmin.addEventListener('click', function () {
-        newUserAdmin.classList.toggle('active');
-        newUserAdmin.classList.toggle('off');
-        newUserAdmin.textContent = newUserAdmin.classList.contains('active') ? 'On' : 'Off';
-    });
-
-    userList.addEventListener('click', handleUserChange);
-    userList.addEventListener('change', handleUserChange);
-    userList.addEventListener('click', confirmChanges);
 });
