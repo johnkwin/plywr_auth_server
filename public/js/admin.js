@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserEmail = document.getElementById('newUserEmail');
     const newUserPassword = document.getElementById('newUserPassword');
     const newUserForm = document.getElementById('newUserForm');
-    const newUserAdmin = document.getElementById('newUserAdmin');  // Updated ID reference
+    const newUserAdmin = document.getElementById('newUserAdmin');
     const newUserSubscriptionStatus = document.getElementById('newUserSubscriptionStatus');
 
     if (searchUsers) {
@@ -27,16 +27,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        newUserEmail.value = '';
-                        newUserPassword.value = '';
-                        newUserForm.style.display = 'none'; // Hide the form after adding a user
-                        handleSearch({ target: { value: '' } }); // Refresh user list
+                .then(response => {
+                    if (response.ok) {
+                        return response.json(); // Properly parse JSON
                     } else {
-                        console.error('Error adding user:', data.message);
+                        console.error('Error adding user:', response);
+                        throw new Error('Error adding user');
                     }
+                })
+                .then(data => {
+                    console.log('User added:', data);
+                    newUserEmail.value = '';
+                    newUserPassword.value = '';
+                    newUserForm.style.display = 'none'; // Hide the form after adding a user
+                    handleSearch({ target: { value: '' } }); // Refresh user list
                 })
                 .catch(error => console.error('Error adding user:', error));
             } else {
@@ -54,19 +58,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (userList) {
-        userList.addEventListener('click', function (event) {
-            if (event.target.matches('.confirm-changes-button')) {
-                confirmChanges(event.target);
-            } else if (event.target.matches('.toggle-button')) {
-                toggleAdmin(event.target);
-            }
-        });
-
-        userList.addEventListener('change', function (event) {
-            if (event.target.matches('select[data-userid]')) {
-                markChanged(event.target);
-            }
-        });
+        userList.addEventListener('click', handleUserChange);
+        userList.addEventListener('change', handleUserChange);
+        userList.addEventListener('click', confirmChanges);
     }
 
     function handleSearch(event) {
@@ -78,7 +72,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         fetch(`/admin/search-users?q=${encodeURIComponent(query)}`)
-            .then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    console.error('Error searching users:', response);
+                    throw new Error('Error searching users');
+                }
+            })
             .then(users => {
                 userList.innerHTML = ''; // Clear the list before updating
                 newUserForm.style.display = 'none'; // Hide new user form
@@ -103,71 +104,73 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error searching users:', error));
     }
 
-    function toggleAdmin(button) {
-        button.classList.toggle('active');
-        button.classList.toggle('off');
-        button.textContent = button.classList.contains('active') ? 'On' : 'Off';
+    function handleUserChange(event) {
+        if (event.target.matches('select[data-userid]')) {
+            const selectElement = event.target;
+            const confirmButton = selectElement.nextElementSibling;
 
-        const confirmButton = button.nextElementSibling.nextElementSibling; // Find the confirm button
-        confirmButton.style.display = 'inline-block'; // Show the confirm button
-    }
+            if (selectElement.value === 'delete') {
+                confirmButton.textContent = 'Confirm Deletion';
+                confirmButton.classList.add('confirm-deletion');
+            } else {
+                confirmButton.textContent = 'Confirm Changes';
+                confirmButton.classList.remove('confirm-deletion');
+            }
+            confirmButton.style.display = 'inline-block';
+        } else if (event.target.matches('.toggle-button')) {
+            const button = event.target;
+            button.classList.toggle('active');
+            button.classList.toggle('off');
+            button.textContent = button.classList.contains('active') ? 'On' : 'Off';
 
-    function markChanged(selectElement) {
-        const confirmButton = selectElement.nextElementSibling;
-        if (selectElement.value === 'delete') {
-            confirmButton.textContent = 'Confirm Deletion';
-            confirmButton.classList.add('confirm-deletion');
-            confirmButton.style.backgroundColor = '#dc3545';
-        } else {
-            confirmButton.textContent = 'Confirm Changes';
-            confirmButton.classList.remove('confirm-deletion');
-            confirmButton.style.backgroundColor = '#28a745';
+            const confirmButton = button.nextElementSibling.nextElementSibling; // Find the confirm button
+            confirmButton.style.display = 'inline-block'; // Show the confirm button
         }
-        confirmButton.style.display = 'inline-block';
     }
 
-    function confirmChanges(button) {
-        const listItem = button.closest('.user-list-item');
-        const userId = listItem.dataset.userid;
-        const isAdminButton = listItem.querySelector('.toggle-button');
-        const subscriptionSelect = listItem.querySelector('select');
-        const isAdmin = isAdminButton.classList.contains('active');
-        const subscriptionStatus = subscriptionSelect.value;
+    function confirmChanges(event) {
+        if (event.target.matches('.confirm-changes-button')) {
+            const button = event.target;
+            const listItem = button.closest('.user-list-item');
+            const userId = listItem.dataset.userid;
+            const isAdminButton = listItem.querySelector('.toggle-button');
+            const subscriptionSelect = listItem.querySelector('select');
+            const isAdmin = isAdminButton.classList.contains('active');
+            const subscriptionStatus = subscriptionSelect.value;
 
-        if (subscriptionStatus === 'delete') {
-            fetch(`/admin/user/delete`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id: userId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    listItem.remove(); // Remove the user from the list
-                } else {
-                    console.error('Error deleting user:', data.message);
-                }
-            })
-            .catch(error => console.error('Error deleting user:', error));
-        } else {
-            fetch(`/admin/update-user/${userId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ isAdmin, subscriptionStatus })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    button.style.display = 'none'; // Hide confirm button
-                } else {
-                    console.error('Error updating user:', data.message);
-                }
-            })
-            .catch(error => console.error('Error updating user:', error));
+            if (subscriptionStatus === 'delete') {
+                fetch(`/admin/user/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: userId })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        listItem.remove(); // Remove the user from the list
+                    } else {
+                        console.error('Error deleting user:', response);
+                    }
+                })
+                .catch(error => console.error('Error deleting user:', error));
+            } else {
+                fetch(`/admin/update-user/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ isAdmin, subscriptionStatus })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        button.style.display = 'none'; // Hide confirm button
+                    } else {
+                        console.error('Error updating user:', response);
+                    }
+                })
+                .catch(error => console.error('Error updating user:', error));
+            }
         }
     }
 });
