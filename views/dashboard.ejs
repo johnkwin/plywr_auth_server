@@ -7,29 +7,26 @@
 </head>
 <body class="dashboard-page">
     <div class="dashboard-container">
-        <h2>Admin Dashboard</h2>
-        <a href="/admin/logout" class="logout-button">Logout</a>
-
-        <input type="text" class="search-bar" id="searchBar" placeholder="Search users...">
-
-        <div id="user-list-container">
-            <!-- Dynamically populated user list -->
+        <div class="logout-container">
+            <h2>Admin Dashboard</h2>
+            <a href="/admin/logout" class="logout-button">Logout</a>
         </div>
 
-        <form action="/admin/user" method="POST" class="user-form" id="new-user-form">
-            <h3>Create New User</h3>
+        <div class="search-container">
+            <input type="text" id="search" placeholder="Search users..." oninput="handleSearch()">
+        </div>
+
+        <form action="/admin/user" method="POST" class="user-form" id="user-form">
             <input type="hidden" name="id" id="userId">
-            <input type="email" id="email" name="email" placeholder="New User Email" required>
-            <input type="password" id="password" name="password" placeholder="Password" required>
-            <label for="isAdmin">Admin:</label>
-            <input type="checkbox" id="isAdmin" name="isAdmin">
-            <label for="subscriptionStatus">Subscription Status:</label>
-            <select id="subscriptionStatus" name="subscriptionStatus">
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
+            <label for="newUserEmail">New User Email:</label>
+            <input type="email" id="newUserEmail" name="email" required>
+            <label for="newUserPassword">Password:</label>
+            <input type="password" id="newUserPassword" name="password">
             <button type="submit">Save User</button>
         </form>
+
+        <h3>Users</h3>
+        <ul class="user-list" id="user-list"></ul>
     </div>
     <script src="/js/admin.js"></script>
 </body>
