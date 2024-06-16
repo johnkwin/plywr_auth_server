@@ -78,8 +78,8 @@ function confirmChanges(button) {
         console.log('User updated:', data);
         userItem.classList.remove('changed');
         button.style.display = 'none';
-        // Clear the password field after update
-        userItem.querySelector('input[type="password"]').value = '';
+        // Keep the password field content after update
+        // userItem.querySelector('input[type="password"]').value = '';
     })
     .catch(error => {
         console.error('Error updating user:', error);
@@ -132,24 +132,19 @@ function createUser() {
     const email = document.getElementById('new-user-email').value;
     const password = document.getElementById('new-user-password').value;
     const isAdmin = document.getElementById('new-user-admin').classList.contains('active');
-    const subscriptionStatus = document.getElementById('new-user-subscription').value;
+    const subscriptionStatus = document.getElementById('new-user-subscription-status').value;
 
     fetch('/admin/user', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
     })
     .then(response => response.text())
     .then(data => {
         console.log('User created:', data);
-        document.getElementById('new-user-email').value = '';
-        document.getElementById('new-user-password').value = '';
-        document.getElementById('new-user-admin').classList.remove('active');
-        document.getElementById('new-user-admin').classList.add('off');
-        document.getElementById('new-user-admin').textContent = 'Off';
-        document.getElementById('new-user-subscription').value = 'active';
+        handleSearch('');
     })
     .catch(error => {
         console.error('Error creating user:', error);

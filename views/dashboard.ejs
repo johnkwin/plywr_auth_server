@@ -7,37 +7,31 @@
 </head>
 <body class="dashboard-page">
     <div class="container">
-        <a href="/admin/logout" class="logout-button">Logout</a>
         <h2>Admin Dashboard</h2>
-        
+        <a href="/admin/logout" class="logout-button">Logout</a>
         <div>
-            <h3>Users</h3>
-            <input type="text" placeholder="Search users..." id="search-users">
+            <input type="text" id="search-users" placeholder="Search users by email">
         </div>
-        
-        <div class="new-user-form">
-            <input type="email" placeholder="New User Email" id="new-user-email">
-            <input type="password" placeholder="Password" id="new-user-password">
-            <div class="new-user-options">
-                <button class="toggle-button off" id="new-user-admin">Off</button>
-                <select id="new-user-subscription">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
-            </div>
-            <button id="save-new-user">Save User</button>
-        </div>
-        
         <div class="user-list-header">
             <span>Email</span>
             <span>Password</span>
             <span>Admin</span>
             <span>Subscription Status</span>
+            <span>Actions</span>
         </div>
-        
-        <ul class="user-list" id="user-list">
-            <!-- User list items will be appended here by JavaScript -->
-        </ul>
+        <div class="new-user-form">
+            <input type="email" id="new-user-email" placeholder="Email">
+            <input type="password" id="new-user-password" placeholder="Password">
+            <div class="new-user-options">
+                <button id="new-user-admin" class="toggle-button off">Off</button>
+                <select id="new-user-subscription-status">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <button id="save-new-user">Save New User</button>
+        </div>
+        <ul class="user-list" id="user-list"></ul>
     </div>
     <script src="/js/admin.js"></script>
 </body>
