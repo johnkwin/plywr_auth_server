@@ -1,78 +1,76 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('search');
-    const userList = document.getElementById('user-list');
-    const newUserForm = document.getElementById('new-user-form');
-    const userCreationForm = document.getElementById('user-creation-form');
+document.addEventListener('DOMContentLoaded', () => {
+    const userList = document.getElementById('userList');
+    const searchUsers = document.getElementById('searchUsers');
+    const newUserForm = document.getElementById('newUserForm');
 
-    function renderUsers(users) {
-        userList.innerHTML = '';
+    // Handle user search
+    searchUsers.addEventListener('input', handleSearch);
+
+    // Load users dynamically based on search input
+    async function handleSearch() {
+        const query = searchUsers.value.trim();
+        if (query === '') {
+            clearUserList();
+            newUserForm.style.display = 'block';
+            return;
+        }
+
+        newUserForm.style.display = 'none';
+        const response = await fetch(`/admin/search-users?q=${query}`);
+        const users = await response.json();
+        populateUserList(users);
+    }
+
+    // Populate user list
+    function populateUserList(users) {
+        clearUserList();
         users.forEach(user => {
-            const userItem = document.createElement('div');
-            userItem.classList.add('user-item');
-            userItem.innerHTML = `
-                <div>
-                    <input type="text" class="user-email" value="${user.email}" disabled>
-                    <button class="admin-toggle" data-isadmin="${user.isAdmin}" style="background: ${user.isAdmin ? '#28a745' : '#6c757d'}">${user.isAdmin ? 'On' : 'Off'}</button>
-                    <select class="subscription-status">
-                        <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
-                        <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
-                    </select>
-                </div>
-                <button class="confirm-button" data-id="${user._id}">Confirm Changes</button>
+            const listItem = document.createElement('div');
+            listItem.className = 'user-list-item';
+            listItem.innerHTML = `
+                <input type="text" value="${user.email}" readonly>
+                <button class="toggle-button ${user.isAdmin ? 'active' : ''}" data-userid="${user._id}" onclick="toggleAdmin(this)">${user.isAdmin ? 'On' : 'Off'}</button>
+                <select data-userid="${user._id}" onchange="markChanged(this)">
+                    <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
+                    <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
+                </select>
+                <button class="confirm-changes-button" data-userid="${user._id}" onclick="confirmChanges(this)">Confirm Changes</button>
             `;
-
-            userList.appendChild(userItem);
+            userList.appendChild(listItem);
         });
     }
 
-    function handleSearch(event) {
-        const query = event.target.value;
-        if (query) {
-            fetch(`/admin/search-users?q=${query}`)
-                .then(response => response.json())
-                .then(data => renderUsers(data))
-                .catch(error => console.error('Error searching users:', error));
-            userCreationForm.style.display = 'none';
-        } else {
-            userList.innerHTML = '';
-            userCreationForm.style.display = 'block';
-        }
+    // Clear user list
+    function clearUserList() {
+        userList.innerHTML = '';
     }
 
-    searchInput.addEventListener('input', handleSearch);
+    // Toggle admin status
+    window.toggleAdmin = (button) => {
+        button.classList.toggle('active');
+        button.textContent = button.classList.contains('active') ? 'On' : 'Off';
+        markChanged(button);
+    };
 
-    userList.addEventListener('click', function (event) {
-        if (event.target.classList.contains('admin-toggle')) {
-            const button = event.target;
-            const isAdmin = button.dataset.isadmin === 'true';
-            button.dataset.isadmin = !isAdmin;
-            button.textContent = !isAdmin ? 'On' : 'Off';
-            button.style.background = !isAdmin ? '#28a745' : '#6c757d';
-        }
+    // Mark a user as changed
+    window.markChanged = (element) => {
+        const confirmButton = element.parentNode.querySelector('.confirm-changes-button');
+        confirmButton.classList.add('visible');
+    };
 
-        if (event.target.classList.contains('confirm-button')) {
-            const button = event.target;
-            const userId = button.dataset.id;
-            const listItem = button.closest('.user-item');
-            const email = listItem.querySelector('.user-email').value;
-            const isAdmin = listItem.querySelector('.admin-toggle').dataset.isadmin === 'true';
-            const subscriptionStatus = listItem.querySelector('.subscription-status').value;
+    // Confirm changes
+    window.confirmChanges = async (button) => {
+        const userId = button.getAttribute('data-userid');
+        const listItem = button.parentNode;
+        const isAdmin = listItem.querySelector('.toggle-button').classList.contains('active');
+        const subscriptionStatus = listItem.querySelector('select').value;
 
-            fetch('/admin/update-user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: userId, email, isAdmin, subscriptionStatus })
-            })
-                .then(response => response.json())
-                .then(() => {
-                    button.style.display = 'none';
-                })
-                .catch(error => console.error('Error updating user:', error));
-        }
-    });
+        await fetch('/admin/update-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: userId, isAdmin, subscriptionStatus })
+        });
 
-    userList.addEventListener('change', function (event) {
-        const confirmButton = event.target.closest('.user-item').querySelector('.confirm-button');
-        confirmButton.style.display = 'inline-block';
-    });
+        button.classList.remove('visible');
+    };
 });

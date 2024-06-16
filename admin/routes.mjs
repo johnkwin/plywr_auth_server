@@ -71,16 +71,27 @@ router.post('/user', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
+// Search users
 router.get('/search-users', isAuthenticated, async (req, res) => {
+    const query = req.query.q;
     try {
-        const query = req.query.q;
-        const users = await User.find({
-            email: { $regex: query, $options: 'i' } // Case-insensitive search
-        }).select('email isAdmin subscriptionStatus'); // Selecting only necessary fields
+        const users = await User.find({ email: { $regex: query, $options: 'i' } }).select('email isAdmin subscriptionStatus');
         res.json(users);
     } catch (error) {
-        res.status(500).json({ error: 'Server error' });
-        console.error('Error searching users:', error);
+        res.status(500).send('Server error');
+        console.error(error);
+    }
+});
+
+// Update user
+router.post('/update-user', isAuthenticated, async (req, res) => {
+    const { id, isAdmin, subscriptionStatus } = req.body;
+    try {
+        await User.findByIdAndUpdate(id, { isAdmin, subscriptionStatus });
+        res.send('User updated');
+    } catch (error) {
+        res.status(500).send('Server error');
+        console.error(error);
     }
 });
 // Delete User

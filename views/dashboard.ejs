@@ -1,33 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
-
 <body class="dashboard-page">
     <div class="dashboard-container">
-        <div class="header">
-            <h2>Admin Dashboard</h2>
-            <a href="/admin/logout" class="logout-button">Logout</a>
-        </div>
-        <div class="search-container">
-            <input type="text" id="search" placeholder="Search users...">
-        </div>
-        <div id="user-creation-form">
-            <h3>New User</h3>
-            <form action="/admin/user" method="POST" id="new-user-form">
-                <input type="text" id="new-email" name="email" placeholder="New User Email" required>
-                <input type="password" id="new-password" name="password" placeholder="Password" required>
-                <button type="submit">Save User</button>
-            </form>
-        </div>
+        <a href="/admin/logout" class="logout-button">Logout</a>
+        <h2>Admin Dashboard</h2>
+        
         <h3>Users</h3>
-        <div id="user-list"></div>
+        <input type="text" id="searchUsers" placeholder="Search users..." oninput="handleSearch()">
+        
+        <form action="/admin/user" method="POST" class="user-form" id="newUserForm">
+            <label for="newUserEmail">New User Email</label>
+            <input type="email" id="newUserEmail" name="email" placeholder="New User Email">
+            <label for="newUserPassword">Password</label>
+            <input type="password" id="newUserPassword" name="password" placeholder="Password">
+            <button type="submit">Save User</button>
+        </form>
+
+        <div class="user-list" id="userList">
+            <!-- Dynamically populated user list -->
+        </div>
     </div>
     <script src="/js/admin.js"></script>
 </body>
-
 </html>
