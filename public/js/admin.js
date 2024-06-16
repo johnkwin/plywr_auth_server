@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     listItem.innerHTML = `
                         <input type="text" value="${user.email}" readonly>
                         <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}" data-userid="${user._id}">${user.isAdmin ? 'On' : 'Off'}</button>
-                        <select data-userid="${user._id}" onchange="handleUserChange(this)">
+                        <select data-userid="${user._id}" onchange="handleUserChange(event)">
                             <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
                             <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
                             <option value="delete" class="delete-option">Delete</option>
@@ -40,7 +40,8 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error searching users:', error));
     }
 
-    function handleUserChange(selectElement) {
+    function handleUserChange(event) {
+        const selectElement = event.target;
         const userId = selectElement.getAttribute('data-userid');
         const confirmButton = selectElement.nextElementSibling;
         if (!confirmButton) return;
@@ -55,7 +56,8 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmButton.style.display = 'inline-block';
     }
 
-    function confirmChanges(button) {
+    function confirmChanges(event) {
+        const button = event.target;
         const userId = button.getAttribute('data-userid');
         const listItem = button.closest('.user-list-item');
         const isAdminButton = listItem.querySelector('.toggle-button');
@@ -113,27 +115,34 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
         })
-        .then(response => response.ok ? response.json() : Promise.reject(response))
-        .then(() => {
-            newUserEmail.value = '';
-            newUserPassword.value = '';
+        .then(response => {
+            if (response.ok) {
+                newUserEmail.value = '';
+                newUserPassword.value = '';
+                newUserForm.style.display = 'none'; // Hide the form after adding a user
+                handleSearch({ target: { value: '' } }); // Refresh user list
+            } else {
+                console.error('Error adding user:', response);
+            }
         })
-        .catch(error => console.error('Error saving new user:', error));
+        .catch(error => console.error('Error adding user:', error));
     });
 
-    document.getElementById('userList').addEventListener('click', function (event) {
+    // Toggle admin status
+    document.addEventListener('click', function (event) {
         if (event.target.classList.contains('toggle-button')) {
-            toggleAdmin(event.target);
-        } else if (event.target.classList.contains('confirm-changes-button')) {
-            confirmChanges(event.target);
+            const button = event.target;
+            button.classList.toggle('active');
+            button.classList.toggle('off');
+            button.textContent = button.classList.contains('active') ? 'On' : 'Off';
+            handleUserChange({ target: button.nextElementSibling }); // Trigger user change
         }
     });
 
-    function toggleAdmin(button) {
-        button.classList.toggle('active');
-        button.classList.toggle('off');
-        button.textContent = button.classList.contains('active') ? 'On' : 'Off';
-        const confirmButton = button.closest('.user-list-item').querySelector('.confirm-changes-button');
-        confirmButton.style.display = 'inline-block';
-    }
+    // Confirm changes
+    document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('confirm-changes-button')) {
+            confirmChanges(event);
+        }
+    });
 });
