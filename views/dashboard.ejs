@@ -12,7 +12,7 @@
         
         <div>
             <h3>Users</h3>
-            <input type="text" placeholder="Search users..." id="search-users" oninput="handleSearch(this.value)">
+            <input type="text" placeholder="Search users..." id="search-users">
         </div>
         
         <div class="new-user-form">
@@ -25,7 +25,7 @@
                     <option value="inactive">Inactive</option>
                 </select>
             </div>
-            <button onclick="createUser()">Save User</button>
+            <button id="save-new-user">Save User</button>
         </div>
         
         <div class="user-list-header">
@@ -38,6 +38,6 @@
             <!-- User list items will be appended here by JavaScript -->
         </ul>
     </div>
-    <script src="/js/admin.js"></script> <!-- External JavaScript file -->
+    <script src="/js/admin.js"></script>
 </body>
 </html>

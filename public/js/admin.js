@@ -3,22 +3,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const userList = document.getElementById('user-list');
     const newUserForm = document.querySelector('.new-user-form');
     const newUserAdmin = document.getElementById('new-user-admin');
+    const saveNewUserButton = document.getElementById('save-new-user');
 
     searchInput.addEventListener('input', () => {
-        if (searchInput.value.length === 0) {
-            userList.innerHTML = '';
-            newUserForm.style.display = 'flex';
-        } else {
-            handleSearch(searchInput.value);
-        }
+        handleSearch(searchInput.value);
     });
 
     newUserAdmin.addEventListener('click', () => {
         toggleNewUserAdmin(newUserAdmin);
     });
+
+    saveNewUserButton.addEventListener('click', createUser);
 });
 
-// Toggle admin status
 function toggleAdmin(button) {
     const userId = button.dataset.userid;
     const isAdmin = button.classList.contains('active');
@@ -35,7 +32,6 @@ function toggleAdmin(button) {
     markChanged(button);
 }
 
-// Toggle new user admin status
 function toggleNewUserAdmin(button) {
     if (button.classList.contains('active')) {
         button.classList.remove('active');
@@ -48,15 +44,17 @@ function toggleNewUserAdmin(button) {
     }
 }
 
-// Mark user as changed
 function markChanged(element) {
     const userItem = element.closest('.user-list-item');
     if (userItem) {
         userItem.classList.add('changed');
+        const confirmButton = userItem.querySelector('.confirm-changes-button');
+        if (confirmButton) {
+            confirmButton.style.display = 'inline-block';
+        }
     }
 }
 
-// Confirm changes
 function confirmChanges(button) {
     const userId = button.dataset.userid;
     const userItem = button.closest('.user-list-item');
@@ -81,7 +79,6 @@ function confirmChanges(button) {
     });
 }
 
-// Handle search input
 function handleSearch(query) {
     const userForm = document.querySelector('.new-user-form');
     const userList = document.getElementById('user-list');
@@ -102,14 +99,19 @@ function handleSearch(query) {
                 listItem.classList.add('user-list-item');
                 listItem.innerHTML = `
                     <input type="text" value="${user.email}" readonly>
-                    <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}" data-userid="${user._id}">${user.isAdmin ? 'On' : 'Off'}</button>
-                    <select data-userid="${user._id}" onchange="markChanged(this)">
+                    <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}" data-userid="${user._id}">On</button>
+                    <select data-userid="${user._id}">
                         <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
                         <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
                     </select>
-                    <button class="confirm-changes-button" data-userid="${user._id}" onclick="confirmChanges(this)">Confirm Changes</button>
+                    <button class="confirm-changes-button" data-userid="${user._id}">Confirm Changes</button>
                 `;
                 userList.appendChild(listItem);
+
+                // Attach event listeners
+                listItem.querySelector('.toggle-button').addEventListener('click', (e) => toggleAdmin(e.target));
+                listItem.querySelector('select').addEventListener('change', (e) => markChanged(e.target));
+                listItem.querySelector('.confirm-changes-button').addEventListener('click', (e) => confirmChanges(e.target));
             });
         })
         .catch(error => {
@@ -117,7 +119,6 @@ function handleSearch(query) {
         });
 }
 
-// Create new user
 function createUser() {
     const email = document.getElementById('new-user-email').value;
     const password = document.getElementById('new-user-password').value;
@@ -134,25 +135,14 @@ function createUser() {
     .then(response => response.text())
     .then(data => {
         console.log('User created:', data);
-        // Optionally refresh the list or reset the form
+        document.getElementById('new-user-email').value = '';
+        document.getElementById('new-user-password').value = '';
+        document.getElementById('new-user-admin').classList.remove('active');
+        document.getElementById('new-user-admin').classList.add('off');
+        document.getElementById('new-user-admin').textContent = 'Off';
+        document.getElementById('new-user-subscription').value = 'active';
     })
     .catch(error => {
         console.error('Error creating user:', error);
     });
 }
-
-// Initial display setup
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('search-users');
-    const userList = document.getElementById('user-list');
-    const newUserForm = document.querySelector('.new-user-form');
-    
-    searchInput.addEventListener('input', () => {
-        if (searchInput.value.length === 0) {
-            userList.innerHTML = '';
-            newUserForm.style.display = 'flex';
-        } else {
-            handleSearch(searchInput.value);
-        }
-    });
-});
