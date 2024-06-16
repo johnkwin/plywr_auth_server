@@ -83,11 +83,12 @@ router.get('/search-users', isAuthenticated, async (req, res) => {
 // Make sure the route is defined with the correct case-sensitive path
 // In admin.js, the route is defined as '/update-user/:id', while the path in the request is '/update-user/:ID'
 // This is why the route is not being matched correctly.
-router.patch('/update-user/:ID', isAuthenticated, async (req, res) => {
+// Change the route to match the case-sensitive path in the request
+router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
     try {
-        const { ID } = req.params;
+        const { id } = req.params;
         const { isAdmin, subscriptionStatus } = req.body;
-        const user = await User.findById(ID);
+        const user = await User.findById(id);
         if (user) {
             user.isAdmin = isAdmin === 'true';
             user.subscriptionStatus = subscriptionStatus;
