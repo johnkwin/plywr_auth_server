@@ -78,8 +78,6 @@ function confirmChanges(button) {
         console.log('User updated:', data);
         userItem.classList.remove('changed');
         button.style.display = 'none';
-        // Keep the password field content after update
-        // userItem.querySelector('input[type="password"]').value = '';
     })
     .catch(error => {
         console.error('Error updating user:', error);

@@ -9,29 +9,16 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif; /* General font */
-    background: #2b2b2b; /* Dark background for the entire body */
-    color: #fff; /* White text for contrast */
 }
 
-/* Centering Flexbox */
 body {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    background: #2b2b2b;
 }
 
-.container {
-    background: #333; /* Slightly lighter background for containers */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Stronger shadow for more depth */
-    width: 600px; /* Adjusted width for better layout */
-    max-width: 90%; /* Ensure it doesn't exceed the screen width */
-    position: relative;
-}
-
-/* Container for different pages */
 .login-page, .dashboard-page {
     display: flex;
     justify-content: center;
@@ -40,226 +27,142 @@ body {
     height: 100%;
 }
 
-/* General form styling */
-input[type="text"], input[type="email"], input[type="password"], select {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #555; /* Dark border for inputs */
-    border-radius: 4px;
-    background: #444; /* Dark background for inputs */
-    color: #fff;
-    font-size: 1rem; /* Consistent font size */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
-input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, select:focus {
-    border-color: #007bff; /* Highlight border on focus */
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Glow effect */
-}
-
-/* Buttons */
-button {
-    padding: 10px;
-    margin: 10px 0;
-    width: 100%;
-    background: #007bff; /* Primary blue color */
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    text-align: center;
-    transition: background 0.3s ease;
-}
-
-button:hover {
-    background: #0056b3; /* Darker blue on hover */
-}
-
-/* Special button styles */
 .logout-button {
-    background: #dc3545; /* Red background for logout */
-    position: absolute; /* Positioning to the top right */
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 5px 10px;
+    background: #dc3545;
     color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    text-align: center;
-    transition: background 0.3s ease;
-    padding: 10px;
-    margin: 10px 0;
-    width: 100%;
-    top: 10px;
-    right: 10px;
+    text-decoration: none;
+    border-radius: 5px;
 }
 
 .logout-button:hover {
-    background: #c82333; /* Darker red on hover */
+    background: #c82333;
 }
 
-/* Toggle Button for Admin On/Off */
-.toggle-button {
-    width: 80px;
-    padding: 10px;
-    background: #28a745; /* Green for On state */
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
+h2 {
     text-align: center;
-    transition: background 0.3s ease;
+    margin-bottom: 20px;
 }
 
-.toggle-button.off {
-    background: #6c757d; /* Grey for Off state */
-}
-
-.toggle-button:hover {
-    background: #218838; /* Darker green for hover when On */
-}
-
-.toggle-button.off:hover {
-    background: #5a6268; /* Darker grey for hover when Off */
-}
-
-/* User List Styling */
-.user-list {
-    width: 100%;
-    list-style-type: none;
-    padding: 0;
+h3 {
     margin-top: 20px;
 }
 
-.user-list-header {
+.new-user-form, .user-list-header {
     display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    background: #444; /* Background for header */
-    border-radius: 4px;
-    font-weight: bold;
-}
-
-.user-list-item {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    margin: 5px 0;
-    background: #555; /* Background for list items */
-    border-radius: 4px;
+    margin: 10px 0;
 }
 
-.user-list-item input[type="text"] {
-    background: #666; /* Slightly lighter background for inputs in list */
-    border: none;
-}
-
-.user-list-item button.confirm-changes-button {
-    display: none; /* Hidden by default */
-    background: #17a2b8; /* Teal color for Confirm Changes */
-    margin-left: 10px; /* Align Confirm Changes button */
-    white-space: nowrap; /* Prevent wrapping */
-}
-
-.user-list-item.changed button.confirm-changes-button {
-    display: inline-block; /* Show when a change is detected */
-}
-
-.user-list-item select {
-    margin-left: 10px;
-    width: auto;
-    padding: 5px;
-}
-
-.user-list-item input[type="text"] {
-    flex: 1;
-}
-
-.user-list-item select, .user-list-item button {
-    margin-left: 10px;
-}
-
-/* Label styling */
-.user-list-header span {
-    flex: 1;
-    text-align: center;
-}
-
-.user-list-item span {
-    flex: 1;
-    text-align: center;
-}
-
-/* New User Form Adjustments */
-.new-user-form {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+.new-user-form input[type="email"], .new-user-form input[type="password"], .new-user-form select {
+    padding: 8px;
+    margin: 5px;
+    width: calc(25% - 10px);
+    box-sizing: border-box;
 }
 
 .new-user-options {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
+    width: 50%;
 }
 
-.new-user-options button, .new-user-options select {
-    width: auto;
-    padding: 10px;
-    margin-top: 0;
-    margin-left: 10px;
+.new-user-form .toggle-button, .new-user-form button {
+    margin: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    background: #007bff;
+    color: #fff;
 }
 
-.new-user-options .toggle-button {
-    margin-left: 0;
+.new-user-form .toggle-button.off {
+    background: #ccc;
+    color: #000;
 }
-/* Additional CSS for updated layout */
-.user-list-header {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
+
+.new-user-form .toggle-button.active {
+    background: #28a745;
+}
+
+.user-list-header span {
+    flex: 1;
+    margin: 5px;
     font-weight: bold;
+    text-align: center;
+}
+
+.user-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
 }
 
 .user-list-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     padding: 10px;
     border-bottom: 1px solid #ccc;
+    width: 100%;
+    position: relative;
 }
 
 .user-list-item input[type="text"], .user-list-item input[type="password"], .user-list-item select {
     flex: 1;
-    margin: 0 5px;
-    padding: 5px;
-    border-radius: 4px;
+    margin: 5px;
+    padding: 8px;
     border: 1px solid #ccc;
+    border-radius: 4px;
+    width: calc(25% - 10px);
+    box-sizing: border-box;
+}
+
+.user-list-item .toggle-button {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.user-list-item .toggle-button.off {
+    background: #ccc;
+    color: #000;
+}
+
+.user-list-item .toggle-button.active {
+    background: #28a745;
+    color: #fff;
 }
 
 .user-list-item .confirm-changes-button {
     display: none;
-    margin-left: 10px;
     padding: 5px 10px;
     background: #28a745;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    position: absolute;
+    right: -120px; /* Position to the right side of the list */
+    transform: translateX(-100%);
 }
 
 .user-list-item .confirm-changes-button:hover {
     background: #218838;
-}
-
-.new-user-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
 }
