@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (userList) {
         userList.addEventListener('click', handleUserChange);
         userList.addEventListener('change', handleUserChange);
-        userList.addEventListener('click', confirmChanges);
+        userList.addEventListener('click', event => confirmChanges(event.target));
     }
 
     function handleSearch(event) {
@@ -159,4 +159,5 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
+
 
