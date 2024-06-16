@@ -38,7 +38,6 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    position: relative; /* Position for logout button */
 }
 
 h2 {
@@ -56,8 +55,6 @@ label {
     margin-top: 10px;
     text-align: left;
     width: 100%;
-    display: block; /* Ensure block display */
-    margin-bottom: 5px; /* Space between label and input */
 }
 
 input[type="email"], input[type="password"], input[type="text"], input[type="checkbox"] {
@@ -85,8 +82,8 @@ button:hover {
 
 .logout-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 20px;
+    right: 20px;
     padding: 10px;
     background: #dc3545;
     color: #fff;
@@ -160,8 +157,6 @@ button:hover {
     cursor: pointer;
     text-align: center;
     display: none;
-    position: absolute;
-    right: 20px;
 }
 
 .user-list-item .confirm-changes-button:hover {
