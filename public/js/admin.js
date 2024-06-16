@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function toggleAdmin(button) {
-    const userId = button.dataset.userid;
     const isAdmin = button.classList.contains('active');
 
     if (isAdmin) {
@@ -60,19 +59,27 @@ function confirmChanges(button) {
     const userItem = button.closest('.user-list-item');
     const isAdmin = userItem.querySelector('.toggle-button').classList.contains('active');
     const subscriptionStatus = userItem.querySelector('select').value;
+    const newPassword = userItem.querySelector('input[type="password"]').value;
+
+    const body = { id: userId, isAdmin, subscriptionStatus };
+    if (newPassword) {
+        body.password = newPassword;
+    }
 
     fetch('/admin/update-user', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: userId, isAdmin, subscriptionStatus })
+        body: JSON.stringify(body)
     })
     .then(response => response.text())
     .then(data => {
         console.log('User updated:', data);
         userItem.classList.remove('changed');
         button.style.display = 'none';
+        // Clear the password field after update
+        userItem.querySelector('input[type="password"]').value = '';
     })
     .catch(error => {
         console.error('Error updating user:', error);
@@ -99,6 +106,7 @@ function handleSearch(query) {
                 listItem.classList.add('user-list-item');
                 listItem.innerHTML = `
                     <input type="text" value="${user.email}" readonly>
+                    <input type="password" placeholder="New Password">
                     <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}" data-userid="${user._id}">On</button>
                     <select data-userid="${user._id}">
                         <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
@@ -110,6 +118,7 @@ function handleSearch(query) {
 
                 // Attach event listeners
                 listItem.querySelector('.toggle-button').addEventListener('click', (e) => toggleAdmin(e.target));
+                listItem.querySelector('input[type="password"]').addEventListener('input', (e) => markChanged(e.target));
                 listItem.querySelector('select').addEventListener('change', (e) => markChanged(e.target));
                 listItem.querySelector('.confirm-changes-button').addEventListener('click', (e) => confirmChanges(e.target));
             });
