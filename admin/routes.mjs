@@ -80,29 +80,6 @@ router.get('/search-users', isAuthenticated, async (req, res) => {
     }
 });
 
-// Make sure the route is defined with the correct case-sensitive path
-// In admin.js, the route is defined as '/update-user/:id', while the path in the request is '/update-user/:ID'
-// This is why the route is not being matched correctly.
-// Change the route to match the case-sensitive path in the request
-router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { isAdmin, subscriptionStatus } = req.body;
-        const user = await User.findById(id);
-        if (user) {
-            user.isAdmin = isAdmin === 'true';
-            user.subscriptionStatus = subscriptionStatus;
-            await user.save();
-            notifyClient(user._id.toString());
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ success: false, message: 'User not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
-    }
-});
 router.patch('/user/:id', isAuthenticated, async (req, res) => {
     try {
         const { id } = req.params;
@@ -113,7 +90,7 @@ router.patch('/user/:id', isAuthenticated, async (req, res) => {
             user.subscriptionStatus = subscriptionStatus;
             await user.save();
             notifyClient(user._id.toString());
-            res.json({ success: true, message: 'User updated' }); // Ensure JSON response
+            res.json({ success: true, message: 'User updated' });
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -129,7 +106,7 @@ router.post('/user/delete', isAuthenticated, async (req, res) => {
         if (user) {
             await User.findByIdAndDelete(req.body.id);
             notifyClient(user._id.toString());
-            res.json({ success: true, message: 'User deleted' }); // Ensure JSON response
+            res.json({ success: true, message: 'User deleted' });
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -138,7 +115,6 @@ router.post('/user/delete', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
-
 
 router.get('/logout', (req, res) => {
     req.session.destroy();
