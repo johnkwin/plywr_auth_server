@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const subscriptionStatus = newUserSubscriptionStatus.value;
 
             if (email && password) {
-                fetch('/admin/user', {
+                fetch('/admin/user/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -127,100 +127,61 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    async function confirmChanges(button) {
+    function confirmChanges(button) {
         const listItem = button.closest('.user-list-item');
         const userId = listItem.dataset.userid;
-        const email = listItem.querySelector('.user-email').value;
-        const isAdmin = listItem.querySelector('.toggle-button').classList.contains('active');
-        const subscriptionStatus = listItem.querySelector('.user-subscription-status').value;
-        const password = listItem.querySelector('.user-password').value;
-    
-        try {
-            const response = await fetch(`/admin/user/${userId}`, {
+        const isAdminButton = listItem.querySelector('.toggle-button');
+        const subscriptionSelect = listItem.querySelector('select');
+        const isAdmin = isAdminButton.classList.contains('active');
+        const subscriptionStatus = subscriptionSelect.value;
+
+        if (subscriptionStatus === 'delete') {
+            fetch(`/admin/user/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: userId })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw new Error(data.message); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    listItem.remove();
+                } else {
+                    console.error('Error deleting user:', data);
+                    alert('Error deleting user');
+                }
+            })
+            .catch(error => console.error('Error deleting user:', error));
+        } else {
+            fetch(`/admin/user/update`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, isAdmin, subscriptionStatus, password })
-            });
-    
-            const result = await response.json();
-    
-            if (result.success) {
-                alert('User updated successfully');
-                button.classList.remove('show'); // Hide the confirm button after changes are confirmed
-            } else {
-                alert('Failed to update user');
-            }
-        } catch (error) {
-            console.error('Error updating user:', error);
-            alert('Failed to update user');
+                body: JSON.stringify({ id: userId, isAdmin, subscriptionStatus })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw new Error(data.message); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    button.style.display = 'none';
+                    console.log('User updated successfully:', data);
+                } else {
+                    console.error('Error updating user:', data);
+                    alert('Error updating user');
+                }
+            })
+            .catch(error => console.error('Error updating user:', error));
         }
     }
-    
-    // Event listener for the toggle admin button
-    document.addEventListener('click', (event) => {
-        if (event.target.classList.contains('toggle-button')) {
-            toggleAdmin(event.target);
-        }
-    });
-    
-    // Event listener for changes in the input fields
-    document.addEventListener('input', (event) => {
-        if (event.target.classList.contains('user-email') ||
-            event.target.classList.contains('user-subscription-status') ||
-            event.target.classList.contains('user-password')) {
-            markChanged(event.target);
-        }
-    });
-    
-    // Function to mark a change and show the confirm button
-    function markChanged(input) {
-        const listItem = input.closest('.user-list-item');
-        listItem.querySelector('.confirm-changes-button').classList.add('show');
-    }
-    
-    // Function to handle the toggle admin button
-    function toggleAdmin(button) {
-        button.classList.toggle('active');
-        button.classList.toggle('inactive');
-        button.textContent = button.classList.contains('active') ? 'On' : 'Off';
-        markChanged(button);
-    }
-    
-    // Function to handle user search
-    async function handleSearch(event) {
-        const query = event.target.value;
-        const userList = document.querySelector('.user-list');
-    
-        if (query.length === 0) {
-            userList.innerHTML = ''; // Clear the list if search input is empty
-            document.querySelector('.new-user-form').style.display = 'flex'; // Show the new user form
-            return;
-        }
-    
-        try {
-            const response = await fetch(`/admin/search-users?q=${query}`);
-            const users = await response.json();
-    
-            userList.innerHTML = users.map(user => `
-                <div class="user-list-item" data-userid="${user._id}">
-                    <input type="text" class="user-email" value="${user.email}">
-                    <button class="toggle-button ${user.isAdmin ? 'active' : 'inactive'}">${user.isAdmin ? 'On' : 'Off'}</button>
-                    <select class="user-subscription-status">
-                        <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
-                        <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
-                    </select>
-                    <input type="password" class="user-password" placeholder="New password (optional)">
-                    <button class="confirm-changes-button" onclick="confirmChanges(this)">Confirm Changes</button>
-                </div>
-            `).join('');
-    
-            document.querySelector('.new-user-form').style.display = 'none'; // Hide the new user form during search
-        } catch (error) {
-            console.error('Error searching users:', error);
-        }
-    }
-    
-    document.getElementById('search-input').addEventListener('input', handleSearch);
 });

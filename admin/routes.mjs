@@ -1,11 +1,9 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.mjs';
-import { notifyClient } from '../websocket.mjs'; // Ensure this import path is correct
 
 const router = express.Router();
 
-// Middleware for checking authentication for admin routes
 function isAuthenticated(req, res, next) {
     if (req.session.userId) {
         return next();
@@ -13,7 +11,6 @@ function isAuthenticated(req, res, next) {
     res.redirect('/admin/login');
 }
 
-// Admin login page
 router.get('/login', (req, res) => {
     res.render('login', { message: req.flash('message') });
 });
@@ -30,104 +27,75 @@ router.post('/login', async (req, res) => {
             res.redirect('/admin/login');
         }
     } catch (error) {
-        res.status(500).send('Server error');
+        res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
 });
 
-// Admin dashboard
 router.get('/dashboard', isAuthenticated, async (req, res) => {
-    res.render('dashboard', { users: [] });
-});
-
-// Add or Edit User
-router.post('/user', isAuthenticated, async (req, res) => {
     try {
-        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
-        if (id) {
-            // Edit existing user
-            const user = await User.findById(id);
-            user.email = email;
-            user.isAdmin = isAdmin === 'on'; // Checkbox value handling
-            if (password) {
-                user.password = await bcrypt.hash(password, 10);
-            }
-            user.subscriptionStatus = subscriptionStatus;
-            await user.save();
-        } else {
-            // Add new user
-            const hashedPassword = await bcrypt.hash(password, 10);
-            await User.create({
-                email,
-                password: hashedPassword,
-                isAdmin: isAdmin === 'on',
-                subscriptionStatus: subscriptionStatus
-            });
-        }
-        res.redirect('/admin/dashboard');
-    } catch (error) {
-        res.status(500).send('Server error');
-        console.error(error);
-    }
-});
-
-// Update user
-router.patch('/user/:id', isAuthenticated, async (req, res) => {
-    try {
-        const { isAdmin, subscriptionStatus, email, password } = req.body;
-        const user = await User.findById(req.params.id);
-        if (user) {
-            user.email = email;
-            user.isAdmin = isAdmin;
-            user.subscriptionStatus = subscriptionStatus;
-            if (password) {
-                user.password = await bcrypt.hash(password, 10);
-            }
-            await user.save();
-            notifyClient(user._id.toString());
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ success: false, message: 'User not found' });
-        }
+        const users = await User.find({});
+        res.render('dashboard', { users });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
 });
 
-// Search users
-router.get('/search-users', isAuthenticated, async (req, res) => {
-    const query = req.query.q;
+// Create User
+router.post('/user/create', isAuthenticated, async (req, res) => {
     try {
-        const users = await User.find({
-            email: { $regex: query, $options: 'i' }
-        }).select('email isAdmin subscriptionStatus');
-        res.json(users);
+        const { email, password, isAdmin, subscriptionStatus } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = new User({
+            email,
+            password: hashedPassword,
+            isAdmin: isAdmin === 'on',
+            subscriptionStatus
+        });
+        await newUser.save();
+        res.json({ success: true, message: 'User created', user: newUser });
     } catch (error) {
-        res.status(500).send('Server error');
+        res.status(500).json({ success: false, message: 'Server error' });
+        console.error(error);
+    }
+});
+
+// Update User
+router.patch('/user/update', isAuthenticated, async (req, res) => {
+    try {
+        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        user.email = email || user.email;
+        if (password) {
+            user.password = await bcrypt.hash(password, 10);
+        }
+        user.isAdmin = isAdmin === 'on' ? true : (isAdmin === 'off' ? false : user.isAdmin);
+        user.subscriptionStatus = subscriptionStatus || user.subscriptionStatus;
+        await user.save();
+        res.json({ success: true, message: 'User updated', user });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
 });
 
 // Delete User
-router.post('/user/delete', isAuthenticated, async (req, res) => {
+router.delete('/user/delete', isAuthenticated, async (req, res) => {
     try {
-        const user = await User.findById(req.body.id);
-        if (user) {
-            await User.findByIdAndDelete(req.body.id);
-            notifyClient(user._id.toString()); // Notify client about deletion
+        const { id } = req.body;
+        const user = await User.findByIdAndDelete(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
         }
-        res.redirect('/admin/dashboard');
+        res.json({ success: true, message: 'User deleted' });
     } catch (error) {
-        res.status(500).send('Server error');
+        res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
-});
-
-// Admin logout
-router.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/admin/login');
 });
 
 export default router;
