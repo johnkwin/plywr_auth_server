@@ -1,4 +1,3 @@
-// admin.js
 document.addEventListener('DOMContentLoaded', function () {
     const searchUsers = document.getElementById('searchUsers');
     const userList = document.getElementById('userList');
@@ -28,7 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => { throw new Error(data.message); });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         console.log('User added:', data);
@@ -139,7 +143,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ id: userId })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw new Error(data.message); });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     listItem.remove();
@@ -157,9 +166,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ isAdmin, subscriptionStatus })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw new Error(data.message); });
+                }
+                return response.json();
+            })
             .then(data => {
-            console.log(response);
                 if (data.success) {
                     button.style.display = 'none';
                     console.log('User updated successfully:', data);
