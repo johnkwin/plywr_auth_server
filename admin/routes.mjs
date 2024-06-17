@@ -50,7 +50,47 @@ router.get('/search-users', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
+router.post('/user', isAuthenticated, async (req, res) => {
+    try {
+        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
 
+        if (id) {
+            // Update existing user
+            const user = await User.findById(id);
+            if (!user) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+
+            user.email = email;
+            user.isAdmin = isAdmin === 'on';
+            if (password) {
+                user.password = await bcrypt.hash(password, 10);
+            }
+            user.subscriptionStatus = subscriptionStatus;
+            await user.save();
+            res.json({ success: true, message: 'User updated' });
+        } else {
+            // Check if email already exists
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({ success: false, message: 'Email already in use' });
+            }
+
+            // Create new user
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await User.create({
+                email,
+                password: hashedPassword,
+                isAdmin: isAdmin === 'on',
+                subscriptionStatus
+            });
+            res.json({ success: true, message: 'User created' });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+        console.error(error);
+    }
+});
 router.patch('/user/:id', isAuthenticated, async (req, res) => {
     try {
         const { id } = req.params;
