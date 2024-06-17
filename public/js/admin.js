@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const isAdmin = isAdminButton.classList.contains('active');
         const subscriptionStatus = subscriptionSelect.value;
 
-        if (!userId || userId === "update") {
+        if (!userId || !/^[a-fA-F0-9]{24}$/.test(userId)) {
             alert('Invalid User ID');
             return;
         }
