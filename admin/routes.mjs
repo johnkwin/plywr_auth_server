@@ -96,8 +96,6 @@ router.patch('/user/update', async (req, res) => {
     }
 });
 
-export default router;
-
 // Delete User
 router.delete('/user/delete', isAuthenticated, async (req, res) => {
     try {
