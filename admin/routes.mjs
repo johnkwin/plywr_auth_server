@@ -4,7 +4,6 @@ import { notifyClient } from '../websocket.mjs';
 
 const router = express.Router();
 
-// Middleware for checking authentication for admin routes
 function isAuthenticated(req, res, next) {
     if (req.session.userId) {
         return next();
@@ -12,12 +11,10 @@ function isAuthenticated(req, res, next) {
     res.redirect('/admin/login');
 }
 
-// Routes
 router.get('/login', (req, res) => {
     res.render('login', { message: req.flash('message') });
 });
 
-// Add JSON parsing to POST/PUT/PATCH handlers if not already done
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
