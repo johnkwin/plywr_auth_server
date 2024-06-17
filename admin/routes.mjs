@@ -62,26 +62,41 @@ router.post('/user/create', isAuthenticated, async (req, res) => {
 });
 
 // Update User
-router.patch('/user/update', isAuthenticated, async (req, res) => {
+router.patch('/user/update', async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
+
+        // Validate the provided user ID
+        if (!id) {
+            return res.status(400).json({ success: false, message: 'User ID is required' });
+        }
+
         const user = await User.findById(id);
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
+
+        // Update user details
         user.email = email || user.email;
         if (password) {
             user.password = await bcrypt.hash(password, 10);
         }
-        user.isAdmin = isAdmin === 'on' ? true : (isAdmin === 'off' ? false : user.isAdmin);
-        user.subscriptionStatus = subscriptionStatus || user.subscriptionStatus;
+        if (isAdmin !== undefined) {
+            user.isAdmin = isAdmin;
+        }
+        if (subscriptionStatus) {
+            user.subscriptionStatus = subscriptionStatus;
+        }
+
         await user.save();
         res.json({ success: true, message: 'User updated', user });
     } catch (error) {
+        console.error('Error updating user:', error);
         res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
     }
 });
+
+export default router;
 
 // Delete User
 router.delete('/user/delete', isAuthenticated, async (req, res) => {

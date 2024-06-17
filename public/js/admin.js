@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => {
                 if (!response.ok) {
-                    return response.json().then(data => { throw new Error(data.message); });
+                    return response.text().then(text => { throw new Error(text); });
                 }
                 return response.json();
             })
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => {
                 if (!response.ok) {
-                    return response.json().then(data => { throw new Error(data.message); });
+                    return response.text().then(text => { throw new Error(text); });
                 }
                 return response.json();
             })
