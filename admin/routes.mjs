@@ -67,8 +67,8 @@ router.patch('/user/update', async (req, res) => {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
 
         // Validate the provided user ID
-        if (!id) {
-            return res.status(400).json({ success: false, message: 'User ID is required' });
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
         }
 
         const user = await User.findById(id);

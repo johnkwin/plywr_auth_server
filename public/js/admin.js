@@ -135,6 +135,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const isAdmin = isAdminButton.classList.contains('active');
         const subscriptionStatus = subscriptionSelect.value;
 
+        if (!userId || userId === "update") {
+            alert('Invalid User ID');
+            return;
+        }
+
         if (subscriptionStatus === 'delete') {
             fetch(`/admin/user/delete`, {
                 method: 'DELETE',
