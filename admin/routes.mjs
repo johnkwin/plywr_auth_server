@@ -88,6 +88,25 @@ router.get('/search-users', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
+router.patch('/user/:id', isAuthenticated, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isAdmin, subscriptionStatus } = req.body;
+        const user = await User.findById(id);
+        if (user) {
+            user.isAdmin = isAdmin === 'true';
+            user.subscriptionStatus = subscriptionStatus;
+            await user.save();
+            notifyClient(user._id.toString());
+            res.json({ success: true, message: 'User updated' }); // Respond with JSON
+        } else {
+            res.status(404).json({ success: false, message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+        console.error(error);
+    }
+});
 
 router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
     try {
