@@ -61,6 +61,7 @@ router.patch('/user/:id', isAuthenticated, async (req, res) => {
             user.subscriptionStatus = subscriptionStatus;
             await user.save();
             notifyClient(user._id.toString());
+            console.log(JSON.stringify('User updated'));
             res.json({ success: true, message: JSON.stringify('User updated') });
         } else {
             res.status(404).json({ success: false, message: JSON.stringify('User not found') });
