@@ -62,7 +62,7 @@ router.post('/user/create', isAuthenticated, async (req, res) => {
 });
 
 // Update User
-router.patch('/user/update', isAuthenticated, async (req, res) => {
+router.patch('/user/update', async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
 
@@ -81,7 +81,7 @@ router.patch('/user/update', isAuthenticated, async (req, res) => {
         if (password) {
             user.password = await bcrypt.hash(password, 10);
         }
-        if (isAdmin !== undefined) {
+        if (typeof isAdmin === 'boolean') {
             user.isAdmin = isAdmin;
         }
         if (subscriptionStatus) {
