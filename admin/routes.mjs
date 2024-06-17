@@ -1,3 +1,4 @@
+// routes.mjs
 import express from 'express';
 import User from '../models/User.mjs';
 import { notifyClient } from '../websocket.mjs';
@@ -27,7 +28,7 @@ router.post('/user', isAuthenticated, async (req, res) => {
             }
             user.subscriptionStatus = subscriptionStatus;
             await user.save();
-            res.json({ success: true });
+            res.json({ success: true, message: 'User updated' });  // Updated response
         } else {
             const hashedPassword = await bcrypt.hash(password, 10);
             await User.create({
@@ -36,7 +37,7 @@ router.post('/user', isAuthenticated, async (req, res) => {
                 isAdmin: isAdmin === 'on',
                 subscriptionStatus: subscriptionStatus
             });
-            res.json({ success: true });
+            res.json({ success: true, message: 'User created' });  // Updated response
         }
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
@@ -54,7 +55,7 @@ router.patch('/user/:id', isAuthenticated, async (req, res) => {
             user.subscriptionStatus = subscriptionStatus;
             await user.save();
             notifyClient(user._id.toString());
-            res.json({ success: true });
+            res.json({ success: true, message: 'User updated' });  // Updated response
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -70,7 +71,7 @@ router.post('/user/delete', isAuthenticated, async (req, res) => {
         if (user) {
             await User.findByIdAndDelete(req.body.id);
             notifyClient(user._id.toString());
-            res.json({ success: true });
+            res.json({ success: true, message: 'User deleted' });  // Updated response
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }

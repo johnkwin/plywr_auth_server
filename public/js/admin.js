@@ -1,3 +1,4 @@
+// admin.js
 document.addEventListener('DOMContentLoaded', function () {
     const searchUsers = document.getElementById('searchUsers');
     const userList = document.getElementById('userList');
@@ -169,5 +170,4 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error updating user:', error));
         }
     }
-    
 });
