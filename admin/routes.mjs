@@ -113,7 +113,7 @@ router.patch('/user/:id', isAuthenticated, async (req, res) => {
             user.subscriptionStatus = subscriptionStatus;
             await user.save();
             notifyClient(user._id.toString());
-            res.json({ success: true, message: 'User updated' }); // Respond with JSON
+            res.json({ success: true, message: 'User updated' }); // Ensure JSON response
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -122,7 +122,6 @@ router.patch('/user/:id', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
-
 
 router.post('/user/delete', isAuthenticated, async (req, res) => {
     try {
@@ -130,7 +129,7 @@ router.post('/user/delete', isAuthenticated, async (req, res) => {
         if (user) {
             await User.findByIdAndDelete(req.body.id);
             notifyClient(user._id.toString());
-            res.json({ success: true });
+            res.json({ success: true, message: 'User deleted' }); // Ensure JSON response
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -139,6 +138,7 @@ router.post('/user/delete', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
+
 
 router.get('/logout', (req, res) => {
     req.session.destroy();
