@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const subscriptionSelect = listItem.querySelector('select');
         const isAdmin = isAdminButton.classList.contains('active');
         const subscriptionStatus = subscriptionSelect.value;
-    
+
         if (subscriptionStatus === 'delete') {
             fetch(`/admin/user/delete`, {
                 method: 'POST',
