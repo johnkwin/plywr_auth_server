@@ -38,24 +38,10 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
     res.render('dashboard', { users });
 });
 
-router.get('/search-users', isAuthenticated, async (req, res) => {
-    const query = req.query.q;
-    try {
-        const users = await User.find({
-            email: { $regex: query, $options: 'i' }
-        }).select('email isAdmin subscriptionStatus');
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
-    }
-});
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
-
         if (id) {
-            // Update existing user
             const user = await User.findById(id);
             if (!user) {
                 return res.status(404).json({ success: false, message: 'User not found' });
@@ -70,13 +56,11 @@ router.post('/user', isAuthenticated, async (req, res) => {
             await user.save();
             res.json({ success: true, message: 'User updated' });
         } else {
-            // Check if email already exists
             const existingUser = await User.findOne({ email });
             if (existingUser) {
                 return res.status(400).json({ success: false, message: 'Email already in use' });
             }
 
-            // Create new user
             const hashedPassword = await bcrypt.hash(password, 10);
             await User.create({
                 email,
@@ -91,7 +75,21 @@ router.post('/user', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
-router.patch('/user/:id', isAuthenticated, async (req, res) => {
+
+router.get('/search-users', isAuthenticated, async (req, res) => {
+    const query = req.query.q;
+    try {
+        const users = await User.find({
+            email: { $regex: query, $options: 'i' }
+        }).select('email isAdmin subscriptionStatus');
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+        console.error(error);
+    }
+});
+
+router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
     try {
         const { id } = req.params;
         const { isAdmin, subscriptionStatus } = req.body;
@@ -101,13 +99,12 @@ router.patch('/user/:id', isAuthenticated, async (req, res) => {
             user.subscriptionStatus = subscriptionStatus;
             await user.save();
             notifyClient(user._id.toString());
-            console.log(JSON.stringify('User updated'));
-            res.json({ success: true, message: JSON.stringify('User updated') });
+            res.json({ success: true, message: 'User updated' });
         } else {
-            res.status(404).json({ success: false, message: JSON.stringify('User not found') });
+            res.status(404).json({ success: false, message: 'User not found' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: JSON.stringify('Server error') });
+        res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
 });
@@ -118,7 +115,7 @@ router.post('/user/delete', isAuthenticated, async (req, res) => {
         if (user) {
             await User.findByIdAndDelete(req.body.id);
             notifyClient(user._id.toString());
-            res.json({ success: true, message: 'User deleted' });
+            res.json({ success: true });
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }

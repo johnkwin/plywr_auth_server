@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const subscriptionSelect = listItem.querySelector('select');
         const isAdmin = isAdminButton.classList.contains('active');
         const subscriptionStatus = subscriptionSelect.value;
-
+    
         if (subscriptionStatus === 'delete') {
             fetch(`/admin/user/delete`, {
                 method: 'POST',
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Error deleting user:', error));
         } else {
-            fetch(`/admin/user/${userId}`, {
+            fetch(`/admin/update-user/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -158,8 +158,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => response.json())
             .then(data => {
-                console.log(response.json());
-                console.log(data);
                 if (data.success) {
                     button.style.display = 'none';
                     console.log('User updated successfully:', data);
@@ -171,4 +169,5 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error updating user:', error));
         }
     }
+    
 });
