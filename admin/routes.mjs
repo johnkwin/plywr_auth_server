@@ -11,9 +11,9 @@ function isAuthenticated(req, res, next) {
     res.redirect('/admin/login');
 }
 
-/*router.get('/login', (req, res) => {
+router.get('/login', (req, res) => {
     res.render('login', { message: req.flash('message') });
-});*/
+});
 
 router.post('/login', async (req, res) => {
     try {
