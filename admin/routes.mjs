@@ -62,7 +62,7 @@ router.post('/user/create', isAuthenticated, async (req, res) => {
 });
 
 // Update User
-router.patch('/user/update', async (req, res) => {
+router.patch('/user/update', isAuthenticated, async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
 
