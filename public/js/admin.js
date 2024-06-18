@@ -130,23 +130,25 @@ document.addEventListener('DOMContentLoaded', function () {
     function confirmChanges(button) {
         const listItem = button.closest('.user-list-item');
         const userId = listItem.dataset.userid;
+        const emailInput = listItem.querySelector('input[type="text"]');
         const isAdminButton = listItem.querySelector('.toggle-button');
         const subscriptionSelect = listItem.querySelector('select');
         const isAdmin = isAdminButton.classList.contains('active');
         const subscriptionStatus = subscriptionSelect.value;
-
+        const email = emailInput.value.trim();
+    
         if (!userId || !/^[a-fA-F0-9]{24}$/.test(userId)) {
             alert('Invalid User ID');
             return;
         }
-
+    
         if (subscriptionStatus === 'delete') {
-            fetch(`/admin/user`, {
-                method: 'POST',
+            fetch(`/admin/user/delete`, {
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ action: 'delete', id: userId })
+                body: JSON.stringify({ id: userId })
             })
             .then(response => {
                 if (!response.ok) {
