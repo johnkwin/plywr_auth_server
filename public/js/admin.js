@@ -20,12 +20,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const subscriptionStatus = newUserSubscriptionStatus.value;
 
             if (email && password) {
-                fetch('/admin/user/create', {
+                fetch('/admin/user', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
+                    body: JSON.stringify({ action: 'create', email, password, isAdmin, subscriptionStatus })
                 })
                 .then(response => {
                     if (!response.ok) {
@@ -141,12 +141,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (subscriptionStatus === 'delete') {
-            fetch(`/admin/user/delete`, {
-                method: 'DELETE',
+            fetch(`/admin/user`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id: userId })
+                body: JSON.stringify({ action: 'delete', id: userId })
             })
             .then(response => {
                 if (!response.ok) {
@@ -164,12 +164,12 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Error deleting user:', error));
         } else {
-            fetch(`/admin/user/update`, {
-                method: 'PATCH',
+            fetch(`/admin/user`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id: userId, isAdmin, subscriptionStatus })
+                body: JSON.stringify({ action: 'update', id: userId, isAdmin, subscriptionStatus })
             })
             .then(response => {
                 if (!response.ok) {
