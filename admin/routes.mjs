@@ -11,9 +11,6 @@ function isAuthenticated(req, res, next) {
     }
     res.redirect('/admin/login');
 }
-const hashPasswordIfNeeded = async (password) => {
-    return password ? await bcrypt.hash(password, 10) : undefined;
-};
 router.get('/login', (req, res) => {
     res.render('login', { message: req.flash('message') });
 });
@@ -95,39 +92,29 @@ router.post('/user', isAuthenticated, async (req, res) => {
 });
 router.patch('/user/update', async (req, res) => {
     try {
-        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
-
-        // Validate the provided user ID
-        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
-        }
-
-        const user = await User.findById(id);
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
-
-        // Update user details
-        if (email) {
-            user.email = email;
-        }
-        if (password) {
-            user.password = await hashPasswordIfNeeded(password);
-        }
-        if (typeof isAdmin === 'boolean') {
-            user.isAdmin = isAdmin;
-        }
-        if (subscriptionStatus) {
-            user.subscriptionStatus = subscriptionStatus;
-        }
-
-        await user.save();
-        res.json({ success: true, message: 'User updated', user });
+      const { id, email, password, isAdmin, subscriptionStatus } = req.body;
+  
+      // Validate the provided user ID
+      if (!User.isValidObjectId(id)) {
+        return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
+      }
+  
+      // Build the updates object
+      const updates = { email, password, isAdmin, subscriptionStatus };
+  
+      // Use the static method to update the user
+      const updatedUser = await User.updateUser(id, updates);
+  
+      if (!updatedUser) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+  
+      res.json({ success: true, message: 'User updated', user: updatedUser });
     } catch (error) {
-        console.error('Error updating user:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+      console.error('Error updating user:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
     }
-});
+  });
 // Search users
 router.get('/search-users', isAuthenticated, async (req, res) => {
     const query = req.query.q;
