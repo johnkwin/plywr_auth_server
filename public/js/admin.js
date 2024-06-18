@@ -8,12 +8,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserAdmin = document.getElementById('newUserAdmin');
     const newUserSubscriptionStatus = document.getElementById('newUserSubscriptionStatus');
 
-    // Handle user search
     if (searchUsers) {
         searchUsers.addEventListener('input', handleSearch);
     }
 
-    // Handle new user creation
     if (saveNewUserButton) {
         saveNewUserButton.addEventListener('click', function () {
             const email = newUserEmail.value.trim();
@@ -53,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Toggle new user admin status
     if (newUserAdmin) {
         newUserAdmin.addEventListener('click', function () {
             newUserAdmin.classList.toggle('active');
@@ -62,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Handle user list interactions
     if (userList) {
         userList.addEventListener('click', function (event) {
             handleUserChange(event);
@@ -73,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
         userList.addEventListener('change', handleUserChange);
     }
 
-    // Handle user search input
     function handleSearch(event) {
         const query = event.target.value;
         if (query.trim() === '') {
@@ -108,7 +103,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error searching users:', error));
     }
 
-    // Handle user changes
     function handleUserChange(event) {
         if (event.target.matches('select[data-userid]')) {
             const selectElement = event.target;
@@ -133,7 +127,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Confirm user changes
     function confirmChanges(button) {
         const listItem = button.closest('.user-list-item');
         const userId = listItem.dataset.userid;
@@ -172,12 +165,12 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Error deleting user:', error));
         } else {
-            fetch(`/admin/user/update`, {
+            fetch(`/admin/user/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id: userId, email, isAdmin, subscriptionStatus })
+                body: JSON.stringify({ email, isAdmin, subscriptionStatus })
             })
             .then(response => {
                 if (!response.ok) {

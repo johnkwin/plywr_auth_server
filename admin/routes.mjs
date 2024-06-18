@@ -41,63 +41,21 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
-        const { action, id, email, password, isAdmin, subscriptionStatus } = req.body;
-
-        if (action === 'delete' && id) {
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                return res.status(400).json({ success: false, message: 'Invalid User ID' });
-            }
-
-            const objectId = new mongoose.Types.ObjectId(id);
-
-            const user = await User.findById(objectId);
-            if (user) {
-                await User.findByIdAndDelete(objectId);
-                notifyClient(user._id.toString());
-                return res.json({ success: true, message: 'User deleted' });
-            } else {
-                return res.status(404).json({ success: false, message: 'User not found' });
-            }
+        const { email, password, isAdmin, subscriptionStatus } = req.body;
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: 'Email already in use' });
         }
 
-        if (id) {
-            // Update existing user
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                return res.status(400).json({ success: false, message: 'Invalid User ID' });
-            }
-
-            const objectId = new mongoose.Types.ObjectId(id);
-
-            const updates = {};
-            if (email) updates.email = email;
-            if (typeof isAdmin === 'boolean') updates.isAdmin = isAdmin;
-            if (subscriptionStatus) updates.subscriptionStatus = subscriptionStatus;
-            if (password) updates.password = await bcrypt.hash(password, 10);
-
-            const updatedUser = await User.findByIdAndUpdate(objectId, updates, { new: true });
-
-            if (!updatedUser) {
-                return res.status(404).json({ success: false, message: 'User not found' });
-            }
-
-            return res.json({ success: true, message: 'User updated', user: updatedUser });
-        } else {
-            // Create new user
-            const existingUser = await User.findOne({ email });
-            if (existingUser) {
-                return res.status(400).json({ success: false, message: 'Email already in use' });
-            }
-
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = new User({
-                email,
-                password: hashedPassword,
-                isAdmin: isAdmin === 'true',
-                subscriptionStatus
-            });
-            await newUser.save();
-            return res.json({ success: true, message: 'User created', user: newUser });
-        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = new User({
+            email,
+            password: hashedPassword,
+            isAdmin,
+            subscriptionStatus
+        });
+        await newUser.save();
+        return res.json({ success: true, message: 'User created', user: newUser });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
@@ -107,6 +65,9 @@ router.post('/user', isAuthenticated, async (req, res) => {
 router.patch('/user/update', isAuthenticated, async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
+
+        // Log the incoming payload
+        console.log('Payload received:', req.body);
 
         // Validate and convert the user ID
         if (!mongoose.Types.ObjectId.isValid(id)) {
