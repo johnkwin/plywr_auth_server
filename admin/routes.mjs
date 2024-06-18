@@ -97,16 +97,17 @@ router.patch('/user/update', async (req, res) => {
         // Log the incoming payload
         console.log('Payload received:', req.body);
 
-        // Validate the provided user ID
-        if (!User.isValidObjectId(id)) {
+        // Validate and convert the user ID
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
         }
+        const objectId = mongoose.Types.ObjectId(id);
 
         // Build the updates object
         const updates = { email, password, isAdmin, subscriptionStatus };
 
         // Use the static method to update the user
-        const updatedUser = await User.updateUser(id, updates);
+        const updatedUser = await User.updateUser(objectId, updates);
 
         if (!updatedUser) {
             return res.status(404).json({ success: false, message: 'User not found' });
