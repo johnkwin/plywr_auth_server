@@ -92,29 +92,32 @@ router.post('/user', isAuthenticated, async (req, res) => {
 });
 router.patch('/user/update', async (req, res) => {
     try {
-      const { id, email, password, isAdmin, subscriptionStatus } = req.body;
-  
-      // Validate the provided user ID
-      if (!User.isValidObjectId(id)) {
-        return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
-      }
-  
-      // Build the updates object
-      const updates = { email, password, isAdmin, subscriptionStatus };
-  
-      // Use the static method to update the user
-      const updatedUser = await User.updateUser(id, updates);
-  
-      if (!updatedUser) {
-        return res.status(404).json({ success: false, message: 'User not found' });
-      }
-  
-      res.json({ success: true, message: 'User updated', user: updatedUser });
+        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
+
+        // Log the incoming payload
+        console.log('Payload received:', req.body);
+
+        // Validate the provided user ID
+        if (!User.isValidObjectId(id)) {
+            return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
+        }
+
+        // Build the updates object
+        const updates = { email, password, isAdmin, subscriptionStatus };
+
+        // Use the static method to update the user
+        const updatedUser = await User.updateUser(id, updates);
+
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.json({ success: true, message: 'User updated', user: updatedUser });
     } catch (error) {
-      console.error('Error updating user:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
+        console.error('Error updating user:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
-  });
+});
 // Search users
 router.get('/search-users', isAuthenticated, async (req, res) => {
     const query = req.query.q;

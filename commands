@@ -1,4 +1,5 @@
 mongo -u root -p n9bT#tBAv35KwKb --authenticationDatabase admin
+mongo -u plywr -p n9bT#tBAv35KwKb --authenticationDatabase admin
 
 cd //root
 rm -rf plywr_auth_server
@@ -6,6 +7,8 @@ git clone https://github.com/johnkwin/plywr_auth_server
 cd plywr_auth_server
 npm install
 pm2 reset auth-server
+
+pm2 logs auth-server --err --lines 500
 
 use users
 db.createUser({

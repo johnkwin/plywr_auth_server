@@ -5,7 +5,10 @@ const { Schema } = mongoose;
 
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { 
+    type: String, 
+    required: function() { return this.isNew || this.isModified('password'); } 
+  },
   subscriptionStatus: { type: String, default: 'inactive' },
   role: { type: String, default: 'user' },
   isAdmin: { type: Boolean, default: false }
@@ -29,6 +32,11 @@ UserSchema.statics.updateUser = async function (id, updates) {
   // Remove email from updates if it's not provided
   if (!updates.email) {
     delete updates.email;
+  }
+
+  // Validate id again to prevent invalid updates
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error('Invalid User ID');
   }
 
   return this.findByIdAndUpdate(id, updates, { new: true });
