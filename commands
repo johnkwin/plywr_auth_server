@@ -28,8 +28,27 @@ mongodb://plywr:n9bT#tBAv35KwKb@localhost:27017/users
 
 https://join-playware.com/login
 
+mongo -u root -p n9bT#tBAv35KwKb --authenticationDatabase admin
 
 db.users.insertOne({
   email: 'test@test.com',
-  password: '$2b$10$DvKTKowCTcSWoJqU2Y6Ri.qyX/8fBNmUGLhmR0F2nv0.ddCpen8ya' // replace with your hashed password
+  password: '$2b$10$DvKTKowCTcSWoJqU2Y6Ri.qyX/8fBNmUGLhmR0F2nv0.ddCpen8ya', // replace with your hashed password
+  subscriptionStatus: "active", 
+  isAdmin: true,
+  roles: [ { role: "readWrite", db: "users" } ]
+});
+
+db.users.insertOne({
+  email: 'test@test.com',
+  password: '$2b$10$DvKTKowCTcSWoJqU2Y6Ri.qyX/8fBNmUGLhmR0F2nv0.ddCpen8ya', // replace with your hashed password
+  subscriptionStatus: "active", 
+  isAdmin: true,
+  roles: [ { role: "readWrite", db: "users" } ]
+});
+
+db.users.insertOne({
+  email: 'test@test.com', // Replace with actual email
+  password: '2b$10$DvKTKowCTcSWoJqU2Y6Ri.qyX/8fBNmUGLhmR0F2nv0.ddCpen8ya', // Provided hashed password
+  subscriptionStatus: 'active', // Adjust as needed
+  roles: [ { role: "readWrite", db: "users" } ]
 });
