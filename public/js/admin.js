@@ -136,12 +136,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const isAdmin = isAdminButton.classList.contains('active');
         const subscriptionStatus = subscriptionSelect.value;
         const email = emailInput.value.trim();
-    
+
         if (!userId || !/^[a-fA-F0-9]{24}$/.test(userId)) {
             alert('Invalid User ID');
             return;
         }
-    
+
         if (subscriptionStatus === 'delete') {
             fetch(`/admin/user/delete`, {
                 method: 'DELETE',
