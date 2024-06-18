@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         newUserEmail.value = '';
                         newUserPassword.value = '';
                         newUserForm.style.display = 'none';
-                        handleSearch({ target: { value: '' } }); // Refresh user list
+                        handleSearch({ target: { value: '' } });
                     } else {
                         console.error('Error adding user:', data);
                     }
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Toggle admin status button
+    // Toggle new user admin status
     if (newUserAdmin) {
         newUserAdmin.addEventListener('click', function () {
             newUserAdmin.classList.toggle('active');
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Handle user list changes
+    // Handle user list interactions
     if (userList) {
         userList.addEventListener('click', function (event) {
             handleUserChange(event);
@@ -73,10 +73,10 @@ document.addEventListener('DOMContentLoaded', function () {
         userList.addEventListener('change', handleUserChange);
     }
 
-    // Handle search input
+    // Handle user search input
     function handleSearch(event) {
-        const query = event.target.value.trim();
-        if (query === '') {
+        const query = event.target.value;
+        if (query.trim() === '') {
             userList.innerHTML = '';
             newUserForm.style.display = 'block';
             return;
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error searching users:', error));
     }
 
-    // Handle user list interactions
+    // Handle user changes
     function handleUserChange(event) {
         if (event.target.matches('select[data-userid]')) {
             const selectElement = event.target;
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Confirm changes (update or delete user)
+    // Confirm user changes
     function confirmChanges(button) {
         const listItem = button.closest('.user-list-item');
         const userId = listItem.dataset.userid;
@@ -150,12 +150,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (subscriptionStatus === 'delete') {
-            fetch(`/admin/user/delete`, {
+            fetch(`/admin/user/${userId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id: userId })
+                }
             })
             .then(response => {
                 if (!response.ok) {

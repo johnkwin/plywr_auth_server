@@ -39,16 +39,20 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
     res.render('dashboard', { users });
 });
 
-// Create or Update User
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
         const { action, id, email, password, isAdmin, subscriptionStatus } = req.body;
 
         if (action === 'delete' && id) {
-            // Delete user
-            const user = await User.findById(id);
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(400).json({ success: false, message: 'Invalid User ID' });
+            }
+
+            const objectId = new mongoose.Types.ObjectId(id);
+
+            const user = await User.findById(objectId);
             if (user) {
-                await User.findByIdAndDelete(id);
+                await User.findByIdAndDelete(objectId);
                 notifyClient(user._id.toString());
                 return res.json({ success: true, message: 'User deleted' });
             } else {
@@ -58,13 +62,19 @@ router.post('/user', isAuthenticated, async (req, res) => {
 
         if (id) {
             // Update existing user
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(400).json({ success: false, message: 'Invalid User ID' });
+            }
+
+            const objectId = new mongoose.Types.ObjectId(id);
+
             const updates = {};
             if (email) updates.email = email;
             if (typeof isAdmin === 'boolean') updates.isAdmin = isAdmin;
             if (subscriptionStatus) updates.subscriptionStatus = subscriptionStatus;
             if (password) updates.password = await bcrypt.hash(password, 10);
 
-            const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
+            const updatedUser = await User.findByIdAndUpdate(objectId, updates, { new: true });
 
             if (!updatedUser) {
                 return res.status(404).json({ success: false, message: 'User not found' });
@@ -94,21 +104,6 @@ router.post('/user', isAuthenticated, async (req, res) => {
     }
 });
 
-// Search users
-router.get('/search-users', isAuthenticated, async (req, res) => {
-    const query = req.query.q;
-    try {
-        const users = await User.find({
-            email: { $regex: query, $options: 'i' }
-        }).select('email isAdmin subscriptionStatus');
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
-    }
-});
-
-// Update user
 router.patch('/user/update', isAuthenticated, async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
@@ -117,7 +112,7 @@ router.patch('/user/update', isAuthenticated, async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
         }
-        const objectId = mongoose.Types.ObjectId(id);
+        const objectId = new mongoose.Types.ObjectId(id);
 
         // Build the updates object
         const updates = {};
@@ -140,7 +135,19 @@ router.patch('/user/update', isAuthenticated, async (req, res) => {
     }
 });
 
-// Delete User
+router.get('/search-users', isAuthenticated, async (req, res) => {
+    const query = req.query.q;
+    try {
+        const users = await User.find({
+            email: { $regex: query, $options: 'i' }
+        }).select('email isAdmin subscriptionStatus');
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+        console.error(error);
+    }
+});
+
 router.delete('/user/:id', isAuthenticated, async (req, res) => {
     try {
         const userId = req.params.id;
@@ -149,9 +156,11 @@ router.delete('/user/:id', isAuthenticated, async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid User ID' });
         }
 
-        const user = await User.findById(userId);
+        const objectId = new mongoose.Types.ObjectId(userId);
+
+        const user = await User.findById(objectId);
         if (user) {
-            await User.findByIdAndDelete(userId);
+            await User.findByIdAndDelete(objectId);
             notifyClient(user._id.toString());
             res.json({ success: true, message: 'User deleted' });
         } else {
