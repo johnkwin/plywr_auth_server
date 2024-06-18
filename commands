@@ -9,7 +9,7 @@ pm2 reset auth-server
 
 use users
 db.createUser({
-  user: "plywr",
+  user: "plywr@test.com",
   pwd: "n9bT#tBAv35KwKb",
   roles: [ { role: "readWrite", db: "users" } ]
 })
