@@ -164,12 +164,12 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Error deleting user:', error));
         } else {
-            fetch(`/admin/user`, {
-                method: 'POST',
+            fetch(`/admin/user/update`, {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ action: 'update', id: userId, isAdmin, subscriptionStatus })
+                body: JSON.stringify({ id: userId, email, isAdmin, subscriptionStatus })
             })
             .then(response => {
                 if (!response.ok) {

@@ -42,9 +42,10 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
         const { action, id, email, password, isAdmin, subscriptionStatus } = req.body;
-        
+        console.log("USER DELETE START");
         if (action === 'delete' && id) {
             // Delete user
+            console.log("INSIDE USER DELETE ACTION");
             const user = await User.findById(id);
             if (user) {
                 await User.findByIdAndDelete(id);
@@ -90,7 +91,41 @@ router.post('/user', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
+router.patch('/user/update', async (req, res) => {
+    try {
+        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
 
+        // Validate the provided user ID
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
+        }
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Update user details
+        if (email) {
+            user.email = email;
+        }
+        if (password) {
+            user.password = await bcrypt.hash(password, 10);
+        }
+        if (typeof isAdmin === 'boolean') {
+            user.isAdmin = isAdmin;
+        }
+        if (subscriptionStatus) {
+            user.subscriptionStatus = subscriptionStatus;
+        }
+
+        await user.save();
+        res.json({ success: true, message: 'User updated', user });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
 // Search users
 router.get('/search-users', isAuthenticated, async (req, res) => {
     const query = req.query.q;
