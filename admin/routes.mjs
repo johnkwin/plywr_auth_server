@@ -38,15 +38,29 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
     res.render('dashboard', { users });
 });
 
+// Add, Edit, or Delete User
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
-        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
+        const { action, id, email, password, isAdmin, subscriptionStatus } = req.body;
+        
+        if (action === 'delete' && id) {
+            // Delete user
+            const user = await User.findById(id);
+            if (user) {
+                await User.findByIdAndDelete(id);
+                notifyClient(user._id.toString());
+                return res.json({ success: true, message: 'User deleted' });
+            } else {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+        }
+
         if (id) {
+            // Edit existing user
             const user = await User.findById(id);
             if (!user) {
                 return res.status(404).json({ success: false, message: 'User not found' });
             }
-
             user.email = email;
             user.isAdmin = isAdmin === 'on';
             if (password) {
@@ -54,8 +68,9 @@ router.post('/user', isAuthenticated, async (req, res) => {
             }
             user.subscriptionStatus = subscriptionStatus;
             await user.save();
-            res.json({ success: true, message: 'User updated' });
+            return res.json({ success: true, message: 'User updated' });
         } else {
+            // Add new user
             const existingUser = await User.findOne({ email });
             if (existingUser) {
                 return res.status(400).json({ success: false, message: 'Email already in use' });
@@ -68,7 +83,7 @@ router.post('/user', isAuthenticated, async (req, res) => {
                 isAdmin: isAdmin === 'on',
                 subscriptionStatus
             });
-            res.json({ success: true, message: 'User created' });
+            return res.json({ success: true, message: 'User created' });
         }
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
@@ -76,6 +91,7 @@ router.post('/user', isAuthenticated, async (req, res) => {
     }
 });
 
+// Search users
 router.get('/search-users', isAuthenticated, async (req, res) => {
     const query = req.query.q;
     try {
@@ -88,35 +104,20 @@ router.get('/search-users', isAuthenticated, async (req, res) => {
         console.error(error);
     }
 });
+
+// Update user
 router.patch('/user/:id', isAuthenticated, async (req, res) => {
     try {
         const { id } = req.params;
-        const { isAdmin, subscriptionStatus } = req.body;
+        const { email, isAdmin, subscriptionStatus, password } = req.body;
         const user = await User.findById(id);
         if (user) {
-            user.isAdmin = isAdmin === 'true';
+            user.email = email;
+            user.isAdmin = isAdmin === 'true'; // Ensure boolean
             user.subscriptionStatus = subscriptionStatus;
-            await user.save();
-            notifyClient(user._id.toString());
-            res.json({ success: true, message: 'User updated' }); // Respond with JSON
-        } else {
-            res.status(404).json({ success: false, message: 'User not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
-    }
-});
-
-router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { isAdmin, subscriptionStatus } = req.body;
-        const user = await User.findById(id);
-        con
-        if (user) {
-            user.isAdmin = isAdmin === 'true';
-            user.subscriptionStatus = subscriptionStatus;
+            if (password) {
+                user.password = await bcrypt.hash(password, 10);
+            }
             await user.save();
             notifyClient(user._id.toString());
             res.json({ success: true, message: 'User updated' });
@@ -129,13 +130,14 @@ router.patch('/update-user/:id', isAuthenticated, async (req, res) => {
     }
 });
 
-router.post('/user/delete', isAuthenticated, async (req, res) => {
+// Delete User
+router.delete('/user/:id', isAuthenticated, async (req, res) => {
     try {
-        const user = await User.findById(req.body.id);
+        const user = await User.findById(req.params.id);
         if (user) {
-            await User.findByIdAndDelete(req.body.id);
+            await User.findByIdAndDelete(req.params.id);
             notifyClient(user._id.toString());
-            res.json({ success: true });
+            res.json({ success: true, message: 'User deleted' });
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }

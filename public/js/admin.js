@@ -1,192 +1,121 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const searchUsers = document.getElementById('searchUsers');
-    const userList = document.getElementById('userList');
-    const saveNewUserButton = document.getElementById('saveNewUser');
-    const newUserEmail = document.getElementById('newUserEmail');
-    const newUserPassword = document.getElementById('newUserPassword');
-    const newUserForm = document.getElementById('newUserForm');
-    const newUserAdmin = document.getElementById('newUserAdmin');
-    const newUserSubscriptionStatus = document.getElementById('newUserSubscriptionStatus');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const userForm = document.getElementById('user-form');
+    const userList = document.getElementById('user-list');
+    const confirmButtons = document.getElementsByClassName('confirm-changes-button');
+    const logoutButton = document.getElementById('logout-button');
 
-    if (searchUsers) {
-        searchUsers.addEventListener('input', handleSearch);
-    }
-
-    if (saveNewUserButton) {
-        saveNewUserButton.addEventListener('click', function () {
-            const email = newUserEmail.value.trim();
-            const password = newUserPassword.value.trim();
-            const isAdmin = newUserAdmin.classList.contains('active');
-            const subscriptionStatus = newUserSubscriptionStatus.value;
-
-            if (email && password) {
-                fetch('/admin/user', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ action: 'create', email, password, isAdmin, subscriptionStatus })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => { throw new Error(data.message); });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        console.log('User added:', data);
-                        newUserEmail.value = '';
-                        newUserPassword.value = '';
-                        newUserForm.style.display = 'none';
-                        handleSearch({ target: { value: '' } });
-                    } else {
-                        console.error('Error adding user:', data);
-                    }
-                })
-                .catch(error => console.error('Error adding user:', error));
-            } else {
-                alert('Please fill out all fields.');
-            }
+    // Toggle Admin Status
+    async function toggleAdmin(button) {
+        const userId = button.getAttribute('data-userid');
+        const isAdmin = button.classList.contains('active');
+        const newStatus = !isAdmin;
+        
+        const response = await fetch(`/admin/user/${userId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ isAdmin: newStatus })
         });
-    }
 
-    if (newUserAdmin) {
-        newUserAdmin.addEventListener('click', function () {
-            newUserAdmin.classList.toggle('active');
-            newUserAdmin.classList.toggle('off');
-            newUserAdmin.textContent = newUserAdmin.classList.contains('active') ? 'On' : 'Off';
-        });
-    }
-
-    if (userList) {
-        userList.addEventListener('click', function (event) {
-            handleUserChange(event);
-            if (event.target.matches('.confirm-changes-button')) {
-                confirmChanges(event.target);
-            }
-        });
-        userList.addEventListener('change', handleUserChange);
-    }
-
-    function handleSearch(event) {
-        const query = event.target.value;
-        if (query.trim() === '') {
-            userList.innerHTML = '';
-            newUserForm.style.display = 'block';
-            return;
-        }
-
-        fetch(`/admin/search-users?q=${encodeURIComponent(query)}`)
-            .then(response => response.json())
-            .then(users => {
-                userList.innerHTML = '';
-                newUserForm.style.display = 'none';
-
-                users.forEach(user => {
-                    const listItem = document.createElement('div');
-                    listItem.className = 'user-list-item';
-                    listItem.dataset.userid = user._id;
-                    listItem.innerHTML = `
-                        <input type="text" value="${user.email}" readonly>
-                        <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
-                        <select data-userid="${user._id}">
-                            <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
-                            <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
-                            <option value="delete" class="delete-option">Delete</option>
-                        </select>
-                        <button class="confirm-changes-button" style="display: none;">Confirm Changes</button>
-                    `;
-                    userList.appendChild(listItem);
-                });
-            })
-            .catch(error => console.error('Error searching users:', error));
-    }
-
-    function handleUserChange(event) {
-        if (event.target.matches('select[data-userid]')) {
-            const selectElement = event.target;
-            const confirmButton = selectElement.nextElementSibling;
-
-            if (selectElement.value === 'delete') {
-                confirmButton.textContent = 'Confirm Deletion';
-                confirmButton.classList.add('confirm-deletion');
-            } else {
-                confirmButton.textContent = 'Confirm Changes';
-                confirmButton.classList.remove('confirm-deletion');
-            }
-            confirmButton.style.display = 'inline-block';
-        } else if (event.target.matches('.toggle-button')) {
-            const button = event.target;
+        if (response.ok) {
             button.classList.toggle('active');
-            button.classList.toggle('off');
-            button.textContent = button.classList.contains('active') ? 'On' : 'Off';
-
-            const confirmButton = button.closest('.user-list-item').querySelector('.confirm-changes-button');
-            confirmButton.style.display = 'inline-block';
-        }
-    }
-
-    function confirmChanges(button) {
-        const listItem = button.closest('.user-list-item');
-        const userId = listItem.dataset.userid;
-        const isAdminButton = listItem.querySelector('.toggle-button');
-        const subscriptionSelect = listItem.querySelector('select');
-        const isAdmin = isAdminButton.classList.contains('active');
-        const subscriptionStatus = subscriptionSelect.value;
-
-        if (!userId || !/^[a-fA-F0-9]{24}$/.test(userId)) {
-            alert('Invalid User ID');
-            return;
-        }
-
-        if (subscriptionStatus === 'delete') {
-            fetch(`/admin/user`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action: 'delete', id: userId })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    listItem.remove();
-                } else {
-                    console.error('Error deleting user:', data);
-                    alert('Error deleting user');
-                }
-            })
-            .catch(error => console.error('Error deleting user:', error));
+            button.textContent = newStatus ? 'On' : 'Off';
         } else {
-            fetch(`/admin/user`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action: 'update', id: userId, isAdmin, subscriptionStatus })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    button.style.display = 'none';
-                    console.log('User updated successfully:', data);
-                } else {
-                    console.error('Error updating user:', data);
-                    alert('Error updating user');
-                }
-            })
-            .catch(error => console.error('Error updating user:', error));
+            console.error('Failed to update admin status');
         }
     }
+
+    // Handle Confirm Changes
+    async function confirmChanges(button) {
+        const userId = button.getAttribute('data-userid');
+        const emailInput = document.querySelector(`input[data-userid='${userId}']`);
+        const isAdmin = document.querySelector(`button[data-userid='${userId}']`).classList.contains('active');
+        const subscriptionStatus = document.querySelector(`select[data-userid='${userId}']`).value;
+
+        const response = await fetch(`/admin/user/${userId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: emailInput.value,
+                isAdmin,
+                subscriptionStatus
+            })
+        });
+
+        if (response.ok) {
+            console.log('User updated successfully');
+            button.style.display = 'none'; // Hide button after confirming changes
+        } else {
+            console.error('Failed to update user');
+        }
+    }
+
+    // Mark Field as Changed
+    function markChanged(element) {
+        const userId = element.getAttribute('data-userid');
+        const confirmButton = document.querySelector(`.confirm-changes-button[data-userid='${userId}']`);
+        confirmButton.style.display = 'inline-block'; // Show confirm button
+    }
+
+    // Handle Search
+    async function handleSearch() {
+        const query = searchInput.value;
+        const response = await fetch(`/admin/search-users?q=${query}`);
+        
+        if (response.ok) {
+            const users = await response.json();
+            userList.innerHTML = '';
+
+            users.forEach(user => {
+                const listItem = document.createElement('div');
+                listItem.className = 'user-list-item';
+                listItem.innerHTML = `
+                    <input type="text" data-userid="${user._id}" value="${user.email}" readonly>
+                    <button class="toggle-button ${user.isAdmin ? 'active' : ''}" data-userid="${user._id}" onclick="toggleAdmin(this)">${user.isAdmin ? 'On' : 'Off'}</button>
+                    <select data-userid="${user._id}" onchange="markChanged(this)">
+                        <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
+                        <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
+                    </select>
+                    <button class="confirm-changes-button" data-userid="${user._id}" onclick="confirmChanges(this)" style="display:none;">Confirm Changes</button>
+                `;
+                userList.appendChild(listItem);
+            });
+        } else {
+            console.error('Error searching users');
+        }
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('input', handleSearch);
+
+    // Add new user
+    userForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const formData = new FormData(userForm);
+        const data = Object.fromEntries(formData.entries());
+
+        const response = await fetch('/admin/user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            console.log('User added or updated successfully');
+            handleSearch(); // Refresh the user list
+        } else {
+            console.error('Failed to add or update user');
+        }
+    });
+
+    // Ensure correct scope for functions
+    window.toggleAdmin = toggleAdmin;
+    window.confirmChanges = confirmChanges;
+    window.markChanged = markChanged;
 });
