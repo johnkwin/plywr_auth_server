@@ -27,12 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => { throw new Error(data.message); });
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         console.log('User added:', data);
@@ -149,12 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'Content-Type': 'application/json',
                 }
             })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     listItem.remove();
@@ -172,12 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ email, isAdmin, subscriptionStatus })
             })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     button.style.display = 'none';

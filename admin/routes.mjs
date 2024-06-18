@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
             res.redirect('/admin/login');
         }
     } catch (error) {
-        res.status(500).send('Server error');
+        res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
 });
@@ -66,23 +66,19 @@ router.patch('/user/update', isAuthenticated, async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
 
-        // Log the incoming payload
         console.log('Payload received:', req.body);
 
-        // Validate and convert the user ID
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
         }
         const objectId = new mongoose.Types.ObjectId(id);
 
-        // Build the updates object
         const updates = {};
         if (email) updates.email = email;
         if (typeof isAdmin === 'boolean') updates.isAdmin = isAdmin;
         if (subscriptionStatus) updates.subscriptionStatus = subscriptionStatus;
         if (password) updates.password = await bcrypt.hash(password, 10);
 
-        // Find and update the user
         const updatedUser = await User.findByIdAndUpdate(objectId, updates, { new: true });
 
         if (!updatedUser) {
