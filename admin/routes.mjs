@@ -11,7 +11,9 @@ function isAuthenticated(req, res, next) {
     }
     res.redirect('/admin/login');
 }
-
+const hashPasswordIfNeeded = async (password) => {
+    return password ? await bcrypt.hash(password, 10) : undefined;
+};
 router.get('/login', (req, res) => {
     res.render('login', { message: req.flash('message') });
 });
@@ -110,7 +112,7 @@ router.patch('/user/update', async (req, res) => {
             user.email = email;
         }
         if (password) {
-            user.password = await bcrypt.hash(password, 10);
+            user.password = await hashPasswordIfNeeded(password);
         }
         if (typeof isAdmin === 'boolean') {
             user.isAdmin = isAdmin;
