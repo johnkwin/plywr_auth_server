@@ -8,10 +8,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserAdmin = document.getElementById('newUserAdmin');
     const newUserSubscriptionStatus = document.getElementById('newUserSubscriptionStatus');
 
+    // Handle user search
     if (searchUsers) {
         searchUsers.addEventListener('input', handleSearch);
     }
 
+    // Handle new user creation
     if (saveNewUserButton) {
         saveNewUserButton.addEventListener('click', function () {
             const email = newUserEmail.value.trim();
@@ -25,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ action: 'create', email, password, isAdmin, subscriptionStatus })
+                    body: JSON.stringify({ email, password, isAdmin, subscriptionStatus })
                 })
                 .then(response => {
                     if (!response.ok) {
@@ -39,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         newUserEmail.value = '';
                         newUserPassword.value = '';
                         newUserForm.style.display = 'none';
-                        handleSearch({ target: { value: '' } });
+                        handleSearch({ target: { value: '' } }); // Refresh user list
                     } else {
                         console.error('Error adding user:', data);
                     }
@@ -51,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Toggle admin status button
     if (newUserAdmin) {
         newUserAdmin.addEventListener('click', function () {
             newUserAdmin.classList.toggle('active');
@@ -59,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Handle user list changes
     if (userList) {
         userList.addEventListener('click', function (event) {
             handleUserChange(event);
@@ -69,9 +73,10 @@ document.addEventListener('DOMContentLoaded', function () {
         userList.addEventListener('change', handleUserChange);
     }
 
+    // Handle search input
     function handleSearch(event) {
-        const query = event.target.value;
-        if (query.trim() === '') {
+        const query = event.target.value.trim();
+        if (query === '') {
             userList.innerHTML = '';
             newUserForm.style.display = 'block';
             return;
@@ -103,6 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error searching users:', error));
     }
 
+    // Handle user list interactions
     function handleUserChange(event) {
         if (event.target.matches('select[data-userid]')) {
             const selectElement = event.target;
@@ -127,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Confirm changes (update or delete user)
     function confirmChanges(button) {
         const listItem = button.closest('.user-list-item');
         const userId = listItem.dataset.userid;
