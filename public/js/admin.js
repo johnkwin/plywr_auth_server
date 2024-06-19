@@ -82,6 +82,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     const listItem = document.createElement('div');
                     listItem.className = 'user-list-item';
                     listItem.dataset.userid = user._id;
+                    console.log("User isAdmin:", user.isAdmin);
+                    console.log("User subscriptionStatus:", user.subscriptionStatus);
+                    console.log("User email:", user.email);
+                    console.log("User _id:", user._id);
+                    console.log("User createdAt:", user.createdAt);
+                    
                     listItem.innerHTML = `
                         <input type="text" value="${user.email}" readonly>
                         <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
