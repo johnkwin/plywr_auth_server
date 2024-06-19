@@ -131,12 +131,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const isAdmin = isAdminButton.classList.contains('active');
         const subscriptionStatus = subscriptionSelect.value;
         const email = emailInput.value.trim();
-
+    
         if (!userId || !/^[a-fA-F0-9]{24}$/.test(userId)) {
             alert('Invalid User ID');
             return;
         }
-
+    
         if (subscriptionStatus === 'delete') {
             fetch(`/admin/user/${userId}`, {
                 method: 'DELETE',
@@ -144,8 +144,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     'Content-Type': 'application/json',
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                // Log the full response object
+                console.log('Full Response:', response);
+                if (!response.ok) {
+                    // Handle HTTP errors
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                // Log the parsed JSON data
+                console.log('Parsed JSON:', data);
                 if (data.success) {
                     listItem.remove();
                 } else {
@@ -153,7 +163,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     alert('Error deleting user');
                 }
             })
-            .catch(error => console.error('Error deleting user:', error));
+            .catch(error => {
+                console.error('Error deleting user:', error);
+                alert('Error deleting user');
+            });
         } else {
             fetch(`/admin/user/${userId}`, {
                 method: 'PATCH',
@@ -162,10 +175,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ email, isAdmin, subscriptionStatus })
             })
-            .then(response => response.json())
+            .then(response => {
+                // Log the full response object
+                console.log('Full Response:', response);
+                if (!response.ok) {
+                    // Handle HTTP errors
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log(response);
-                console.log(response.json());
+                // Log the parsed JSON data
+                console.log('Parsed JSON:', data);
                 if (data.success) {
                     button.style.display = 'none';
                     console.log('User updated successfully:', data);
@@ -174,7 +195,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     alert('Error updating user');
                 }
             })
-            .catch(error => console.error('Error updating user:', error));
+            .catch(error => {
+                console.error('Error updating user:', error);
+                alert('Error updating user');
+            });
         }
     }
 });
