@@ -137,15 +137,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const isAdmin = isAdminButton.classList.contains('active');
         const subscriptionStatus = subscriptionSelect.value;
         const email = emailInput.value.trim();
-    
+
         if (!userId || !/^[a-fA-F0-9]{24}$/.test(userId)) {
             alert('Invalid User ID');
             return;
         }
-    
+
         const handleResponse = async (response) => {
             console.log('Full Response:', response);
-            // Check if the response content type is JSON
             const contentType = response.headers.get('content-type');
             if (!response.ok) {
                 const errorText = await response.text();
@@ -154,10 +153,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (contentType && contentType.includes('application/json')) {
                 return response.json();
             }
-            // If not JSON, return as text
             return response.text();
         };
-    
+
         if (subscriptionStatus === 'delete') {
             fetch(`/admin/user/${userId}`, {
                 method: 'DELETE',
@@ -182,13 +180,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Error deleting user');
             });
         } else {
-            console.log(JSON.stringify({email, isAdmin, subscriptionStatus }));
+            console.log(JSON.stringify({ email, isAdmin, subscriptionStatus }));
             fetch(`/admin/user/update/${userId}`, {
-                method: 'POST',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({email, isAdmin, subscriptionStatus })
+                body: JSON.stringify({ email, isAdmin, subscriptionStatus })
             })
             .then(handleResponse)
             .then(data => {
