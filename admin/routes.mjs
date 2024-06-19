@@ -65,19 +65,19 @@ router.post('/user', isAuthenticated, async (req, res) => {
     }
 });
 
-router.patch('/user/update', isAuthenticated, async (req, res) => {
+router.patch('/user/update/:id', isAuthenticated, async (req, res) => {
     try {
-        const { userId, email, password, isAdmin, subscriptionStatus } = req.body;
+        const id = req.params.id;
+        const { email, password, isAdmin, subscriptionStatus } = req.body;
         console.log('User ID:', id);
         console.log('Payload received:', req.body);
 
-        const objectId = new mongoose.Types.ObjectId(objectId);
-        
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            
             res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
         }
-
+        const objectId = new mongoose.Types.ObjectId(objectId);
         const updates = {};
         if (email) updates.email = email;
         if (typeof isAdmin === 'boolean') updates.isAdmin = isAdmin;
