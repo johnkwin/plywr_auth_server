@@ -70,10 +70,11 @@ router.patch('/user/update/:id', isAuthenticated, async (req, res) => {
         const id = req.params.id;
         const { email, password, isAdmin, subscriptionStatus } = req.body;
         console.log('User ID:', id);
+        console.log('User ID:', id);
         console.log('Payload received:', req.body);
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            
+
             res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
         }
