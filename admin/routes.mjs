@@ -65,7 +65,7 @@ router.post('/user', isAuthenticated, async (req, res) => {
     }
 });
 
-router.patch('/user/update/:id', isAuthenticated, async (req, res) => {
+router.post('/user/update/:id', isAuthenticated, async (req, res) => {
     try {
         const id = req.params.id;
         const { email, password, isAdmin, subscriptionStatus } = req.body;
