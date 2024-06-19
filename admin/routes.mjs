@@ -44,6 +44,7 @@ router.post('/user', isAuthenticated, async (req, res) => {
         const { email, password, isAdmin, subscriptionStatus } = req.body;
         const existingUser = await User.findOne({ email });
         if (existingUser) {
+            res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ success: false, message: 'Email already in use' });
         }
 
@@ -55,8 +56,10 @@ router.post('/user', isAuthenticated, async (req, res) => {
             subscriptionStatus
         });
         await newUser.save();
+        res.setHeader('Content-Type', 'application/json');
         return res.json({ success: true, message: 'User created', user: newUser });
     } catch (error) {
+        res.setHeader('Content-Type', 'application/json');
         res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
@@ -69,6 +72,7 @@ router.patch('/user/update', isAuthenticated, async (req, res) => {
         console.log('Payload received:', req.body);
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
+            res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
         }
         const objectId = new mongoose.Types.ObjectId(id);
@@ -82,12 +86,15 @@ router.patch('/user/update', isAuthenticated, async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(objectId, updates, { new: true });
 
         if (!updatedUser) {
+            res.setHeader('Content-Type', 'application/json');
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
+        res.setHeader('Content-Type', 'application/json');
         res.json({ success: true, message: 'User updated', user: updatedUser });
     } catch (error) {
         console.error('Error updating user:', error);
+        res.setHeader('Content-Type', 'application/json');
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
@@ -98,8 +105,10 @@ router.get('/search-users', isAuthenticated, async (req, res) => {
         const users = await User.find({
             email: { $regex: query, $options: 'i' }
         }).select('email isAdmin subscriptionStatus');
+        res.setHeader('Content-Type', 'application/json');
         res.json(users);
     } catch (error) {
+        res.setHeader('Content-Type', 'application/json');
         res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
@@ -110,6 +119,7 @@ router.delete('/user/:id', isAuthenticated, async (req, res) => {
         const userId = req.params.id;
 
         if (!mongoose.Types.ObjectId.isValid(userId)) {
+            res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ success: false, message: 'Invalid User ID' });
         }
 
@@ -119,11 +129,14 @@ router.delete('/user/:id', isAuthenticated, async (req, res) => {
         if (user) {
             await User.findByIdAndDelete(objectId);
             notifyClient(user._id.toString());
+            res.setHeader('Content-Type', 'application/json');
             res.json({ success: true, message: 'User deleted' });
         } else {
+            res.setHeader('Content-Type', 'application/json');
             res.status(404).json({ success: false, message: 'User not found' });
         }
     } catch (error) {
+        res.setHeader('Content-Type', 'application/json');
         res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
