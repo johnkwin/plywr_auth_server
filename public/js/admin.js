@@ -137,6 +137,21 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
     
+        const handleResponse = async (response) => {
+            console.log('Full Response:', response);
+            // Check if the response content type is JSON
+            const contentType = response.headers.get('content-type');
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+            }
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            }
+            // If not JSON, return as text
+            return response.text();
+        };
+    
         if (subscriptionStatus === 'delete') {
             fetch(`/admin/user/${userId}`, {
                 method: 'DELETE',
@@ -144,19 +159,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     'Content-Type': 'application/json',
                 }
             })
-            .then(response => {
-                // Log the full response object
-                console.log('Full Response:', response);
-                if (!response.ok) {
-                    // Handle HTTP errors
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(handleResponse)
             .then(data => {
-                // Log the parsed JSON data
-                console.log('Parsed JSON:', data);
-                if (data.success) {
+                if (typeof data === 'string') {
+                    console.log('Response as text:', data);
+                    alert(data); // Handle text response
+                } else if (data.success) {
                     listItem.remove();
                 } else {
                     console.error('Error deleting user:', data);
@@ -175,19 +183,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ email, isAdmin, subscriptionStatus })
             })
-            .then(response => {
-                // Log the full response object
-                console.log('Full Response:', response);
-                if (!response.ok) {
-                    // Handle HTTP errors
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(handleResponse)
             .then(data => {
-                // Log the parsed JSON data
-                console.log('Parsed JSON:', data);
-                if (data.success) {
+                if (typeof data === 'string') {
+                    console.log('Response as text:', data);
+                    alert(data); // Handle text response
+                } else if (data.success) {
                     button.style.display = 'none';
                     console.log('User updated successfully:', data);
                 } else {

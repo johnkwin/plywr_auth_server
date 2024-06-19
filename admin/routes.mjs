@@ -91,13 +91,14 @@ router.patch('/user/update', isAuthenticated, async (req, res) => {
         }
 
         res.setHeader('Content-Type', 'application/json');
-        res.json({ success: true, message: 'THIS IS A TEST', user: updatedUser });
+        res.json({ success: true, message: 'User updated', user: updatedUser });
     } catch (error) {
         console.error('Error updating user:', error);
         res.setHeader('Content-Type', 'application/json');
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
+
 
 router.get('/search-users', isAuthenticated, async (req, res) => {
     const query = req.query.q;
