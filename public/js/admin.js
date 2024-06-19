@@ -177,34 +177,4 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error updating user:', error));
         }
     }
-    async function updateUser() {
-        try {
-            const response = await fetch('/user/update', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    id: '60d0fe4f5311236168a109ca',
-                    email: 'newemail@example.com',
-                    password: 'newpassword123',
-                    isAdmin: true,
-                    subscriptionStatus: 'active'
-                })
-            });
-    
-            const data = await response.json();
-            if (response.ok) {
-                console.log('Update successful:', data.message);
-                // Display success message
-            } else {
-                console.error('Update failed:', data.message || data.errors);
-                // Display error message
-            }
-        } catch (error) {
-            console.error('Network error:', error);
-            // Display network error message
-        }
-    }
-    updateUser();
 });
