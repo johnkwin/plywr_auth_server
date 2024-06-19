@@ -164,6 +164,8 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => response.json())
             .then(data => {
+                console.log(response);
+                console.log(response.json());
                 if (data.success) {
                     button.style.display = 'none';
                     console.log('User updated successfully:', data);
