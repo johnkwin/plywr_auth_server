@@ -182,6 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Error deleting user');
             });
         } else {
+            console.log(isAdmin, subscriptionStatus, email);
             fetch(`/admin/user/${userId}`, {
                 method: 'PATCH',
                 headers: {
