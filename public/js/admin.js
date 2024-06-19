@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log("User email:", user.email);
                     console.log("User _id:", user._id);
                     console.log("User createdAt:", user.createdAt);
-                    
+
                     listItem.innerHTML = `
                         <input type="text" value="${user.email}" readonly>
                         <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
@@ -191,10 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(handleResponse)
             .then(data => {
-                if (typeof data === 'string') {
-                    console.log('Response as text:', data);
-                    alert(data); // Handle text response
-                } else if (data.success) {
+                if (data === "User updated" || data.success) {
                     button.style.display = 'none';
                     console.log('User updated successfully:', data);
                 } else {
