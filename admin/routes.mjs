@@ -71,11 +71,12 @@ router.patch('/user/update', isAuthenticated, async (req, res) => {
         console.log('User ID:', id);
         console.log('Payload received:', req.body);
 
+        const objectId = new mongoose.Types.ObjectId(objectId);
+        
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ success: false, message: 'Invalid or missing User ID' });
         }
-        const objectId = new mongoose.Types.ObjectId(userId);
 
         const updates = {};
         if (email) updates.email = email;
