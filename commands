@@ -8,6 +8,8 @@ cd plywr_auth_server
 npm install
 pm2 reset auth-server
 
+db.users.updateMany({}, { $set: { isAdmin: true } })
+
 pm2 logs auth-server --err --lines 500
 
 use users
