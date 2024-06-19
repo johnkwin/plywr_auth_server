@@ -91,7 +91,7 @@ router.patch('/user/update', isAuthenticated, async (req, res) => {
         }
 
         res.setHeader('Content-Type', 'application/json');
-        res.json({ success: true, message: 'User updated', user: updatedUser });
+        res.json({ success: true, message: 'THIS IS A TEST', user: updatedUser });
     } catch (error) {
         console.error('Error updating user:', error);
         res.setHeader('Content-Type', 'application/json');
