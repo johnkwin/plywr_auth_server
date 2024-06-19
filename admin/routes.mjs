@@ -69,7 +69,7 @@ router.patch('/user/update', isAuthenticated, async (req, res) => {
     try {
         const { userId, email, password, isAdmin, subscriptionStatus } = req.body;
         const id = userId;
-        console.log(id);
+        console.log('User ID:', id);
         console.log('Payload received:', req.body);
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
