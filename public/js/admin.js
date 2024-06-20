@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserForm = document.getElementById('newUserForm');
     const newUserAdmin = document.getElementById('newUserAdmin');
     const newUserSubscriptionStatus = document.getElementById('newUserSubscriptionStatus');
-
+    const userTable = document.querySelector('.user-list-table');
     if (searchUsers) {
         searchUsers.addEventListener('input', handleSearch);
     }
@@ -76,7 +76,11 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(users => {
                 userList.innerHTML = '';
-
+                if (users.length === 0) {
+                    userTable.classList.add('hidden'); // Hide the table if no users are found
+                } else {
+                    userTable.classList.remove('hidden'); // Show the table if users are found
+                    
                 users.forEach(user => {
                     const row = document.createElement('tr');
                     row.className = 'user-list-item';
@@ -95,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     `;
                     userList.appendChild(row);
                 });
+            }
             })
             .catch(error => console.error('Error searching users:', error));
     }
