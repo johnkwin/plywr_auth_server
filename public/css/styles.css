@@ -206,15 +206,6 @@ h2 {
     padding: 0;
 }
 
-.user-list-header, .user-list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-}
-
 .user-list-header {
     background: #f8f9fa;
     font-weight: bold;
@@ -404,14 +395,20 @@ h2 {
     width: 100%;
 }
 
+.user-list-container {
+    margin-top: 20px;
+    width: 100%;
+}
+
 .user-list-table {
     width: 100%;
     border-collapse: collapse;
+    margin-bottom: 20px;
 }
 
 .user-list-table th, .user-list-table td {
     padding: 10px;
-    text-align: center;
+    text-align: left;
     border: 1px solid #444;
     background-color: #444;
 }
@@ -421,7 +418,10 @@ h2 {
     font-weight: bold;
 }
 
-.user-list-table td input[type="text"], .user-list-table td input[type="password"], .user-list-table td button, .user-list-table td select {
+.user-list-table td input[type="text"],
+.user-list-table td input[type="password"],
+.user-list-table td button,
+.user-list-table td select {
     width: 100%;
     padding: 8px;
     margin: 2px;
@@ -430,7 +430,8 @@ h2 {
     color: #ddd;
 }
 
-.user-list-table td input[type="text"]:focus, .user-list-table td input[type="password"]:focus {
+.user-list-table td input[type="text"]:focus,
+.user-list-table td input[type="password"]:focus {
     border-color: #007bff;
     outline: none;
 }
@@ -454,16 +455,5 @@ h2 {
     color: #fff;
     border: none;
     display: none;
-}
-
-.user-list-table td .delete-option {
-    color: red;
-}
-
-.user-list-table tr {
-    position: relative;
-}
-
-.user-list-table td button {
-    margin: 0;
+    margin-left: 10px;
 }
