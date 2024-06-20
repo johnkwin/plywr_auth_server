@@ -400,11 +400,13 @@ h2 {
 }
 
 .user-list-table {
+    
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
 }
 .user-list-table th, .user-list-table td {
+    width: 20%;
     padding: 10px;
     text-align: left;
     border: 1px solid #444;
@@ -420,7 +422,6 @@ h2 {
 .user-list-table td input[type="password"],
 .user-list-table td button,
 .user-list-table td select {
-    width: 100%;
     padding: 8px;
     margin: 2px;
     border-radius: 4px;
@@ -453,5 +454,4 @@ h2 {
     color: #fff;
     border: none;
     display: none;
-    margin-left: 10px;
 }
