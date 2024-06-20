@@ -3,7 +3,7 @@
 @font-face {
     font-family: 'Nexa';
     src: url('../fonts/Nexa-Regular.woff2') format('woff2'),
-         url('../fonts/Nexa-Regular.woff') format('woff');
+        url('../fonts/Nexa-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
@@ -11,20 +11,26 @@
 @font-face {
     font-family: 'Nexa';
     src: url('../fonts/Nexa-Bold.woff2') format('woff2'),
-         url('../fonts/Nexa-Bold.woff') format('woff');
+        url('../fonts/Nexa-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
 }
-body, input, select, button {
+
+body,
+input,
+select,
+button {
     font-family: 'Nexa', sans-serif;
 }
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
     padding: 0;
@@ -37,6 +43,7 @@ body {
     height: 100vh;
     background: #2b2b2b;
 }
+
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -48,6 +55,7 @@ select {
     box-sizing: border-box;
     display: flex;
 }
+
 button {
     top: 10px;
     right: 10px;
@@ -59,14 +67,18 @@ button {
     text-align: center;
     cursor: pointer;
 }
-#newUserForm, .login-form {
+
+#newUserForm,
+.login-form {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    margin-bottom: 20px; /* Add margin for spacing */
+    margin-bottom: 20px;
+    /* Add margin for spacing */
 }
+
 .dashboard-page {
     display: flex;
     justify-content: center;
@@ -88,6 +100,7 @@ button {
     text-align: center;
     position: relative;
 }
+
 .dashboard-container {
     background: #fff;
     padding: 20px;
@@ -140,7 +153,8 @@ h2 {
     margin-bottom: 20px;
 }
 
-.new-user-form input[type="email"], .new-user-form input[type="password"] {
+.new-user-form input[type="email"],
+.new-user-form input[type="password"] {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
@@ -195,11 +209,14 @@ h2 {
 .new-user-form button:hover {
     background: #0056b3;
 }
+
 .user-list-container {
     margin-top: 20px;
-    position: relative; /* Ensure the container is the relative reference point */
+    position: relative;
+    /* Ensure the container is the relative reference point */
     width: 65%;
 }
+
 .user-list {
     width: 100%;
     list-style-type: none;
@@ -215,7 +232,8 @@ h2 {
     padding: 10px 0;
 }
 
-.user-list-item input, .user-list-item select {
+.user-list-item input,
+.user-list-item select {
     flex: 2;
     margin-right: 10px;
     padding: 8px;
@@ -264,6 +282,7 @@ h2 {
 .user-list-item .confirm-changes-button:hover {
     background: #218838;
 }
+
 .user-list-item {
     align-items: center;
     padding: 10px;
@@ -349,7 +368,8 @@ h2 {
     width: 100%;
 }
 
-.new-user-form input[type="email"], .new-user-form input[type="password"] {
+.new-user-form input[type="email"],
+.new-user-form input[type="password"] {
     margin-bottom: 10px;
 }
 
@@ -359,7 +379,8 @@ h2 {
     margin-bottom: 10px;
 }
 
-.new-user-options button, .new-user-options select {
+.new-user-options button,
+.new-user-options select {
     flex: 1;
     margin-right: 10px;
 }
@@ -388,6 +409,7 @@ h2 {
 .logout-button:hover {
     background: #c82333;
 }
+
 .user-list-container {
     margin-top: 20px;
     width: 100%;
@@ -399,12 +421,15 @@ h2 {
 }
 
 .user-list-table {
-    
+
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    display: none;
 }
-.user-list-table th, .user-list-table td {
+
+.user-list-table th,
+.user-list-table td {
     width: 20%;
     padding: 10px;
     text-align: left;
@@ -453,4 +478,9 @@ h2 {
     color: #fff;
     border: none;
     display: none;
+}
+
+.user-list-table td .confirm-changes-button.show {
+    display: inline-block;
+    /* Show when changes are detected */
 }

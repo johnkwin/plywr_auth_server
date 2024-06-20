@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserAdmin = document.getElementById('newUserAdmin');
     const newUserSubscriptionStatus = document.getElementById('newUserSubscriptionStatus');
     const userTable = document.querySelector('.user-list-table');
+
     if (searchUsers) {
         searchUsers.addEventListener('input', handleSearch);
     }
@@ -69,6 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (query.trim() === '') {
             userList.innerHTML = '';
             newUserForm.style.display = 'flex';
+            userTable.classList.add('hidden');
             return;
         }
 
