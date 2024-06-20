@@ -26,15 +26,20 @@
             </select>
             <button id="saveNewUser">Save User</button>
         </div>
-
-        <div id="userList" class="user-list">
-            <!-- Labels for the columns -->
-            <div class="user-list-header">
-                <span>Email</span>
-                <span>Admin</span>
-                <span>Subscription Status</span>
-                <span>Actions</span>
-            </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Admin</th>
+                        <th>Subscription Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="user-list">
+                    <!-- User rows go here -->
+                </tbody>
+            </table>
         </div>
     </div>
     <script src="/js/admin.js"></script>
