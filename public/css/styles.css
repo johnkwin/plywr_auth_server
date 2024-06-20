@@ -1,3 +1,4 @@
+/* General Reset */
 /* Import Nexa font */
 @font-face {
     font-family: 'Nexa';
@@ -14,7 +15,9 @@
     font-weight: bold;
     font-style: normal;
 }
-/* General Reset */
+body, input, select, button {
+    font-family: 'Nexa', sans-serif;
+}
 * {
     box-sizing: border-box;
     margin: 0;
@@ -26,9 +29,7 @@ html, body {
     margin: 0;
     padding: 0;
 }
-body, input, select, button {
-    font-family: 'Nexa', sans-serif;
-}
+
 body {
     display: flex;
     justify-content: center;
@@ -47,20 +48,6 @@ select {
     border-radius: 4px;
     box-sizing: border-box;
     display: block;
-}
-button {
-    padding: 10px 20px;
-    margin: 10px 0;
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    display: inline-block;
-    transition: background-color 0.3s;
-}
-button:hover {
-    background-color: #2980b9;
 }
 .dashboard-page {
     display: flex;
