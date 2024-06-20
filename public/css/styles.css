@@ -405,7 +405,12 @@ h2 {
     border-collapse: collapse;
     margin-bottom: 20px;
 }
-
+tr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;    
+    width:100%;
+}
 .user-list-table th, .user-list-table td {
     padding: 10px;
     text-align: left;
