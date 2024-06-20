@@ -59,7 +59,7 @@ button {
     text-align: center;
     cursor: pointer;
 }
-#newUserForm, .login-container {
+#newUserForm {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -75,7 +75,7 @@ button {
     height: 100%;
 }
 
-.dashboard-container {
+.dashboard-container, .login-container {
     background: #fff;
     padding: 20px;
     border-radius: 8px;
