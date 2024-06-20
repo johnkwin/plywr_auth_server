@@ -154,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const subscriptionSelect = listItem.querySelector('select');
         const isAdmin = isAdminButton.classList.contains('active');
         const subscriptionStatus = subscriptionSelect.value;
+        const password = listItem.querySelector('input[type="password"]');
         const email = emailInput.value.trim();
 
         if (!userId || !/^[a-fA-F0-9]{24}$/.test(userId)) {
@@ -199,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         } else {
             const id = userId;
-            console.log(JSON.stringify({ id, email, isAdmin, subscriptionStatus }));
+            console.log(JSON.stringify({ id, email, password, isAdmin, subscriptionStatus }));
             fetch(`/admin/update-user`, {
                 method: 'PATCH',
                 headers: {
