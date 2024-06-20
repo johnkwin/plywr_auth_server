@@ -56,7 +56,7 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     console.log('CORS request from:', origin);
-    if (!origin || origin === 'null' || origin === 'undefined' || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
+    if (!origin || origin === 'null' || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -102,10 +102,8 @@ app.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ email, password: hashedPassword });
     await user.save();
-    res.setHeader('Content-Type', 'application/json');
     res.json({ message: 'User registered' }); // Send JSON response
   } catch (error) {
-    res.setHeader('Content-Type', 'application/json');
     res.status(500).json({ message: 'Server error' });
     console.error(error);
   }
@@ -117,14 +115,11 @@ app.post('/login', async (req, res) => {
     const user = await User.findOne({ email });
     if (user && await bcrypt.compare(password, user.password)) {
       const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
-      res.setHeader('Content-Type', 'application/json');
       res.json({ token });
     } else {
-      res.setHeader('Content-Type', 'application/json');
       res.status(400).json({ message: 'Invalid credentials' }); // Send JSON response
     }
   } catch (error) {
-    res.setHeader('Content-Type', 'application/json');
     res.status(500).json({ message: 'Server error' });
     console.error(error);
   }
@@ -133,7 +128,6 @@ app.post('/login', async (req, res) => {
 app.post('/check-subscription', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
-    res.setHeader('Content-Type', 'application/json');
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
@@ -141,13 +135,10 @@ app.post('/check-subscription', async (req, res) => {
     const decoded = jwt.verify(token, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
     const user = await User.findById(decoded.userId);
     if (!user || user.subscriptionStatus !== 'active') {
-      res.setHeader('Content-Type', 'application/json');
       return res.status(401).json({ message: 'Subscription expired' });
     }
-    res.setHeader('Content-Type', 'application/json');
     res.json({ valid: true });
   } catch (error) {
-    res.setHeader('Content-Type', 'application/json');
     res.status(401).json({ message: 'Unauthorized' });
   }
 });
@@ -159,7 +150,6 @@ app.post('/subscribe', async (req, res) => {
     const user = await User.findById(decoded.userId);
 
     if (!user) {
-      res.setHeader('Content-Type', 'application/json');
       return res.status(401).json({ message: 'User not found' });
     }
 
@@ -172,10 +162,8 @@ app.post('/subscribe', async (req, res) => {
       items: [{ plan: planId }],
     });
     await User.findByIdAndUpdate(user._id, { subscriptionStatus: 'active' });
-    res.setHeader('Content-Type', 'application/json');
     res.json({ message: 'Subscription successful' });
   } catch (error) {
-    res.setHeader('Content-Type', 'application/json');
     res.status(500).json({ message: 'Server error' });
     console.error(error);
   }
