@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const query = event.target.value;
         if (query.trim() === '') {
             userList.innerHTML = '';
-            newUserForm.style.display = 'block';
+            newUserForm.style.display = 'flex';
             return;
         }
 
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     listItem.innerHTML = `
                         <input type="text" value="${user.email}" readonly>
-                        <input type="text" value="${user.password}">
+                        <input type="password" data-userid="${user._id}" value="${user.password}">
                         <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
                         <select data-userid="${user._id}">
                             <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
