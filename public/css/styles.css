@@ -59,7 +59,23 @@ button {
     text-align: center;
     cursor: pointer;
 }
-.login-container, .dashboard-container {
+#newUserForm, .login-form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px; /* Add margin for spacing */
+}
+.dashboard-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.login-container {
     background: #fff;
     padding: 20px;
     border-radius: 8px;
@@ -72,17 +88,25 @@ button {
     text-align: center;
     position: relative;
 }
-
 .dashboard-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     width: 75%;
     max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
 }
 
 h2 {
     margin-bottom: 20px;
 }
 
-.logout-button, .confirm-changes-button {
+.logout-button {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -99,28 +123,86 @@ h2 {
     background: #c82333;
 }
 
-.confirm-changes-button {
-    display: none;
+.user-search {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.user-search input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+.new-user-form {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.new-user-form input[type="email"], .new-user-form input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+.new-user-form .new-user-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.new-user-form .toggle-button {
+    flex: 1;
+    padding: 10px;
     background: #007bff;
     color: #fff;
     border: none;
-    border-radius: 4px;
-    position: absolute;
-    right: -130px; /* Position to the right outside of the item */
-    top: 50%;
-    transform: translateY(-50%);
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin: 10px;
 }
 
-.confirm-changes-button.confirm-deletion {
-    background: #dc3545;
+.new-user-form .toggle-button.off {
+    background: #6c757d;
 }
 
-.confirm-changes-button:hover {
-    background: #218838;
+.new-user-form .toggle-button.active {
+    background: #28a745;
 }
 
-.confirm-changes-button.confirm-deletion:hover {
-    background: #c82333;
+.new-user-form select {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.new-user-form button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.new-user-form button:hover {
+    background: #0056b3;
+}
+.user-list-container {
+    margin-top: 20px;
+    position: relative; /* Ensure the container is the relative reference point */
+}
+.user-list {
+    width: 100%;
+    list-style-type: none;
+    padding: 0;
 }
 
 .user-list-header, .user-list-item {
@@ -130,12 +212,16 @@ h2 {
     background-color: #f1f1f1;
     margin-bottom: 5px;
     border-radius: 5px;
-    position: relative;
+    position: relative; /* Set relative positioning for the container */
 }
 
 .user-list-header {
-    background-color: #ddd;
+    background: #f8f9fa;
     font-weight: bold;
+}
+
+.user-list-item {
+    padding: 10px 0;
 }
 
 .user-list-header span, .user-list-item input, .user-list-item button, .user-list-item select {
@@ -145,68 +231,179 @@ h2 {
     text-align: center;
 }
 
-.user-list-item input {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.user-list-item button {
+.user-list-item .toggle-button {
+    flex: 1;
+    padding: 8px 10px;
+    margin-right: 10px;
+    background: #007bff;
+    color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-}
-
-.user-list-item select {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.toggle-button {
-    width: 80px;
     text-align: center;
 }
 
-.user-list-header span {
-    text-align: left;
+.user-list-item .toggle-button.off {
+    background: #6c757d;
 }
 
-.user-list-container {
-    margin-top: 20px;
+.user-list-item .toggle-button.active {
+    background: #28a745;
 }
 
-.user-list-header, .user-list-item {
+.user-list-item select {
+    flex: 1;
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.user-list-item .confirm-changes-button {
+    flex: 1;
+    padding: 8px 10px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    display: none;
+    margin-left: 10px;
+}
+
+.user-list-item .confirm-changes-button:hover {
+    background: #218838;
+}
+.user-list-item {
     display: flex;
     align-items: center;
     padding: 10px;
-    background-color: #f1f1f1;
-    margin-bottom: 5px;
+    border: 1px solid #ccc;
     border-radius: 5px;
-    position: relative;
-}
-
-.user-list-item input, .user-list-item button, .user-list-item select {
-    flex: 1;
-    padding: 8px;
-    margin: 2px;
-    text-align: center;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .user-list-item input {
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    flex: 2;
+    margin-right: 10px;
 }
 
-.user-list-item button {
+.user-list-item .toggle-button {
+    flex: 1;
+    padding: 5px 10px;
+    margin-right: 10px;
+    background: #007bff;
+    color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
+    text-align: center;
+}
+
+.user-list-item .toggle-button.off {
+    background: #6c757d;
+}
+
+.user-list-item .toggle-button.active {
+    background: #28a745;
 }
 
 .user-list-item select {
+    flex: 1;
+    padding: 5px;
+    margin-right: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
+}
+
+.user-list-item .confirm-changes-button {
+    flex: 1;
+    padding: 5px 10px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: absolute;
+    right: -130px; /* Position to the right outside of the item */
+    top: 50%; /* Vertically center */
+    transform: translateY(-50%);
+}
+/* Hide confirm button initially */
+.confirm-changes-button {
+    display: none;
+}
+
+
+.user-list-item .confirm-changes-button.confirm-deletion {
+    background: #dc3545;
+}
+
+.user-list-item .confirm-changes-button:hover {
+    background: #218838;
+}
+
+.user-list-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .user-list-header span {
-    text-align: left;
+    flex: 1;
+    margin-right: 10px;
+}
+
+.new-user-form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.new-user-form input[type="email"], .new-user-form input[type="password"] {
+    margin-bottom: 10px;
+}
+
+.new-user-options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.new-user-options button, .new-user-options select {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.new-user-options button {
+    margin: 0;
+}
+
+.new-user-options select {
+    max-width: 200px;
+}
+
+.logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    background: #dc3545;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background: #c82333;
 }
