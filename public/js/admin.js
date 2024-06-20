@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         } else {
             console.log(JSON.stringify({ email, isAdmin, subscriptionStatus }));
-            fetch(`/admin/user/update/${userId}`, {
+            fetch(`/admin/update-user/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
