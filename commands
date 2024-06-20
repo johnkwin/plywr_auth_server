@@ -7,6 +7,7 @@ git clone https://github.com/johnkwin/plywr_auth_server
 cd plywr_auth_server
 npm install
 pm2 restart auth-server
+pm2 logs auth-server
 
 db.users.updateMany({}, { $set: { isAdmin: true } })
 
