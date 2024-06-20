@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const query = event.target.value;
         if (query.trim() === '') {
             userList.innerHTML = '';
-            //newUserForm.style.display = 'flex';
+            newUserForm.style.display = 'flex';
             return;
         }
 
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(users => {
                 userList.innerHTML = '';
-                //newUserForm.style.display = 'none';
+                newUserForm.style.display = 'none';
 
                 users.forEach(user => {
                     const listItem = document.createElement('div');
@@ -106,6 +106,27 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleUserChange(event) {
+        if (event.target.matches('select[data-userid]')) {
+            const selectElement = event.target;
+            const confirmButton = selectElement.nextElementSibling;
+
+            if (selectElement.value === 'delete') {
+                confirmButton.textContent = 'Confirm Deletion';
+                confirmButton.classList.add('confirm-deletion');
+            } else {
+                confirmButton.textContent = 'Confirm Changes';
+                confirmButton.classList.remove('confirm-deletion');
+            }
+            confirmButton.style.display = 'inline-block';
+        } else if (event.target.matches('.toggle-button')) {
+            const button = event.target;
+            button.classList.toggle('active');
+            button.classList.toggle('off');
+            button.textContent = button.classList.contains('active') ? 'On' : 'Off';
+
+            const confirmButton = button.closest('.user-list-item').querySelector('.confirm-changes-button');
+            confirmButton.style.display = 'inline-block';
+        }
         const listItem = event.target.closest('.user-list-item');
         if (!listItem) return;
 
