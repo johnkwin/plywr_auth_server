@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(users => {
                 userList.innerHTML = '';
-                //newUserForm.style.display = 'none';
 
                 users.forEach(user => {
                     const row = document.createElement('tr');
@@ -92,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
                             <option value="delete" class="delete-option">Delete</option>
                         </select></td>
-                        <td><button class="confirm-changes-button">Confirm Changes</button></td>
+                        <td><button class="confirm-changes-button" style="display: none;">Confirm Changes</button></td>
                     `;
                     userList.appendChild(row);
                 });
