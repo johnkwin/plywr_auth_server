@@ -259,7 +259,6 @@ h2 {
     cursor: pointer;
     text-align: center;
     display: none;
-    margin-left: 10px;
 }
 
 .user-list-item .confirm-changes-button:hover {
