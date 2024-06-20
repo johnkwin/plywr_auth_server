@@ -37,7 +37,28 @@ body {
     height: 100vh;
     background: #2b2b2b;
 }
-
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: flex;
+}
+button {
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+    background: #222127;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+}
 .login-container, .dashboard-container {
     background: #fff;
     padding: 20px;
