@@ -197,7 +197,6 @@ h2 {
 }
 .user-list-container {
     margin-top: 20px;
-    position: relative; /* Ensure the container is the relative reference point */
 }
 .user-list {
     width: 100%;
@@ -206,13 +205,13 @@ h2 {
 }
 
 .user-list-header, .user-list-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr auto;
     align-items: center;
     padding: 10px;
-    background-color: #f1f1f1;
+    background-color: #444;
     margin-bottom: 5px;
     border-radius: 5px;
-    position: relative; /* Set relative positioning for the container */
 }
 
 .user-list-header {
@@ -358,7 +357,7 @@ h2 {
 
 .user-list-header span {
     flex: 1;
-    margin-right: 10px;
+    padding: 0 10px;
 }
 
 .new-user-form {
