@@ -180,7 +180,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Error deleting user');
             });
         } else {
-            console.log(JSON.stringify({ userId, email, isAdmin, subscriptionStatus }));
+            const id = userId;
+            console.log(JSON.stringify({ id, email, isAdmin, subscriptionStatus }));
             fetch(`/admin/update-user`, {
                 method: 'PATCH',
                 headers: {
