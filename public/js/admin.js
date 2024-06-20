@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     listItem.innerHTML = `
                         <input type="text" value="${user.email}" readonly>
+                        <input type="text" value="${user.password}">
                         <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
                         <select data-userid="${user._id}">
                             <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
