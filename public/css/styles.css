@@ -61,7 +61,7 @@ button {
 }
 div #newUserForm {
     width: 100%;
-    display: flex;
+    display: inline-block;
     flex-direction: column;
     align-items: center;
     text-align: center;
