@@ -150,7 +150,7 @@ h2 {
     border-radius: 5px;
     cursor: pointer;
     text-align: center;
-    margin-right: 10px;
+    margin: 10px;
 }
 
 .new-user-form .toggle-button.off {
@@ -207,7 +207,7 @@ h2 {
     padding: 10px 0;
 }
 
-.user-list-item input[type="text"], .user-list-item select {
+.user-list-item input, .user-list-item select {
     flex: 2;
     margin-right: 10px;
     padding: 8px;
@@ -268,7 +268,7 @@ h2 {
     box-sizing: border-box;
 }
 
-.user-list-item input[type="text"] {
+.user-list-item input {
     flex: 2;
     margin-right: 10px;
 }
