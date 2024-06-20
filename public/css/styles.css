@@ -59,7 +59,7 @@ button {
     text-align: center;
     cursor: pointer;
 }
-#newUserForm {
+#newUserForm, .login-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
