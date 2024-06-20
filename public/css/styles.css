@@ -1,3 +1,19 @@
+/* Import Nexa font */
+@font-face {
+    font-family: 'Nexa';
+    src: url('../fonts/Nexa-Regular.woff2') format('woff2'),
+         url('../fonts/Nexa-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Nexa';
+    src: url('../fonts/Nexa-Bold.woff2') format('woff2'),
+         url('../fonts/Nexa-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
 /* General Reset */
 * {
     box-sizing: border-box;
@@ -10,7 +26,9 @@ html, body {
     margin: 0;
     padding: 0;
 }
-
+body, input, select, button {
+    font-family: 'Nexa', sans-serif;
+}
 body {
     display: flex;
     justify-content: center;
