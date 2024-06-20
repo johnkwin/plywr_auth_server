@@ -399,3 +399,71 @@ h2 {
 .logout-button:hover {
     background: #c82333;
 }
+.user-list-container {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.user-list-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-list-table th, .user-list-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #444;
+    background-color: #444;
+}
+
+.user-list-table th {
+    background-color: #555;
+    font-weight: bold;
+}
+
+.user-list-table td input[type="text"], .user-list-table td input[type="password"], .user-list-table td button, .user-list-table td select {
+    width: 100%;
+    padding: 8px;
+    margin: 2px;
+    border-radius: 4px;
+    background: #222;
+    color: #ddd;
+}
+
+.user-list-table td input[type="text"]:focus, .user-list-table td input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.user-list-table td .toggle-button {
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+}
+
+.user-list-table td .toggle-button.active {
+    background-color: #28a745;
+}
+
+.user-list-table td .toggle-button.off {
+    background-color: #ff6b6b;
+}
+
+.user-list-table td .confirm-changes-button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    display: none;
+}
+
+.user-list-table td .delete-option {
+    color: red;
+}
+
+.user-list-table tr {
+    position: relative;
+}
+
+.user-list-table td button {
+    margin: 0;
+}

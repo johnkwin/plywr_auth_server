@@ -79,47 +79,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 //newUserForm.style.display = 'none';
 
                 users.forEach(user => {
-                    const listItem = document.createElement('div');
-                    listItem.className = 'user-list-item';
-                    listItem.dataset.userid = user._id;
+                    const row = document.createElement('tr');
+                    row.className = 'user-list-item';
+                    row.dataset.userid = user._id;
 
-                    // Create user detail elements
-                    const emailInput = document.createElement('input');
-                    emailInput.type = 'text';
-                    emailInput.value = user.email;
-                    emailInput.dataset.original = user.email;
-
-                    const passwordInput = document.createElement('input');
-                    passwordInput.type = 'password';
-                    passwordInput.placeholder = 'Update Password';
-
-                    const adminButton = document.createElement('button');
-                    adminButton.className = `toggle-button ${user.isAdmin ? 'active' : 'off'}`;
-                    adminButton.textContent = user.isAdmin ? 'On' : 'Off';
-
-                    const subscriptionSelect = document.createElement('select');
-                    subscriptionSelect.dataset.original = user.subscriptionStatus;
-                    subscriptionSelect.innerHTML = `
-                        <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
-                        <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
-                        <option value="delete" class="delete-option">Delete</option>
+                    row.innerHTML = `
+                        <td><input type="text" value="${user.email}"></td>
+                        <td><input type="password" data-userid="${user._id}" value="" placeholder="Update Password"></td>
+                        <td><button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button></td>
+                        <td><select data-userid="${user._id}">
+                            <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
+                            <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
+                            <option value="delete" class="delete-option">Delete</option>
+                        </select></td>
+                        <td><button class="confirm-changes-button">Confirm Changes</button></td>
                     `;
-
-                    // Append elements to listItem
-                    listItem.appendChild(emailInput);
-                    listItem.appendChild(passwordInput);
-                    listItem.appendChild(adminButton);
-                    listItem.appendChild(subscriptionSelect);
-
-                    // Append listItem to userList
-                    userList.appendChild(listItem);
-
-                    // Create and append the confirm button separately
-                    const confirmButton = document.createElement('button');
-                    confirmButton.className = 'confirm-changes-button';
-                    confirmButton.style.display = 'none';
-                    confirmButton.textContent = 'Confirm Changes';
-                    listItem.appendChild(confirmButton);
+                    userList.appendChild(row);
                 });
             })
             .catch(error => console.error('Error searching users:', error));
