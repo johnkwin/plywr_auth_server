@@ -1,32 +1,23 @@
-/* General Styles */
+/* General Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #333;
-    color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    margin: 0;
+    background: #2b2b2b;
 }
-
-.container {
-    width: 100%;
-    max-width: 800px;
-    background-color: #fff;
-    color: #333;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-h1 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    font-weight: bold;
-}
-
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -39,7 +30,6 @@ select {
     box-sizing: border-box;
     display: block;
 }
-
 button {
     padding: 10px 20px;
     margin: 10px 0;
@@ -51,185 +41,376 @@ button {
     display: inline-block;
     transition: background-color 0.3s;
 }
-
 button:hover {
     background-color: #2980b9;
 }
+.dashboard-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
 
-/* Toggle Button Styling */
-.toggle-button {
-    padding: 8px 16px;
-    margin: 0 8px;
-    background-color: #e74c3c;
+.dashboard-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 600px;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+.logout-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+    background: #dc3545;
     color: #fff;
-    border: none;
-    border-radius: 4px;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
     cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-.toggle-button.active {
-    background-color: #2ecc71;
+.logout-button:hover {
+    background: #c82333;
 }
 
-.toggle-button:hover {
-    background-color: #c0392b;
+.user-search {
+    width: 100%;
+    margin-bottom: 20px;
 }
 
-.toggle-button.active:hover {
-    background-color: #27ae60;
+.user-search input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
 }
 
-/* Input Group Styling */
-.input-group {
+.new-user-form {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.new-user-form input[type="email"], .new-user-form input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+.new-user-form .new-user-options {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
-.input-group input,
-.input-group select {
+.new-user-form .toggle-button {
+    flex: 1;
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.new-user-form .toggle-button.off {
+    background: #6c757d;
+}
+
+.new-user-form .toggle-button.active {
+    background: #28a745;
+}
+
+.new-user-form select {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.new-user-form button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.new-user-form button:hover {
+    background: #0056b3;
+}
+
+.user-list {
+    width: 100%;
+    list-style-type: none;
+    padding: 0;
+}
+
+.user-list-header, .user-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.user-list-header {
+    background: #f8f9fa;
+    font-weight: bold;
+}
+
+.user-list-item {
+    padding: 10px 0;
+}
+
+.user-list-item input[type="text"], .user-list-item select {
+    flex: 2;
+    margin-right: 10px;
+    padding: 8px;
+}
+
+.user-list-item .toggle-button {
+    flex: 1;
+    padding: 8px 10px;
+    margin-right: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.user-list-item .toggle-button.off {
+    background: #6c757d;
+}
+
+.user-list-item .toggle-button.active {
+    background: #28a745;
+}
+
+.user-list-item select {
+    flex: 1;
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.user-list-item .confirm-changes-button {
+    flex: 1;
+    padding: 8px 10px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    display: none;
+    margin-left: 10px;
+}
+
+.user-list-item .confirm-changes-button:hover {
+    background: #218838;
+}
+.user-list-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.user-list-item input[type="text"] {
+    flex: 2;
+    margin-right: 10px;
+}
+
+.user-list-item .toggle-button {
+    flex: 1;
+    padding: 5px 10px;
+    margin-right: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.user-list-item .toggle-button.off {
+    background: #6c757d;
+}
+
+.user-list-item .toggle-button.active {
+    background: #28a745;
+}
+
+.user-list-item select {
+    flex: 1;
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.user-list-item .confirm-changes-button {
+    flex: 1;
+    padding: 5px 10px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    display: none;
+}
+
+.user-list-item .confirm-changes-button.confirm-deletion {
+    background: #dc3545;
+}
+
+.user-list-item .confirm-changes-button:hover {
+    background: #218838;
+}
+
+.user-list-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.user-list-header span {
     flex: 1;
     margin-right: 10px;
 }
 
-.input-group button {
+.new-user-form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.new-user-form input[type="email"], .new-user-form input[type="password"] {
+    margin-bottom: 10px;
+}
+
+.new-user-options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.new-user-options button, .new-user-options select {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.new-user-options button {
     margin: 0;
 }
 
-/* Table Styling */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+.new-user-options select {
+    max-width: 200px;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: left;
+.logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    background: #dc3545;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
 }
 
-th {
-    background-color: #f2f2f2;
-    color: #333;
-    font-weight: bold;
+.logout-button:hover {
+    background: #c82333;
 }
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #f1f1f1;
-}
-
-#user-list .user-list-item {
+.user-list-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-}
-
-/* Keep Table Headers Visible */
-.table-container {
-    overflow-x: auto;
-}
-
-.table-container table {
-    width: 100%;
-}
-
-.table-container thead th {
-    position: sticky;
-    top: 0;
-    background-color: #f2f2f2;
-    z-index: 2;
-}
-
-/* Login Form */
-#login-form {
-    width: 100%;
-    max-width: 400px;
-    margin: auto;
-    padding: 20px;
-    background-color: #fff;
-    color: #333;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: left;
-}
-
-#login-form h2 {
-    margin-bottom: 20px;
-    font-size: 22px;
-}
-
-#login-form input[type="email"],
-#login-form input[type="password"] {
-    width: calc(100% - 20px);
     padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
 }
 
-#login-form button {
-    width: 100%;
+.user-list-item {
+    display: flex;
+    align-items: center;
     padding: 10px;
-    background-color: #3498db;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.user-list-item input[type="text"] {
+    flex: 2;
+    margin-right: 10px;
+}
+
+.user-list-item .toggle-button {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.user-list-item select {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.user-list-item .confirm-changes-button {
+    flex: 1;
+    background: #28a745;
     color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-}
-
-#login-form button:hover {
-    background-color: #2980b9;
-}
-
-/* Search Input */
-#searchUsers {
-    width: calc(100% - 20px);
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-/* Logout Button */
-#logout-button {
-    float: right;
-    background-color: #e74c3c;
-    color: #fff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-#logout-button:hover {
-    background-color: #c0392b;
-}
-
-/* Admin Dashboard */
-#admin-dashboard {
-    width: 100%;
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    background-color: #fff;
-    color: #333;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
+    display: none;
 }
 
-#admin-dashboard h1 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    font-weight: bold;
+.user-list-item .confirm-changes-button.confirm-deletion {
+    background: #dc3545;
+}
+
+.user-list-item .confirm-changes-button:hover {
+    background: #218838;
+}
+
+.user-list-item .confirm-changes-button.confirm-deletion:hover {
+    background: #c82333;
 }
