@@ -82,25 +82,44 @@ document.addEventListener('DOMContentLoaded', function () {
                     const listItem = document.createElement('div');
                     listItem.className = 'user-list-item';
                     listItem.dataset.userid = user._id;
-                    console.log("User isAdmin:", user.isAdmin);
-                    console.log("User subscriptionStatus:", user.subscriptionStatus);
-                    console.log("User email:", user.email);
-                    console.log("User _id:", user._id);
-                    console.log("User _id:", user.password);
-                    console.log("User createdAt:", user.createdAt);
 
-                    listItem.innerHTML = `
-                        <input type="text" value="${user.email}">
-                         <input type="password" data-userid="${user._id}" value="" placeholder="Update Password">
-                        <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
-                        <select data-userid="${user._id}">
-                            <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
-                            <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
-                            <option value="delete" class="delete-option">Delete</option>
-                        </select>
-                        <button class="confirm-changes-button" style="display: none;">Confirm Changes</button>
+                    // Create user detail elements
+                    const emailInput = document.createElement('input');
+                    emailInput.type = 'text';
+                    emailInput.value = user.email;
+                    emailInput.dataset.original = user.email;
+
+                    const passwordInput = document.createElement('input');
+                    passwordInput.type = 'password';
+                    passwordInput.placeholder = 'Update Password';
+
+                    const adminButton = document.createElement('button');
+                    adminButton.className = `toggle-button ${user.isAdmin ? 'active' : 'off'}`;
+                    adminButton.textContent = user.isAdmin ? 'On' : 'Off';
+
+                    const subscriptionSelect = document.createElement('select');
+                    subscriptionSelect.dataset.original = user.subscriptionStatus;
+                    subscriptionSelect.innerHTML = `
+                        <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
+                        <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
+                        <option value="delete" class="delete-option">Delete</option>
                     `;
+
+                    // Append elements to listItem
+                    listItem.appendChild(emailInput);
+                    listItem.appendChild(passwordInput);
+                    listItem.appendChild(adminButton);
+                    listItem.appendChild(subscriptionSelect);
+
+                    // Append listItem to userList
                     userList.appendChild(listItem);
+
+                    // Create and append the confirm button separately
+                    const confirmButton = document.createElement('button');
+                    confirmButton.className = 'confirm-changes-button';
+                    confirmButton.style.display = 'none';
+                    confirmButton.textContent = 'Confirm Changes';
+                    listItem.appendChild(confirmButton);
                 });
             })
             .catch(error => console.error('Error searching users:', error));
