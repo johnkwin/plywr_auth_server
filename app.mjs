@@ -115,6 +115,7 @@ app.post('/login', async (req, res) => {
     const user = await User.findOne({ email });
     if (user && await bcrypt.compare(password, user.password)) {
       const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+      console.log("password correct...");
       res.json({ token });
     } else {
       res.status(400).json({ message: 'Invalid credentials' }); // Send JSON response
