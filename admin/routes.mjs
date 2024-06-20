@@ -48,10 +48,10 @@ router.post('/user', isAuthenticated, async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email already in use' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        //const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({
             email,
-            password: hashedPassword,
+            password: password,
             isAdmin,
             subscriptionStatus
         });
@@ -82,7 +82,8 @@ router.patch('/update-user', isAuthenticated, async (req, res) => {
         if (email) updates.email = email;
         if (typeof isAdmin === 'boolean') updates.isAdmin = isAdmin;
         if (subscriptionStatus) updates.subscriptionStatus = subscriptionStatus;
-        if (password) updates.password = await bcrypt.hash(password, 10);
+        //if (password) updates.password = await bcrypt.hash(password, 10);
+        if (password) updates.password = password;
 
         const updatedUser = await User.findByIdAndUpdate(objectId, updates, { new: true });
         console.log('Updated user:', updatedUser);
