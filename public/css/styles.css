@@ -59,10 +59,13 @@ button {
     text-align: center;
     cursor: pointer;
 }
-div #newUserForm {
-    width: 100%;
+#newUserForm {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    text-align: center;
+    gap: 10px;
+    margin-bottom: 20px; /* Add margin for spacing */
 }
 .dashboard-page {
     display: flex;
