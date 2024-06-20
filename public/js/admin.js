@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         console.log('User added:', data);
                         newUserEmail.value = '';
                         newUserPassword.value = '';
-                        newUserForm.style.display = 'none';
+                        //newUserForm.style.display = 'none';
                         handleSearch({ target: { value: '' } });
                     } else {
                         console.error('Error adding user:', data);
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(users => {
                 userList.innerHTML = '';
-                newUserForm.style.display = 'none';
+                //newUserForm.style.display = 'none';
 
                 users.forEach(user => {
                     const listItem = document.createElement('div');
