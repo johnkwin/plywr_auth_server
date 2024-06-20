@@ -197,8 +197,207 @@ h2 {
 }
 .user-list-container {
     margin-top: 20px;
+    position: relative; /* Ensure the container is the relative reference point */
+    width: 65%;
+}
+.user-list {
     width: 100%;
-    overflow-x: auto; /* Ensure table fits within container */
+    list-style-type: none;
+    padding: 0;
+}
+
+.user-list-header {
+    background: #f8f9fa;
+    font-weight: bold;
+}
+
+.user-list-item {
+    padding: 10px 0;
+}
+
+.user-list-item input, .user-list-item select {
+    flex: 2;
+    margin-right: 10px;
+    padding: 8px;
+}
+
+.user-list-item .toggle-button {
+    flex: 1;
+    padding: 8px 10px;
+    margin-right: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.user-list-item .toggle-button.off {
+    background: #6c757d;
+}
+
+.user-list-item .toggle-button.active {
+    background: #28a745;
+}
+
+.user-list-item select {
+    flex: 1;
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.user-list-item .confirm-changes-button {
+    flex: 1;
+    padding: 8px 10px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    display: none;
+    margin-left: 10px;
+}
+
+.user-list-item .confirm-changes-button:hover {
+    background: #218838;
+}
+.user-list-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.user-list-item input {
+    flex: 2;
+    margin-right: 10px;
+}
+
+.user-list-item .toggle-button {
+    flex: 1;
+    padding: 5px 10px;
+    margin-right: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.user-list-item .toggle-button.off {
+    background: #6c757d;
+}
+
+.user-list-item .toggle-button.active {
+    background: #28a745;
+}
+
+.user-list-item select {
+    flex: 1;
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.user-list-item .confirm-changes-button {
+    flex: 1;
+    padding: 5px 10px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    display: none;
+}
+
+.user-list-item .confirm-changes-button.confirm-deletion {
+    background: #dc3545;
+}
+
+.user-list-item .confirm-changes-button:hover {
+    background: #218838;
+}
+
+.user-list-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.user-list-header span {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.new-user-form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.new-user-form input[type="email"], .new-user-form input[type="password"] {
+    margin-bottom: 10px;
+}
+
+.new-user-options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.new-user-options button, .new-user-options select {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.new-user-options button {
+    margin: 0;
+}
+
+.new-user-options select {
+    max-width: 200px;
+}
+
+.logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    background: #dc3545;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background: #c82333;
+}
+.user-list-container {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.user-list-container {
+    margin-top: 20px;
+    width: 100%;
 }
 
 .user-list-table {
@@ -212,7 +411,6 @@ h2 {
     text-align: left;
     border: 1px solid #444;
     background-color: #444;
-    white-space: nowrap; /* Ensure no line breaks in table cells */
 }
 
 .user-list-table th {
@@ -256,22 +454,6 @@ h2 {
     background-color: #28a745;
     color: #fff;
     border: none;
+    display: none;
     margin-left: 10px;
-    width: auto;
-}
-
-.logout-button {
-    display: block;
-    margin: 10px 0 20px;
-    padding: 10px 20px;
-    background-color: #dc3545;
-    color: #fff;
-    text-align: center;
-    border-radius: 5px;
-    text-decoration: none;
-    float: right;
-}
-
-.logout-button:hover {
-    background-color: #c82333;
 }
