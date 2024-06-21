@@ -315,7 +315,6 @@ h2 {
 .user-list-item select {
     flex: 1;
     padding: 5px;
-    
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -465,15 +464,4 @@ h2 {
 
 .user-list-table td .toggle-button.off {
     background-color: #ff6b6b;
-}
-
-.user-list-table td .confirm-changes-button {
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    display: none;
-}
-
-.user-list-table td .confirm-changes-button.show {
-    display: inline-block;
 }
