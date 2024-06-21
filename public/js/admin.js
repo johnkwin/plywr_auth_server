@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id, email, isAdmin, subscriptionStatus })
+                body: JSON.stringify({ bodyData })
             })
             .then(handleResponse)
             .then(data => {
