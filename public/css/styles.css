@@ -423,7 +423,7 @@ h2 {
 
 .user-list-table th,
 .user-list-table td {
-    width: 20%;
+    width: 100%;
     padding: 10px;
     text-align: left;
     border: 1px solid #444;
@@ -444,6 +444,9 @@ h2 {
     border-radius: 4px;
     background: #222;
     color: #ddd;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
 }
 
 .user-list-table td input[type="text"]:focus,
