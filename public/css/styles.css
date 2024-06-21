@@ -235,14 +235,12 @@ h2 {
 .user-list-item input,
 .user-list-item select {
     flex: 2;
-    margin-right: 10px;
     padding: 8px;
 }
 
 .user-list-item .toggle-button {
     flex: 1;
     padding: 8px 10px;
-    margin-right: 10px;
     background: #007bff;
     color: #fff;
     border: none;
@@ -262,7 +260,6 @@ h2 {
 .user-list-item select {
     flex: 1;
     padding: 8px;
-    margin-right: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -288,20 +285,17 @@ h2 {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-bottom: 10px;
     width: 100%;
     box-sizing: border-box;
 }
 
 .user-list-item input {
     flex: 2;
-    margin-right: 10px;
 }
 
 .user-list-item .toggle-button {
     flex: 1;
     padding: 5px 10px;
-    margin-right: 10px;
     background: #007bff;
     color: #fff;
     border: none;
@@ -321,7 +315,7 @@ h2 {
 .user-list-item select {
     flex: 1;
     padding: 5px;
-    margin-right: 10px;
+    
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -358,7 +352,7 @@ h2 {
 
 .user-list-header span {
     flex: 1;
-    margin-right: 10px;
+    
 }
 
 .new-user-form {
@@ -382,7 +376,7 @@ h2 {
 .new-user-options button,
 .new-user-options select {
     flex: 1;
-    margin-right: 10px;
+    
 }
 
 .new-user-options button {
