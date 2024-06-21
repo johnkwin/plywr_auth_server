@@ -219,20 +219,25 @@ h2 {
     padding: 8px;
 }
 
-.user-list-item .toggle-button,
-.user-list-item .confirm-changes-button {
+.user-list-item .toggle-button {}
     padding: 8px 10px;
     color: #333; /* Darker gray text */
     border: none;
     border-radius: 5px;
     cursor: pointer;
     text-align: center;
-    position: absolute;
+}
+.user-list-item .confirm-changes-button {
     right: -120%; /* Adjust this value as needed to position outside the table */
     top: 50%;
     transform: translateY(-50%);
+    padding: 8px 10px;
+    color: #333; /* Darker gray text */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
 }
-
 .user-list-item .confirm-changes-button.confirm-deletion {
     background: #ff6b6b;
     position: absolute;
