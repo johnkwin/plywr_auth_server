@@ -219,7 +219,7 @@ h2 {
     padding: 8px;
 }
 
-.user-list-item .toggle-button {}
+.user-list-item .toggle-button {
     padding: 8px 10px;
     color: #333; /* Darker gray text */
     border: none;
