@@ -97,8 +97,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
                             <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
                             <option value="delete" class="delete-option">Delete</option>
-                        </select>
-                        <button class="confirm-changes-button" style="display: none;">Confirm Changes</button></td>
+                        </select></td>
+                        <td><button class="confirm-changes-button" style="display: none;">Confirm Changes</button></td>
                     `;
                     userList.appendChild(row);
                 });
