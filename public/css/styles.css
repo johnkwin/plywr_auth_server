@@ -150,7 +150,6 @@ h2 {
     border-radius: 5px;
     cursor: pointer;
     text-align: center;
-    margin: 10px;
 }
 
 .new-user-form .toggle-button.off,
@@ -234,6 +233,8 @@ h2 {
 
 .user-list-item .confirm-changes-button.confirm-deletion {
     background: #ff6b6b;
+    position: absolute;
+    right: -25%;
 }
 
 .user-list-table {
