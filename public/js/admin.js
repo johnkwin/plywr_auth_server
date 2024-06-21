@@ -204,8 +204,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         } else {
             const id = userId;
-            const bodyData = { id, email, isAdmin, subscriptionStatus }
-            if (password) bodyData.password = password;
+            const bodyData = { id, email, isAdmin, subscriptionStatus };
+            if (password && password.length != 0) bodyData.password = password;
             console.log(JSON.stringify(bodyData));
             fetch(`/admin/update-user`, {
                 method: 'PATCH',
