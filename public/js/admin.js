@@ -108,43 +108,45 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleUserChange(event) {
-        if (event.target.matches('select[data-userid]')) {
-            const selectElement = event.target;
-            const confirmButton = selectElement.nextElementSibling;
-
-            if (selectElement.value === 'delete') {
-                confirmButton.textContent = 'Confirm Deletion';
-                confirmButton.classList.add('confirm-deletion');
-            } else {
-                confirmButton.textContent = 'Confirm Changes';
-                confirmButton.classList.remove('confirm-deletion');
-            }
-            confirmButton.style.display = 'inline-block';
-        } else if (event.target.matches('.toggle-button')) {
-            const button = event.target;
-            button.classList.toggle('active');
-            button.classList.toggle('off');
-            button.textContent = button.classList.contains('active') ? 'On' : 'Off';
-
-            const confirmButton = button.closest('.user-list-item').querySelector('.confirm-changes-button');
-            confirmButton.style.display = 'inline-block';
-        }
         const listItem = event.target.closest('.user-list-item');
         if (!listItem) return;
-
+    
         const confirmButton = listItem.querySelector('.confirm-changes-button');
         const emailInput = listItem.querySelector('input[type="text"]');
         const passwordInput = listItem.querySelector('input[type="password"]');
         const isAdminButton = listItem.querySelector('.toggle-button');
-        const subscriptionSelect = listItem.querySelector('select');
-
-        const emailChanged = emailInput && emailInput.value !== emailInput.dataset.original;
-        const passwordChanged = passwordInput && passwordInput.value.trim() !== '';
-
-        if (emailChanged || passwordChanged || event.target === isAdminButton || event.target === subscriptionSelect) {
-            confirmButton.style.display = 'inline-block';
-        } else {
-            confirmButton.style.display = 'none';
+        const subscriptionSelect = listItem.querySelector('select[data-userid]');
+    
+        // Ensure the confirmButton exists before setting properties
+        if (confirmButton) {
+            if (event.target.matches('select[data-userid]')) {
+                const selectElement = event.target;
+    
+                if (selectElement.value === 'delete') {
+                    confirmButton.textContent = 'Confirm Deletion';
+                    confirmButton.classList.add('confirm-deletion');
+                } else {
+                    confirmButton.textContent = 'Confirm Changes';
+                    confirmButton.classList.remove('confirm-deletion');
+                }
+                confirmButton.style.display = 'inline-block';
+            } else if (event.target.matches('.toggle-button')) {
+                const button = event.target;
+                button.classList.toggle('active');
+                button.classList.toggle('off');
+                button.textContent = button.classList.contains('active') ? 'On' : 'Off';
+    
+                confirmButton.style.display = 'inline-block';
+            }
+    
+            const emailChanged = emailInput && emailInput.value !== emailInput.dataset.original;
+            const passwordChanged = passwordInput && passwordInput.value.trim() !== '';
+    
+            if (emailChanged || passwordChanged || event.target === isAdminButton || event.target === subscriptionSelect) {
+                confirmButton.style.display = 'inline-block';
+            } else {
+                confirmButton.style.display = 'none';
+            }
         }
     }
 
