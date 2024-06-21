@@ -41,7 +41,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: #2b2b2b;
+    background: #d3d3d3; /* Light gray background */
 }
 
 input[type="text"],
@@ -60,8 +60,8 @@ button {
     top: 10px;
     right: 10px;
     padding: 10px;
-    background: #222127;
-    color: #fff;
+    background: #7a7a7a; /* Light gray button */
+    color: #333; /* Darker gray text */
     text-decoration: none;
     border-radius: 5px;
     text-align: center;
@@ -87,27 +87,12 @@ button {
     height: 100%;
 }
 
-.login-container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 45%;
-    max-width: 65%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    position: relative;
-}
-
+.login-container,
 .dashboard-container {
-    background: #fff;
+    background: #f0f0f0; /* Light background */
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 75%;
-    max-width: 90%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -136,23 +121,13 @@ h2 {
     background: #c82333;
 }
 
-.user-search {
-    width: 100%;
-    margin-bottom: 20px;
-}
-
-.user-search input {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    box-sizing: border-box;
-}
-
+.user-search,
 .new-user-form {
     width: 100%;
     margin-bottom: 20px;
 }
 
+.user-search input,
 .new-user-form input[type="email"],
 .new-user-form input[type="password"] {
     width: 100%;
@@ -161,18 +136,20 @@ h2 {
     box-sizing: border-box;
 }
 
-.new-user-form .new-user-options {
+.new-user-form .new-user-options,
+.user-list-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
 }
 
-.new-user-form .toggle-button {
+.new-user-form .toggle-button,
+.user-list-item .toggle-button {
     flex: 1;
     padding: 10px;
-    background: #007bff;
-    color: #fff;
+    background: #7a7a7a; /* Light gray button */
+    color: #333; /* Darker gray text */
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -180,34 +157,39 @@ h2 {
     margin: 10px;
 }
 
-.new-user-form .toggle-button.off {
-    background: #6c757d;
+.new-user-form .toggle-button.off,
+.user-list-item .toggle-button.off {
+    background: #b0b0b0; /* Lighter gray */
 }
 
-.new-user-form .toggle-button.active {
+.new-user-form .toggle-button.active,
+.user-list-item .toggle-button.active {
     background: #28a745;
 }
 
-.new-user-form select {
+.new-user-form select,
+.user-list-item select {
     flex: 1;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-.new-user-form button {
+.new-user-form button,
+.user-list-item .confirm-changes-button {
     margin-top: 10px;
     width: 100%;
     padding: 10px;
-    background: #007bff;
-    color: #fff;
+    background: #7a7a7a; /* Light gray button */
+    color: #333; /* Darker gray text */
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
-.new-user-form button:hover {
-    background: #0056b3;
+.new-user-form button:hover,
+.user-list-item .confirm-changes-button:hover {
+    background: #5a5a5a; /* Darker gray */
 }
 
 .user-list-container {
@@ -224,12 +206,18 @@ h2 {
 }
 
 .user-list-header {
-    background: #f8f9fa;
+    background: #e0e0e0; /* Light gray */
     font-weight: bold;
 }
 
 .user-list-item {
     padding: 10px 0;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    background: #f9f9f9; /* Light background for items */
 }
 
 .user-list-item input,
@@ -238,183 +226,23 @@ h2 {
     padding: 8px;
 }
 
-.user-list-item .toggle-button {
-    flex: 1;
-    padding: 8px 10px;
-    background: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-}
-
-.user-list-item .toggle-button.off {
-    background: #6c757d;
-}
-
-.user-list-item .toggle-button.active {
-    background: #28a745;
-}
-
-.user-list-item select {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
+.user-list-item .toggle-button,
 .user-list-item .confirm-changes-button {
     flex: 1;
     padding: 8px 10px;
-    background: #28a745;
-    color: #fff;
+    background: #7a7a7a; /* Light gray button */
+    color: #333; /* Darker gray text */
     border: none;
     border-radius: 5px;
     cursor: pointer;
     text-align: center;
-    display: none;
-}
-
-.user-list-item .confirm-changes-button:hover {
-    background: #218838;
-}
-
-.user-list-item {
-    align-items: center;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.user-list-item input {
-    flex: 2;
-}
-
-.user-list-item .toggle-button {
-    flex: 1;
-    padding: 5px 10px;
-    background: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-}
-
-.user-list-item .toggle-button.off {
-    background: #6c757d;
-}
-
-.user-list-item .toggle-button.active {
-    background: #28a745;
-}
-
-.user-list-item select {
-    flex: 1;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.user-list-item .confirm-changes-button {
-    flex: 1;
-    padding: 5px 10px;
-    background: #28a745;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-    display: none;
 }
 
 .user-list-item .confirm-changes-button.confirm-deletion {
     background: #dc3545;
 }
 
-.user-list-item .confirm-changes-button:hover {
-    background: #218838;
-}
-
-.user-list-header {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 2px solid #ccc;
-    margin-bottom: 10px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.user-list-header span {
-    flex: 1;
-    
-}
-
-.new-user-form {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-    width: 100%;
-}
-
-.new-user-form input[type="email"],
-.new-user-form input[type="password"] {
-    margin-bottom: 10px;
-}
-
-.new-user-options {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
-.new-user-options button,
-.new-user-options select {
-    flex: 1;
-    
-}
-
-.new-user-options button {
-    margin: 0;
-}
-
-.new-user-options select {
-    max-width: 200px;
-}
-
-.logout-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 10px;
-    background: #dc3545;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    text-align: center;
-    cursor: pointer;
-}
-
-.logout-button:hover {
-    background: #c82333;
-}
-
-.user-list-container {
-    margin-top: 20px;
-    width: 100%;
-}
-
-.user-list-container {
-    margin-top: 20px;
-    width: 100%;
-}
-
 .user-list-table {
-
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
@@ -426,12 +254,12 @@ h2 {
     width: 20%;
     padding: 10px;
     text-align: left;
-    border: 1px solid #444;
-    background-color: #444;
+    border: 1px solid #aaa; /* Light gray border */
+    background-color: #eaeaea; /* Light background for cells */
 }
 
 .user-list-table th {
-    background-color: #555;
+    background-color: #d0d0d0; /* Slightly darker for header */
     font-weight: bold;
 }
 
@@ -442,8 +270,8 @@ h2 {
     padding: 8px;
     margin: 2px;
     border-radius: 4px;
-    background: #222;
-    color: #ddd;
+    background: #f0f0f0; /* Light input background */
+    color: #333; /* Darker gray text */
     width: 100%;
     align-items: center;
     justify-content: center;
