@@ -131,7 +131,6 @@ h2 {
 .new-user-form input[type="password"] {
     width: 100%;
     padding: 8px;
-    margin-top: 5px;
     box-sizing: border-box;
 }
 
@@ -140,7 +139,6 @@ h2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 10px;
 }
 
 .new-user-form .toggle-button,
@@ -175,7 +173,6 @@ h2 {
 
 .new-user-form button,
 .user-list-item .confirm-changes-button {
-    margin-top: 10px;
     width: 100%;
     padding: 10px;
     color: #019c09;
@@ -236,7 +233,7 @@ h2 {
 }
 
 .user-list-item .confirm-changes-button.confirm-deletion {
-    background: #dc3545;
+    background: #ff6b6b;
 }
 
 .user-list-table {
@@ -248,7 +245,7 @@ h2 {
 
 .user-list-table th,
 .user-list-table td {
-    width: 20%;
+    width: 25%;
     padding: 10px;
     text-align: center;
     align-items: center;
