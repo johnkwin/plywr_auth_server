@@ -68,7 +68,7 @@ router.post('/user', isAuthenticated, async (req, res) => {
 // Use PATCH for updates
 router.patch('/update-user', isAuthenticated, async (req, res) => {
     try {
-        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
+        const { bodyData: { id, email, password, isAdmin, subscriptionStatus } } = req.body;
         console.log('User ID:', id);
         console.log('Payload received:', req.body);
 
