@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (query.trim() === '') {
             userList.innerHTML = '';
             newUserForm.style.display = 'flex';
-            userTable.classList.add('hidden');
+            userTable.style.display = 'none'; // Hide the table
             return;
         }
 
@@ -79,9 +79,10 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(users => {
                 userList.innerHTML = '';
                 if (users.length === 0) {
-                    userTable.style.add('display:none;'); // Hide the table if no users are found
+                    userTable.style.display = 'none'; // Show the table if users are found
                 } else {
-                    userTable.classList.remove('display:none;'); // Show the table if users are found
+                    userTable.style.display = 'table'; // Show the table if users are found
+                    
                     
                 users.forEach(user => {
                     const row = document.createElement('tr');
