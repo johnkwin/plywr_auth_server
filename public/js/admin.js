@@ -79,9 +79,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(users => {
                 userList.innerHTML = '';
                 if (users.length === 0) {
-                    userTable.classList.add('hidden'); // Hide the table if no users are found
+                    userTable.style.add('display:none;'); // Hide the table if no users are found
                 } else {
-                    userTable.classList.remove('hidden'); // Show the table if users are found
+                    userTable.classList.remove('display:none;'); // Show the table if users are found
                     
                 users.forEach(user => {
                     const row = document.createElement('tr');
