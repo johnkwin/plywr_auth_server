@@ -171,7 +171,9 @@ app.post('/subscribe', async (req, res) => {
     console.error(error);
   }
 });
-
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, './views/privacy.html'));
+});
 app.use('/admin', adminRoutes);
 
 // Start server
