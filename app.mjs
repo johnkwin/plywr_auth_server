@@ -173,7 +173,7 @@ app.post('/subscribe', async (req, res) => {
   }
 });
 app.get('/privacy', (req, res) => {
-  res.sendFile(path.join(__dirname, './views/privacy.html'));
+  res.sendFile(new URL('./views/privacy.html', import.meta.url).pathname);
 });
 
 app.use('/admin', adminRoutes);
