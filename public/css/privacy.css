@@ -1,75 +1,85 @@
-/* Basic Reset */
+/* General Reset */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    color: #333;
-    line-height: 1.6;
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif; /* You can set your preferred font here */
 }
 
-header {
-    background: #343a40;
-    color: #fff;
+header, footer {
+    background-color: #333; /* Dark background */
+    color: #fff; /* Light text color */
+    text-align: center;
     padding: 10px 0;
 }
 
-nav {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-nav a {
-    color: #fff;
+header nav a {
+    color: white; /* Adjust to your preferred link color */
+    margin: 0 15px;
     text-decoration: none;
-    padding: 10px;
 }
 
-nav a.active,
-nav a:hover {
-    background-color: #495057;
-    border-radius: 4px;
+header nav a:hover {
+    text-decoration: underline;
 }
 
-.container {
+header nav a.active {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* Main flex container */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Content wrapper to ensure footer stays at the bottom */
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* Main content area */
+main.container {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+/* Style the content */
+section.content {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-}
-
-.content {
-    background: #fff;
-    padding: 20px;
+    background-color: #f9f9f9;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-    margin-bottom: 20px;
-    color: #007bff;
+/* Style for text */
+section.content h1, section.content h2 {
+    color: #333;
 }
 
-h2 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    color: #007bff;
+section.content p {
+    line-height: 1.6;
+    margin-bottom: 1em;
 }
 
-p {
-    margin-bottom: 20px;
-}
-
+/* Footer */
 footer {
-    background: #343a40;
-    color: #fff;
+    padding: 15px 20px;
     text-align: center;
-    padding: 10px 0;
-    position: absolute;
-    width: 100%;
-    bottom: 0;
+}
+
+footer p {
+    margin: 0;
 }
