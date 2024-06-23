@@ -10,6 +10,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import fs from 'fs';
 import https from 'https';
+import path from 'path';
 import { setupWebSocket } from './websocket.mjs';
 import adminRoutes from './admin/routes.mjs';
 import User from './models/User.mjs';
@@ -174,6 +175,7 @@ app.post('/subscribe', async (req, res) => {
 app.get('/privacy', (req, res) => {
   res.sendFile(path.join(__dirname, './views/privacy.html'));
 });
+
 app.use('/admin', adminRoutes);
 
 // Start server
