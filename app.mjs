@@ -117,8 +117,16 @@ app.post('/login', async (req, res) => {
     console.log(bcrypt.hash(password, 10));
     console.log(user.password);
     if (user && await bcrypt.compare(password, user.password)) {
+       // Clear any existing tokens
+      user.tokens = [];
+
+      // Generate a new token
       const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
-      console.log("password correct...");
+
+      // Add the new token to the user's tokens array
+      user.tokens.push({ token });
+      await user.save();
+      console.log("Correct password.");
       res.json({ token });
     } else {
       res.status(400).json({ message: 'Invalid credentials' }); // Send JSON response
@@ -146,7 +154,30 @@ app.post('/check-subscription', async (req, res) => {
     res.status(401).json({ message: 'Unauthorized' });
   }
 });
+app.post('/logout', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
 
+  try {
+    const decoded = jwt.verify(token, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid user' });
+    }
+
+    // Remove the token
+    user.tokens = user.tokens.filter(t => t.token !== token);
+    await user.save();
+
+    res.json({ message: 'Logout successful' });
+  } catch (error) {
+    res.status(401).json({ message: 'Unauthorized' });
+  }
+});
 app.post('/subscribe', async (req, res) => {
   const { token, planId } = req.body;
   try {
