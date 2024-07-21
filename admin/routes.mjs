@@ -21,6 +21,7 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const admin = await User.findOne({ email, isAdmin: true });
+        console.log(admin);
         if (admin && await bcrypt.compare(password, admin.password)) {
             req.session.userId = admin._id;
             res.redirect('/admin/dashboard');
@@ -78,7 +79,7 @@ router.patch('/update-user', isAuthenticated, async (req, res) => {
             res.setHeader('Content-Type', 'application/json');
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-
+        
         res.setHeader('Content-Type', 'application/json');
         res.json({ success: true, message: 'User updated', user: updatedUser });
     } catch (error) {
