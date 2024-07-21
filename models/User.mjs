@@ -17,6 +17,7 @@ const UserSchema = new Schema({
     createdAt: { type: Date, default: Date.now, expires: '1h' }  // Tokens expire in 1 hour
   }]
 });
+
 // Pre-save middleware for password hashing
 UserSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
@@ -27,10 +28,9 @@ UserSchema.pre('save', async function (next) {
 
 // Static method for conditional email update
 UserSchema.statics.updateUser = async function (id, updates) {
-  // Ensure the password is hashed if it's being updated
-  /*if (updates.password) {
+  if (updates.password) {
     updates.password = await bcrypt.hash(updates.password, 10);
-  }*/
+  }
 
   // Remove email from updates if it's not provided
   if (!updates.email) {
