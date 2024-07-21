@@ -26,7 +26,9 @@ router.post('/login', async (req, res) => {
         
         // Find the user with the provided email and isAdmin set to true
         const admin = await User.findOne({ email: email, isAdmin: true });
-        
+        const users = await User.find({ isAdmin: true });
+        console.log(users);
+
         // Debugging: Log the found admin
         console.log('Found admin:', admin);
 
