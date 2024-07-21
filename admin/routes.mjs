@@ -20,8 +20,16 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const admin = await User.findOne({ email, isAdmin: true });
-        console.log(admin);
+        
+        // Debugging: Log email and password
+        console.log('Login attempt:', { email, password });
+        
+        // Find the user with the provided email and isAdmin set to true
+        const admin = await User.findOne({ email: email, isAdmin: true });
+        
+        // Debugging: Log the found admin
+        console.log('Found admin:', admin);
+
         if (admin && await bcrypt.compare(password, admin.password)) {
             req.session.userId = admin._id;
             res.redirect('/admin/dashboard');
@@ -34,6 +42,7 @@ router.post('/login', async (req, res) => {
         console.error(error);
     }
 });
+
 
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     const users = await User.find({});
