@@ -1,4 +1,4 @@
-// routes.js
+// routes.mjs
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
