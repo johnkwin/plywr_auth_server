@@ -79,7 +79,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Session and Flash
-app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
+app.use(session({
+  secret: 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5',
+  resave: false,
+  saveUninitialized: false,
+  store: new MongoStore({ mongooseConnection: mongoose.connection })
+}));
 app.use(flash());
 
 // Static files and view engine

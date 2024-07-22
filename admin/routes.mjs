@@ -72,7 +72,6 @@ router.post('/user', isAuthenticated, async (req, res) => {
     }
 });
 
-// Use PATCH for updates
 router.patch('/update-user', isAuthenticated, async (req, res) => {
     try {
         const { bodyData: { id, email, password, isAdmin, subscriptionStatus } } = req.body;
