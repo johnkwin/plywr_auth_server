@@ -77,6 +77,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Express built-in middleware for JSON parsing (redundant with bodyParser, but good to keep if you plan to remove bodyParser later)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 // Static files and view engine
 app.use(express.static(new URL('./public', import.meta.url).pathname));
 app.set('view engine', 'ejs');
@@ -90,16 +91,19 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     console.error('Failed to connect to MongoDB:', err.message);
     console.error('Error Details:', err);
   });
-  const MongoStore = connectMongo.create({
-    mongoUrl: dbURI,
-    collectionName: 'sessions'
-  });
-  // Session and Flash
+
+// Correct usage of connect-mongo
+const MongoStore = connectMongo.create({
+  mongoUrl: dbURI,
+  collectionName: 'sessions'
+});
+
+// Session and Flash
 app.use(session({
   secret: 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5',
   resave: false,
   saveUninitialized: false,
-  store: new MongoStore({ mongooseConnection: mongoose.connection })
+  store: MongoStore
 }));
 app.use(flash());
 
@@ -161,6 +165,7 @@ app.post('/check-subscription', async (req, res) => {
     res.status(401).json({ message: 'Unauthorized' });
   }
 });
+
 app.post('/logout', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
   
@@ -185,6 +190,7 @@ app.post('/logout', async (req, res) => {
     res.status(401).json({ message: 'Unauthorized' });
   }
 });
+
 app.post('/subscribe', async (req, res) => {
   const { token, planId } = req.body;
   try {
@@ -210,6 +216,7 @@ app.post('/subscribe', async (req, res) => {
     console.error(error);
   }
 });
+
 app.get('/privacy', (req, res) => {
   res.sendFile(new URL('./views/privacy.html', import.meta.url).pathname);
 });
