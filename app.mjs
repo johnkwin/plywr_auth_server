@@ -27,7 +27,7 @@ const options = {
 
 // Create HTTPS server
 const server = https.createServer(options, app);
-
+const MongoStore = connectMongo(session);
 // Setup WebSocket
 setupWebSocket(server);
 
