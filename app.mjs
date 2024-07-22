@@ -11,6 +11,7 @@ import helmet from 'helmet';
 import fs from 'fs';
 import https from 'https';
 import path from 'path';
+import connectMongo from 'connect-mongo';
 import { setupWebSocket } from './websocket.mjs';
 import adminRoutes from './admin/routes.mjs';
 import User from './models/User.mjs';
