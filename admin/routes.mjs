@@ -16,6 +16,7 @@ function isAuthenticated(req, res, next) {
 router.get('/login', (req, res) => {
     res.render('login', { message: req.flash('message') });
 });
+
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -25,11 +26,9 @@ router.post('/login', async (req, res) => {
         
         // Find the user with the provided email and isAdmin set to true
         const admin = await User.findOne({ email: email, isAdmin: true });
-        const users = await User.find({ isAdmin: true });
-        console.log(users);
-        // Debugging: Log the found admin
         console.log('Found admin:', admin);
         console.log('comparison:', await bcrypt.compare(password, admin.password));
+
         if (admin && await bcrypt.compare(password, admin.password)) {
             req.session.userId = admin._id;
             console.log('Session set for user:', req.session.userId);
@@ -43,7 +42,6 @@ router.post('/login', async (req, res) => {
         console.error(error);
     }
 });
-
 
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     const users = await User.find({});
@@ -59,10 +57,10 @@ router.post('/user', isAuthenticated, async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email already in use' });
         }
 
-        //const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
         const newUser = new User({
             email,
-            password: password,
+            password: hashedPassword, // Store the hashed password
             isAdmin,
             subscriptionStatus
         });
@@ -81,9 +79,13 @@ router.patch('/update-user', isAuthenticated, async (req, res) => {
     try {
         const { bodyData: { id, email, password, isAdmin, subscriptionStatus } } = req.body;
 
-        const updates = { email, isAdmin, subscriptionStatus, password };
+        const updates = { email, isAdmin, subscriptionStatus };
 
-        const updatedUser = await User.updateUser(id, updates);
+        if (password) {
+            updates.password = await bcrypt.hash(password, 10); // Hash the password
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
 
         if (!updatedUser) {
             res.setHeader('Content-Type', 'application/json');
@@ -99,6 +101,18 @@ router.patch('/update-user', isAuthenticated, async (req, res) => {
     }
 });
 
+router.get('/verify-password/:email', async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.params.email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        res.json({ success: true, password: user.password });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+        console.error(error);
+    }
+});
 
 router.get('/search-users', isAuthenticated, async (req, res) => {
     const query = req.query.q;
