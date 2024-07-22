@@ -76,10 +76,6 @@ router.patch('/update-user', isAuthenticated, async (req, res) => {
 
         console.log('Update User ID:', id); // Debug log for ID
 
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new Error('Invalid User ID');
-        }
-
         const updates = { email, isAdmin, subscriptionStatus, password };
 
         const updatedUser = await User.updateUser(id, updates);
