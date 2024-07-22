@@ -1,3 +1,4 @@
+// User.mjs
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
@@ -25,6 +26,7 @@ UserSchema.pre('save', async function (next) {
   }
   next();
 });
+
 // Static method for conditional email update
 UserSchema.statics.updateUser = async function (id, updates) {
   if (updates.password) {

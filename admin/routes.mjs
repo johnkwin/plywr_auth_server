@@ -1,3 +1,4 @@
+// routes.js
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
@@ -20,14 +21,11 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        
-        // Debugging: Log email and password
+
         console.log('Login attempt:', { email, password });
-        
-        // Find the user with the provided email and isAdmin set to true
+
         const admin = await User.findOne({ email: email, isAdmin: true });
         console.log('Found admin:', admin);
-        console.log('comparison:', await bcrypt.compare(password, admin.password));
 
         if (admin && await bcrypt.compare(password, admin.password)) {
             req.session.userId = admin._id;
@@ -57,10 +55,10 @@ router.post('/user', isAuthenticated, async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email already in use' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({
             email,
-            password: hashedPassword, // Store the hashed password
+            password: hashedPassword,
             isAdmin,
             subscriptionStatus
         });
@@ -82,16 +80,16 @@ router.patch('/update-user', isAuthenticated, async (req, res) => {
         const updates = { email, isAdmin, subscriptionStatus };
 
         if (password) {
-            updates.password = await bcrypt.hash(password, 10); // Hash the password
+            updates.password = await bcrypt.hash(password, 10);
         }
 
-        const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
+        const updatedUser = await User.updateUser(id, updates);
 
         if (!updatedUser) {
             res.setHeader('Content-Type', 'application/json');
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-        
+
         res.setHeader('Content-Type', 'application/json');
         res.json({ success: true, message: 'User updated', user: updatedUser });
     } catch (error) {
