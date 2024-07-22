@@ -90,7 +90,7 @@ router.patch('/update-user', isAuthenticated, async (req, res) => {
     } catch (error) {
         console.error('Error updating user:', error);
         res.setHeader('Content-Type', 'application/json');
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error: ' + error.message });
     }
 });
 
