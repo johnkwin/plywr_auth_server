@@ -28,7 +28,6 @@ const options = {
 
 // Create HTTPS server
 const server = https.createServer(options, app);
-const MongoStore = connectMongo(session);
 // Setup WebSocket
 setupWebSocket(server);
 
@@ -101,7 +100,10 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     console.error('Failed to connect to MongoDB:', err.message);
     console.error('Error Details:', err);
   });
-
+  const MongoStore = connectMongo.create({
+    mongoUrl: dbURI,
+    collectionName: 'sessions'
+  });
 // Routes
 app.post('/register', async (req, res) => {
   try {
