@@ -1,4 +1,3 @@
-// User.mjs
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
@@ -29,6 +28,13 @@ UserSchema.pre('save', async function (next) {
 
 // Static method for conditional email update
 UserSchema.statics.updateUser = async function (id, updates) {
+  // Convert the id to a valid ObjectId if it's a valid string
+  if (typeof id === 'string' && mongoose.Types.ObjectId.isValid(id)) {
+    id = new mongoose.Types.ObjectId(id);
+  } else if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error('Invalid User ID');
+  }
+
   if (updates.password) {
     updates.password = await bcrypt.hash(updates.password, 10);
   }
@@ -36,11 +42,6 @@ UserSchema.statics.updateUser = async function (id, updates) {
   // Remove email from updates if it's not provided
   if (!updates.email) {
     delete updates.email;
-  }
-
-  // Validate id again to prevent invalid updates
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Error('Invalid User ID');
   }
 
   return this.findByIdAndUpdate(id, updates, { new: true });
