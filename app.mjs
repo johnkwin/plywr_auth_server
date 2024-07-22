@@ -77,16 +77,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Express built-in middleware for JSON parsing (redundant with bodyParser, but good to keep if you plan to remove bodyParser later)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Session and Flash
-app.use(session({
-  secret: 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5',
-  resave: false,
-  saveUninitialized: false,
-  store: new MongoStore({ mongooseConnection: mongoose.connection })
-}));
-app.use(flash());
-
 // Static files and view engine
 app.use(express.static(new URL('./public', import.meta.url).pathname));
 app.set('view engine', 'ejs');
@@ -104,6 +94,15 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     mongoUrl: dbURI,
     collectionName: 'sessions'
   });
+  // Session and Flash
+app.use(session({
+  secret: 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5',
+  resave: false,
+  saveUninitialized: false,
+  store: new MongoStore({ mongooseConnection: mongoose.connection })
+}));
+app.use(flash());
+
 // Routes
 app.post('/register', async (req, res) => {
   try {
