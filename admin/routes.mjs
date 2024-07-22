@@ -1,4 +1,3 @@
-// routes.mjs
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
@@ -55,10 +54,9 @@ router.post('/user', isAuthenticated, async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email already in use' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({
             email,
-            password: hashedPassword,
+            password,  // No need to hash here, the middleware will handle it
             isAdmin,
             subscriptionStatus
         });
@@ -74,13 +72,9 @@ router.post('/user', isAuthenticated, async (req, res) => {
 
 router.patch('/update-user', isAuthenticated, async (req, res) => {
     try {
-        const { bodyData: { id, email, password, isAdmin, subscriptionStatus } } = req.body;
+        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
 
-        const updates = { email, isAdmin, subscriptionStatus };
-
-        if (password) {
-            updates.password = await bcrypt.hash(password, 10);
-        }
+        const updates = { email, isAdmin, subscriptionStatus, password };
 
         const updatedUser = await User.updateUser(id, updates);
 
