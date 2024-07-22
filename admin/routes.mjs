@@ -1,4 +1,3 @@
-// routes.mjs
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
@@ -74,6 +73,12 @@ router.post('/user', isAuthenticated, async (req, res) => {
 router.patch('/update-user', isAuthenticated, async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
+
+        console.log('Update User ID:', id); // Debug log for ID
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw new Error('Invalid User ID');
+        }
 
         const updates = { email, isAdmin, subscriptionStatus, password };
 
