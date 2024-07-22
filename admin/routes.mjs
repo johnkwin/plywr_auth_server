@@ -16,25 +16,6 @@ function isAuthenticated(req, res, next) {
 router.get('/login', (req, res) => {
     res.render('login', { message: req.flash('message') });
 });
-async function hashPlaintextPasswords() {
-    try {
-        const users = await User.find({});
-        
-        for (let user of users) {
-            if (!user.password.startsWith('$2a$')) { // Check if password is not hashed
-                user.password = await bcrypt.hash(user.password, 10);
-                await user.save();
-                console.log(`Updated password for user: ${user.email}`);
-            }
-        }
-        
-        console.log('All plaintext passwords hashed');
-    } catch (error) {
-        console.error('Error hashing passwords:', error);
-    } finally {
-        mongoose.connection.close();
-    }
-  }
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -46,8 +27,6 @@ router.post('/login', async (req, res) => {
         const admin = await User.findOne({ email: email, isAdmin: true });
         const users = await User.find({ isAdmin: true });
         console.log(users);
-        
-hashPlaintextPasswords();
         // Debugging: Log the found admin
         console.log('Found admin:', admin);
 
