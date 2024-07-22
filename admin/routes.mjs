@@ -32,6 +32,7 @@ router.post('/login', async (req, res) => {
 
         if (admin && await bcrypt.compare(password, admin.password)) {
             req.session.userId = admin._id;
+            console.log('Session set for user:', req.session.userId);
             res.redirect('/admin/dashboard');
         } else {
             req.flash('message', 'Invalid credentials');
