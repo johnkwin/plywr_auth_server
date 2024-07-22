@@ -29,7 +29,8 @@ router.post('/login', async (req, res) => {
         console.log(users);
         // Debugging: Log the found admin
         console.log('Found admin:', admin);
-        console.log('password input:', bcrypt.hash(password, 10));
+        const pw = await bcrypt.hash(password, 10)
+        console.log('password input:', pw);
         console.log('found password:', admin.password);
         if (admin && await bcrypt.compare(password, admin.password)) {
             req.session.userId = admin._id;
