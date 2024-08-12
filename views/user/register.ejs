@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Registration</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="register-page">
+    <div class="register-container">
+        <h2>User Registration</h2>
+        <% if (message) { %>
+            <p class="error-message"><%= message %></p>
+        <% } %>
+        <form action="/user/register" method="POST" class="register-form">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Register</button>
+        </form>
+        <p>Already have an account? <a href="/user/login">Login here</a>.</p>
+    </div>
+</body>
+</html>

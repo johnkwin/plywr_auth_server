@@ -2,7 +2,10 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import User from '../models/User.mjs';
+import axios from 'axios';
+import crypto from 'crypto';
 import { notifyClient } from '../websocket.mjs';
+import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET } from '../config.mjs';
 
 const router = express.Router();
 
@@ -14,35 +17,16 @@ function isAuthenticated(req, res, next) {
 }
 
 router.get('/login', (req, res) => {
-    res.render('login', { message: req.flash('message') });
+    res.render('user/login', { message: req.flash('message') });
 });
 
-router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        console.log('Login attempt:', { email, password });
-
-        const admin = await User.findOne({ email: email, isAdmin: true });
-        console.log('Found admin:', admin);
-
-        if (admin && await bcrypt.compare(password, admin.password)) {
-            req.session.userId = admin._id;
-            console.log('Session set for user:', req.session.userId);
-            res.redirect('/admin/dashboard');
-        } else {
-            req.flash('message', 'Invalid credentials');
-            res.redirect('/admin/login');
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
-    }
+router.get('/register', (req, res) => {
+    res.render('user/register', { message: req.flash('message') });
 });
 
-router.get('/dashboard', isAuthenticated, async (req, res) => {
-    const users = await User.find({});
-    res.render('dashboard', { users });
+router.get('/dashboard', isAuthenticated, (req, res) => {
+    const user = await User.findById(req.session.userId);
+    res.render('user/dashboard', { user });
 });
 
 router.post('/user', isAuthenticated, async (req, res) => {

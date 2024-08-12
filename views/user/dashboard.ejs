@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-container">
+        <a href="/user/logout" class="logout-button">Logout</a>
+        <h2>Welcome, <%= user.email %></h2>
+        <p>Your subscription status: <%= user.subscriptionStatus %></p>
+        <p>Admin privileges: <%= user.isAdmin ? 'Yes' : 'No' %></p>
+        <p>Here you can manage your account and view your subscription status.</p>
+    </div>
+</body>
+</html>

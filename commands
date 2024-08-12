@@ -67,3 +67,7 @@ db.users.insertOne({
   subscriptionStatus: 'active', // Adjust as needed
   roles: [ { role: "readWrite", db: "users" } ]
 });
+
+client_id: izdvdlmiggrkbuov0b692t01b23tal
+
+secret: 7g7evc5r6ocqqdo89t05x9fj5pbxu2

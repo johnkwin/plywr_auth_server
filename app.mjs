@@ -14,6 +14,7 @@ import path from 'path';
 import connectMongo from 'connect-mongo';
 import { setupWebSocket } from './websocket.mjs';
 import adminRoutes from './admin/routes.mjs';
+import userRoutes from './user/routes.mjs';
 import User from './models/User.mjs';
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 
@@ -222,6 +223,6 @@ app.get('/privacy', (req, res) => {
 });
 
 app.use('/admin', adminRoutes);
-
+app.use('/user', userRoutes);
 // Start server
 server.listen(3000, '0.0.0.0', () => console.log('Server running on port 3000'));
