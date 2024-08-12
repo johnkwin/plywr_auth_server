@@ -49,34 +49,17 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// User Login Page
 router.get('/login', (req, res) => {
-    res.render('login', { message: req.flash('message') });
+    res.render('user/login', { message: req.flash('message') });
 });
 
-router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        const user = await User.findOne({ email });
-
-        if (user && await bcrypt.compare(password, user.password)) {
-            req.session.userId = user._id;
-            res.redirect('/user/dashboard');
-        } else {
-            req.flash('message', 'Invalid credentials');
-            res.redirect('/user/login');
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
-    }
+router.get('/register', (req, res) => {
+    res.render('user/register', { message: req.flash('message') });
 });
 
-// User Dashboard
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);
-    res.render('user_dashboard', { user });
+    res.render('user/dashboard', { user });
 });
 
 // OAuth Authorization Route
