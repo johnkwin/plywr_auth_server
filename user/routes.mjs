@@ -17,7 +17,7 @@ function isAuthenticated(req, res, next) {
 
 // User Registration Page
 router.get('/register', (req, res) => {
-    res.render('register', { message: req.flash('message') });
+    res.render('/user/register', { message: req.flash('message') });
 });
 
 router.post('/register', async (req, res) => {

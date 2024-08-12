@@ -81,9 +81,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files and view engine
 app.use(express.static(new URL('./public', import.meta.url).pathname));
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-app.set('views', new URL('./views', import.meta.url).pathname);
-
 // MongoDB connection
 const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@127.0.0.1:27017/${DB_NAME}`;
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
