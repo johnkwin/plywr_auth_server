@@ -17,7 +17,10 @@ import adminRoutes from './admin/routes.mjs';
 import userRoutes from './user/routes.mjs';
 import User from './models/User.mjs';
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const stripe = Stripe('your-stripe-secret-key');
 const app = express();
 
@@ -80,9 +83,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Static files and view engine
-app.use(express.static(new URL('./public', import.meta.url).pathname));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB connection
 const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@127.0.0.1:27017/${DB_NAME}`;
