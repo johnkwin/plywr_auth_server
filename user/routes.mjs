@@ -92,12 +92,10 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);
     res.render('user/dashboard', { user });
 });
-
-// OAuth Authorization Route
 router.get('/oauth/authorize', (req, res) => {
     const clientId = TWITCH_CLIENT_ID;
     const redirectUri = encodeURIComponent('https://join-playware.com/user/oauth');
-    const scope = encodeURIComponent('channel:manage:polls channel:read:polls');
+    const scope = encodeURIComponent('user:read:subscriptions channel:manage:polls channel:read:polls');
     const state = crypto.randomBytes(16).toString('hex');
 
     req.session.oauthState = state;
@@ -106,7 +104,10 @@ router.get('/oauth/authorize', (req, res) => {
 
     res.redirect(authUrl);
 });
-
+router.get('/subscribe', isAuthenticated, (req, res) => {
+    const subscribeUrl = `https://twitch.tv/subs/YOUR_TWITCH_CHANNEL`; // Replace with your channel's subscription URL
+    res.render('user/subscribe', { subscribeUrl });
+});
 // OAuth Callback Route
 router.get('/oauth', async (req, res) => {
     const { code, state } = req.query;
