@@ -122,6 +122,7 @@ router.get('/oauth', async (req, res) => {
     }
 
     try {
+        // Exchange the authorization code for an access token
         const tokenResponse = await axios.post('https://id.twitch.tv/oauth2/token', null, {
             params: {
                 client_id: TWITCH_CLIENT_ID,
@@ -135,15 +136,50 @@ router.get('/oauth', async (req, res) => {
             }
         });
 
-        const { access_token, refresh_token, expires_in } = tokenResponse.data;
+        const { access_token, refresh_token } = tokenResponse.data;
 
-        // Store the access token and refresh token in your database if needed
-        // await User.updateOne({ _id: req.session.userId }, { twitchAccessToken: access_token, twitchRefreshToken: refresh_token });
+        // Get the Twitch user ID using the access token
+        const userInfoResponse = await axios.get('https://api.twitch.tv/helix/users', {
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+                'Client-Id': TWITCH_CLIENT_ID
+            }
+        });
 
-        res.redirect('/user/dashboard');
+        const twitchUserId = userInfoResponse.data.data[0].id;
+
+        // Check if the user is subscribed to your Twitch channel
+        const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions', {
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+                'Client-Id': TWITCH_CLIENT_ID
+            },
+            params: {
+                broadcaster_id: 'Player1USA', // Replace with your actual channel ID
+                user_id: twitchUserId
+            }
+        });
+
+        const isSubscribed = subscriptionResponse.data.data.length > 0;
+
+        // Update the user's subscription status based on their Twitch Prime subscription
+        const user = await User.findById(req.session.userId);
+        user.twitchUserId = twitchUserId; // Save the Twitch user ID
+        user.twitchAccessToken = access_token;
+        user.twitchRefreshToken = refresh_token;
+        
+        if (isSubscribed) {
+            user.subscriptionStatus = 'active';
+            await user.save();
+            res.redirect('/user/dashboard');
+        } else {
+            user.subscriptionStatus = 'inactive';
+            await user.save();
+            res.redirect('/user/subscribe'); // Redirect to your site's subscription page
+        }
     } catch (error) {
-        console.error('Error exchanging authorization code for access token:', error);
-        res.status(500).json({ success: false, message: 'Failed to exchange authorization code for access token' });
+        console.error('Error during OAuth process:', error);
+        res.status(500).json({ success: false, message: 'Failed to complete OAuth process' });
     }
 });
 
