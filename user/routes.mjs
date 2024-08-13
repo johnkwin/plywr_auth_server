@@ -112,7 +112,7 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 router.get('/oauth/authorize', (req, res) => {
     const clientId = TWITCH_CLIENT_ID;
     const redirectUri = encodeURIComponent('https://join-playware.com/user/oauth');
-    const scope = encodeURIComponent('user:read:subscriptions channel:manage:polls channel:read:polls');
+    const scope = encodeURIComponent('user:read:subscriptions channel:read:subscriptions');
     const state = crypto.randomBytes(16).toString('hex');
 
     req.session.oauthState = state;
