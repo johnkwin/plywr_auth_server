@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import crypto from 'crypto';
 import axios from 'axios';
 import User from '../models/User.mjs';
-import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_HANDLE } from '../config.mjs';
+import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_BROADCASTER_ID } from '../config.mjs';
 
 const router = express.Router();
 
@@ -15,104 +15,11 @@ function isAuthenticated(req, res, next) {
     res.redirect('/user/login');
 }
 
-// Utility function to get the broadcaster ID from the Twitch handle
-async function getBroadcasterId(accessToken) {
-    try {
-        const response = await axios.get('https://api.twitch.tv/helix/users', {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Client-Id': TWITCH_CLIENT_ID
-            },
-            params: {
-                login: TWITCH_HANDLE
-            }
-        });
-
-        return response.data.data[0].id;
-    } catch (error) {
-        console.error('Error getting broadcaster ID:', error);
-        throw error;
-    }
-}
-
-// User Registration Page
-router.get('/register', (req, res) => {
-    res.render('./user/register', { message: req.flash('message') });
-});
-
-router.post('/register', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            req.flash('message', 'Email already in use');
-            return res.redirect('/user/register');
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        const newUser = new User({
-            email,
-            password: hashedPassword,
-            isAdmin: false,
-            subscriptionStatus: 'inactive'
-        });
-
-        await newUser.save();
-
-        req.session.userId = newUser._id;
-        res.redirect('/user/dashboard');
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
-    }
-});
-
-router.get('/login', (req, res) => {
-    res.render('user/login', { message: req.flash('message') });
-});
-
-router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        console.log('Login attempt:', { email, password });
-
-        const user = await User.findOne({ email });
-        console.log('Found user:', user);
-
-        if (!user) {
-            req.flash('message', 'Invalid credentials');
-            return res.redirect('/user/login');
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        console.log('Password match:', isMatch);
-
-        if (isMatch) {
-            req.session.userId = user._id;
-            console.log('Session set for user:', req.session.userId);
-            res.redirect('/user/dashboard');
-        } else {
-            req.flash('message', 'Invalid credentials');
-            res.redirect('/user/login');
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-        console.error('Login error:', error);
-    }
-});
-
-router.get('/dashboard', isAuthenticated, async (req, res) => {
-    const user = await User.findById(req.session.userId);
-    res.render('user/dashboard', { user });
-});
-
+// OAuth Authorization Route
 router.get('/oauth/authorize', (req, res) => {
     const clientId = TWITCH_CLIENT_ID;
     const redirectUri = encodeURIComponent('https://join-playware.com/user/oauth');
-    const scope = encodeURIComponent('user:read:subscriptions channel:read:subscriptions');
+    const scope = encodeURIComponent('user:read:subscriptions channel:manage:polls channel:read:polls');
     const state = crypto.randomBytes(16).toString('hex');
 
     req.session.oauthState = state;
@@ -120,57 +27,6 @@ router.get('/oauth/authorize', (req, res) => {
     const authUrl = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
 
     res.redirect(authUrl);
-});
-
-// Check if the user is authorized and then direct to subscription or OAuth
-router.get('/subscribe/check', isAuthenticated, async (req, res) => {
-    const user = await User.findById(req.session.userId);
-
-    if (!user.twitchAccessToken) {
-        const clientId = TWITCH_CLIENT_ID;
-        const redirectUri = encodeURIComponent('https://join-playware.com/user/oauth');
-        const scope = encodeURIComponent('user:read:subscriptions');
-        const state = crypto.randomBytes(16).toString('hex');
-
-        req.session.oauthState = state;
-
-        const authUrl = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
-
-        return res.redirect(authUrl);
-    } else {
-        try {
-            const broadcasterId = await getBroadcasterId(user.twitchAccessToken);
-            const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
-                headers: {
-                    'Authorization': `Bearer ${user.twitchAccessToken}`,
-                    'Client-Id': TWITCH_CLIENT_ID
-                },
-                params: {
-                    broadcaster_id: broadcasterId,
-                    user_id: user.twitchUserId
-                }
-            });
-            console.log('broadcaster_id:', broadcasterId); 
-            console.log('user_id:', user.twitchUserId);
-            const isSubscribed = subscriptionResponse.data.data.length > 0;
-            console.log('Subscription API Response:', subscriptionResponse.data);
-            if (isSubscribed) {
-                user.subscriptionStatus = 'active';
-                await user.save();
-                return res.redirect('/user/dashboard');
-            } else {
-                return res.redirect('/user/subscribe');
-            }
-        } catch (error) {
-            console.error('Error checking subscription status:', error);
-            return res.status(500).json({ success: false, message: 'Failed to check subscription status' });
-        }
-    }
-});
-
-router.get('/subscribe', isAuthenticated, (req, res) => {
-    const subscribeUrl = `https://twitch.tv/subs/${TWITCH_HANDLE}`;
-    res.render('user/subscribe', { subscribeUrl });
 });
 
 // OAuth Callback Route
@@ -188,6 +44,7 @@ router.get('/oauth', async (req, res) => {
     }
 
     try {
+        // Exchange the authorization code for an access token
         const tokenResponse = await axios.post('https://id.twitch.tv/oauth2/token', null, {
             params: {
                 client_id: TWITCH_CLIENT_ID,
@@ -203,6 +60,7 @@ router.get('/oauth', async (req, res) => {
 
         const { access_token, refresh_token } = tokenResponse.data;
 
+        // Get the Twitch user ID using the access token
         const userInfoResponse = await axios.get('https://api.twitch.tv/helix/users', {
             headers: {
                 'Authorization': `Bearer ${access_token}`,
@@ -212,26 +70,36 @@ router.get('/oauth', async (req, res) => {
 
         const twitchUserId = userInfoResponse.data.data[0].id;
 
-        const broadcasterId = await getBroadcasterId(access_token);
+        // Check if the user is subscribed to your Twitch channel
+        let isSubscribed = false;
+        try {
+            const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
+                headers: {
+                    'Authorization': `Bearer ${access_token}`,
+                    'Client-Id': TWITCH_CLIENT_ID
+                },
+                params: {
+                    broadcaster_id: TWITCH_BROADCASTER_ID, // Use the broadcaster ID from your config
+                    user_id: twitchUserId
+                }
+            });
 
-        const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
-            headers: {
-                'Authorization': `Bearer ${access_token}`,
-                'Client-Id': TWITCH_CLIENT_ID
-            },
-            params: {
-                broadcaster_id: broadcasterId,
-                user_id: twitchUserId
+            isSubscribed = subscriptionResponse.data.data.length > 0;
+        } catch (err) {
+            if (err.response && err.response.status === 404) {
+                console.log('User is not subscribed.');
+                isSubscribed = false; // Handle gracefully if the user is not subscribed
+            } else {
+                throw err; // For any other errors, rethrow the error
             }
-        });
+        }
 
-        const isSubscribed = subscriptionResponse.data.data.length > 0;
-
+        // Update the user's subscription status based on their Twitch Prime subscription
         const user = await User.findById(req.session.userId);
-        user.twitchUserId = twitchUserId;
+        user.twitchUserId = twitchUserId; // Save the Twitch user ID
         user.twitchAccessToken = access_token;
         user.twitchRefreshToken = refresh_token;
-
+        
         if (isSubscribed) {
             user.subscriptionStatus = 'active';
             await user.save();
@@ -239,12 +107,64 @@ router.get('/oauth', async (req, res) => {
         } else {
             user.subscriptionStatus = 'inactive';
             await user.save();
-            res.redirect('/user/subscribe');
+            res.redirect('/user/subscribe'); // Redirect to your site's subscription page
         }
     } catch (error) {
         console.error('Error during OAuth process:', error);
         res.status(500).json({ success: false, message: 'Failed to complete OAuth process' });
     }
+});
+
+// Check if the user is authorized and then direct to subscription or OAuth
+router.get('/subscribe/check', isAuthenticated, async (req, res) => {
+    const user = await User.findById(req.session.userId);
+
+    if (!user.twitchAccessToken) {
+        // If the user isn't authorized with Twitch, start the OAuth process
+        const clientId = TWITCH_CLIENT_ID;
+        const redirectUri = encodeURIComponent('https://join-playware.com/user/oauth');
+        const scope = encodeURIComponent('user:read:subscriptions');
+        const state = crypto.randomBytes(16).toString('hex');
+
+        req.session.oauthState = state;
+
+        const authUrl = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+
+        return res.redirect(authUrl);
+    } else {
+        // If the user is already authorized, check their subscription status
+        try {
+            const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
+                headers: {
+                    'Authorization': `Bearer ${user.twitchAccessToken}`,
+                    'Client-Id': TWITCH_CLIENT_ID
+                },
+                params: {
+                    broadcaster_id: TWITCH_BROADCASTER_ID, // Use the broadcaster ID from your config
+                    user_id: user.twitchUserId
+                }
+            });
+
+            const isSubscribed = subscriptionResponse.data.data.length > 0;
+
+            if (isSubscribed) {
+                user.subscriptionStatus = 'active';
+                await user.save();
+                return res.redirect('/user/dashboard');
+            } else {
+                return res.redirect('/user/subscribe'); // Direct to the subscribe page if not subscribed
+            }
+        } catch (error) {
+            console.error('Error checking subscription status:', error);
+            return res.status(500).json({ success: false, message: 'Failed to check subscription status' });
+        }
+    }
+});
+
+// Subscribe Page
+router.get('/subscribe', isAuthenticated, (req, res) => {
+    const subscribeUrl = `https://twitch.tv/subs/YOUR_TWITCH_HANDLE`; // Replace with your channel's subscription URL
+    res.render('user/subscribe', { subscribeUrl });
 });
 
 // Logout Route
