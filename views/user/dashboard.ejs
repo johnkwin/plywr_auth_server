@@ -34,7 +34,7 @@
 
         <!-- Conditionally render the Subscribe Free button if subscription is inactive -->
         <% if (user.subscriptionStatus === 'inactive') { %>
-            <a href="/user/subscribe" class="subscribe-button">
+            <a href="/user/subscribe/check" class="subscribe-button">
                 <span class="crown-icon">👑</span> Subscribe Free
             </a>
         <% } else { %>
