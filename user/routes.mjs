@@ -168,9 +168,16 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
     }
 });
 
-router.get('/subscribe', isAuthenticated, (req, res) => {
+router.get('/subscribe', isAuthenticated, async (req, res) => {
+    const user = await User.findById(req.session.userId);
+    
+    // Check if the user is already subscribed
+    if (user.subscriptionStatus === 'active') {
+        return res.redirect('/user/dashboard');
+    }
+
     const subscribeUrl = `https://twitch.tv/subs/${TWITCH_HANDLE}`;
-    res.render('user/subscribe', { subscribeUrl, message: req.flash('message') });
+    res.render('user/subscribe', { subscribeUrl, user });
 });
 
 router.get('/oauth', async (req, res) => {

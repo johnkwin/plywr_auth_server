@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Subscribe</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscribe to Twitch Channel</title>
 </head>
 <body>
-    <h1>Subscribe to Our Channel</h1>
-    <p>You need to subscribe to our Twitch channel to continue. Click the button below to subscribe.</p>
-    <a href="<%= subscribeUrl %>" class="subscribe-button">Subscribe Free</a>
+    <h1>Subscribe to {{TWITCH_HANDLE}}'s Twitch Channel</h1>
+    <p>You need to subscribe to gain full access to our site features.</p>
+    <a href="{{subscribeUrl}}" target="_blank">
+        <button style="background-color: #9147ff; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px;">
+            Subscribe Now on Twitch
+        </button>
+    </a>
 </body>
 </html>
