@@ -177,7 +177,7 @@ router.get('/subscribe', isAuthenticated, async (req, res) => {
     }
 
     const subscribeUrl = `https://twitch.tv/subs/${TWITCH_HANDLE}`;
-    res.render('user/subscribe', { subscribeUrl, user });
+    res.render('user/subscribe', { subscribeUrl, user, TWITCH_HANDLE });
 });
 
 router.get('/oauth', async (req, res) => {
