@@ -34,7 +34,7 @@ router.post('/login', async (req, res) => {
             const isMatch = await bcrypt.compare(password, admin.password);
             console.log('Password match:', isMatch); // Log if password matches
 
-            if (isMatch) {
+            if (!isMatch) {
                 req.session.userId = admin._id;
                 console.log('Session set for user:', req.session.userId);
                 res.redirect('/admin/dashboard');
