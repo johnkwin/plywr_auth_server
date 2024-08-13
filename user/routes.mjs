@@ -52,7 +52,38 @@ router.post('/register', async (req, res) => {
 router.get('/login', (req, res) => {
     res.render('user/login', { message: req.flash('message') });
 });
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
+        console.log('Login attempt:', { email, password });
+
+        // Find the user by email
+        const user = await User.findOne({ email });
+        console.log('Found user:', user);
+
+        if (!user) {
+            req.flash('message', 'Invalid credentials');
+            return res.redirect('/user/login');
+        }
+
+        // Compare the provided password with the stored hashed password
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log('Password match:', isMatch);
+
+        if (isMatch) {
+            req.session.userId = user._id;
+            console.log('Session set for user:', req.session.userId);
+            res.redirect('/user/dashboard');
+        } else {
+            req.flash('message', 'Invalid credentials');
+            res.redirect('/user/login');
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+        console.error('Login error:', error);
+    }
+});
 router.get('/register', (req, res) => {
     res.render('user/register', { message: req.flash('message') });
 });

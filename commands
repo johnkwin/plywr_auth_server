@@ -62,11 +62,16 @@ db.users.insertOne({
 });
 
 db.users.insertOne({
-  email: 'john@admin.com', // Replace with actual email
-  password: '$2b$12$4sAF.b.I6dizt42MHT93b.4K9dTIVuSQHGhwUkoEkOu8iniLP4sRq', // Provided hashed password
-  subscriptionStatus: 'active', // Adjust as needed
-  roles: [ { role: "readWrite", db: "users" } ]
+  _id: new ObjectId('66baa2685ff028c5c86f3565'), // Preserving the same _id
+  email: 'j@a.com', // Email address
+  password: '$2a$10$rWR1qUrWoCV5XOCU4th/JedKnTJCyVc6mKIFcntHVLZw9mu5Lhl7m', // Provided hashed password
+  subscriptionStatus: 'active', // Subscription status
+  role: 'user', // Role of the user
+  isAdmin: true, // Admin flag
+  tokens: [], // Empty tokens array
+  __v: 0 // Version key
 });
+
 
 client_id: izdvdlmiggrkbuov0b692t01b23tal
 
