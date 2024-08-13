@@ -4,14 +4,44 @@
     <meta charset="UTF-8">
     <title>User Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .subscribe-button {
+            display: inline-block;
+            background-color: #9146FF;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .subscribe-button .crown-icon {
+            margin-right: 8px;
+        }
+
+        .subscribe-button:hover {
+            background-color: #772ce8;
+        }
+    </style>
 </head>
-<body class="dashboard-page">
+<body>
     <div class="dashboard-container">
+        <h1>Welcome, <%= user.email %></h1>
+
+        <!-- Conditionally render the Subscribe Free button if subscription is inactive -->
+        <% if (user.subscriptionStatus === 'inactive') { %>
+            <a href="/user/subscribe" class="subscribe-button">
+                <span class="crown-icon">👑</span> Subscribe Free
+            </a>
+        <% } else { %>
+            <p>Your subscription is active.</p>
+        <% } %>
+
         <a href="/user/logout" class="logout-button">Logout</a>
-        <h2>Welcome, <%= user.email %></h2>
-        <p>Your subscription status: <%= user.subscriptionStatus %></p>
-        <p>Admin privileges: <%= user.isAdmin ? 'Yes' : 'No' %></p>
-        <p>Here you can manage your account and view your subscription status.</p>
     </div>
 </body>
 </html>
