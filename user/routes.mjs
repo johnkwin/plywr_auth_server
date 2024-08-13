@@ -188,6 +188,7 @@ router.get('/oauth', async (req, res) => {
     }
 
     try {
+        // Exchange the authorization code for an access token
         const tokenResponse = await axios.post('https://id.twitch.tv/oauth2/token', null, {
             params: {
                 client_id: TWITCH_CLIENT_ID,
@@ -202,7 +203,10 @@ router.get('/oauth', async (req, res) => {
         });
 
         const { access_token, refresh_token } = tokenResponse.data;
+        console.log('Access Token:', access_token);
+        console.log('Refresh Token:', refresh_token);
 
+        // Fetch user info from Twitch
         const userInfoResponse = await axios.get('https://api.twitch.tv/helix/users', {
             headers: {
                 'Authorization': `Bearer ${access_token}`,
@@ -210,10 +214,14 @@ router.get('/oauth', async (req, res) => {
             }
         });
 
+        console.log('User Info Response:', userInfoResponse.data);
         const twitchUserId = userInfoResponse.data.data[0].id;
 
+        // Fetch broadcaster ID
         const broadcasterId = await getBroadcasterId(access_token);
+        console.log('Broadcaster ID:', broadcasterId);
 
+        // Check if the user is subscribed to the broadcaster
         const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
             headers: {
                 'Authorization': `Bearer ${access_token}`,
@@ -225,6 +233,7 @@ router.get('/oauth', async (req, res) => {
             }
         });
 
+        console.log('Subscription Response:', subscriptionResponse.data);
         const isSubscribed = subscriptionResponse.data.data.length > 0;
 
         const user = await User.findById(req.session.userId);
@@ -234,16 +243,21 @@ router.get('/oauth', async (req, res) => {
 
         if (isSubscribed) {
             user.subscriptionStatus = 'active';
-            await user.save();
-            res.redirect('/user/dashboard');
         } else {
             user.subscriptionStatus = 'inactive';
-            await user.save();
             req.flash('message', 'You are not subscribed to our Twitch channel. Please subscribe to gain full access.');
-            res.redirect('/user/subscribe');
         }
+        await user.save();
+        res.redirect('/user/dashboard');
     } catch (error) {
         console.error('Error during OAuth process:', error);
+
+        if (error.response) {
+            console.error('Error Response Data:', error.response.data);
+            console.error('Error Response Status:', error.response.status);
+            console.error('Error Response Headers:', error.response.headers);
+        }
+
         res.status(500).json({ success: false, message: 'Failed to complete OAuth process' });
     }
 });
