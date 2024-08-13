@@ -27,7 +27,7 @@ router.post('/register', async (req, res) => {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             req.flash('message', 'Email already in use');
-            return res.redirect('./user/register');
+            return res.redirect('user/register');
         }
 
         const hashedPassword = await bcrypt.hash(password, 12);
@@ -42,7 +42,7 @@ router.post('/register', async (req, res) => {
         await newUser.save();
 
         req.session.userId = newUser._id;
-        res.redirect('./user/dashboard');
+        res.redirect('user/dashboard');
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
