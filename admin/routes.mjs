@@ -29,10 +29,19 @@ router.post('/login', async (req, res) => {
         const admin = await User.findOne({ email: email, isAdmin: true });
         console.log('Found admin:', admin);
 
-        if (admin && await bcrypt.compare(password, admin.password)) {
-            req.session.userId = admin._id;
-            console.log('Session set for user:', req.session.userId);
-            res.redirect('/admin/dashboard');
+        if (admin) {
+            // Check password comparison
+            const isMatch = await bcrypt.compare(password, admin.password);
+            console.log('Password match:', isMatch); // Log if password matches
+
+            if (isMatch) {
+                req.session.userId = admin._id;
+                console.log('Session set for user:', req.session.userId);
+                res.redirect('/admin/dashboard');
+            } else {
+                req.flash('message', 'Invalid credentials');
+                res.redirect('/admin/login');
+            }
         } else {
             req.flash('message', 'Invalid credentials');
             res.redirect('/admin/login');

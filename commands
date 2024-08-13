@@ -54,16 +54,16 @@ db.users.insertOne({
 });
 
 db.users.insertOne({
-  email: 'test@test.com',
-  password: '$2b$10$DvKTKowCTcSWoJqU2Y6Ri.qyX/8fBNmUGLhmR0F2nv0.ddCpen8ya', // replace with your hashed password
+  email: 'j@a.com',
+  password: '$2b$12$4sAF.b.I6dizt42MHT93b.4K9dTIVuSQHGhwUkoEkOu8iniLP4sRq', // replace with your hashed password
   subscriptionStatus: "active", 
   isAdmin: true,
   roles: [ { role: "readWrite", db: "users" } ]
 });
 
 db.users.insertOne({
-  email: 'test@test.com', // Replace with actual email
-  password: '2b$10$DvKTKowCTcSWoJqU2Y6Ri.qyX/8fBNmUGLhmR0F2nv0.ddCpen8ya', // Provided hashed password
+  email: 'john@admin.com', // Replace with actual email
+  password: '$2b$12$4sAF.b.I6dizt42MHT93b.4K9dTIVuSQHGhwUkoEkOu8iniLP4sRq', // Provided hashed password
   subscriptionStatus: 'active', // Adjust as needed
   roles: [ { role: "readWrite", db: "users" } ]
 });
