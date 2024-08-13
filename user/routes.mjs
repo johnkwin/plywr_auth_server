@@ -77,10 +77,7 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        console.log('Login attempt:', { email, password });
-
         const user = await User.findOne({ email });
-        console.log('Found user:', user);
 
         if (!user) {
             req.flash('message', 'Invalid credentials');
@@ -88,11 +85,9 @@ router.post('/login', async (req, res) => {
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log('Password match:', isMatch);
 
         if (isMatch) {
             req.session.userId = user._id;
-            console.log('Session set for user:', req.session.userId);
             res.redirect('/user/dashboard');
         } else {
             req.flash('message', 'Invalid credentials');
@@ -158,18 +153,24 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
                 await user.save();
                 return res.redirect('/user/dashboard');
             } else {
+                req.flash('message', 'You are not subscribed to our Twitch channel. Please subscribe to gain full access.');
                 return res.redirect('/user/subscribe');
             }
         } catch (error) {
-            console.error('Error checking subscription status:', error);
-            return res.status(500).json({ success: false, message: 'Failed to check subscription status' });
+            if (error.response && error.response.status === 404) {
+                req.flash('message', 'You are not subscribed to our Twitch channel. Please subscribe to gain full access.');
+                return res.redirect('/user/subscribe');
+            } else {
+                console.error('Error checking subscription status:', error);
+                return res.status(500).json({ success: false, message: 'Failed to check subscription status' });
+            }
         }
     }
 });
 
 router.get('/subscribe', isAuthenticated, (req, res) => {
     const subscribeUrl = `https://twitch.tv/subs/${TWITCH_HANDLE}`;
-    res.render('user/subscribe', { subscribeUrl });
+    res.render('user/subscribe', { subscribeUrl, message: req.flash('message') });
 });
 
 // OAuth Callback Route
@@ -238,6 +239,7 @@ router.get('/oauth', async (req, res) => {
         } else {
             user.subscriptionStatus = 'inactive';
             await user.save();
+            req.flash('message', 'You are not subscribed to our Twitch channel. Please subscribe to gain full access.');
             res.redirect('/user/subscribe');
         }
     } catch (error) {
