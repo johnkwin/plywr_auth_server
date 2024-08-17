@@ -16,7 +16,7 @@ import { setupWebSocket } from './websocket.mjs';
 import adminRoutes from './admin/routes.mjs';
 import userRoutes from './user/routes.mjs';
 import User from './models/User.mjs';
-import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
+import { DB_USER, DB_PASSWORD, DB_NAME, TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_HANDLE } from './config.mjs';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
 import crypto from 'crypto';
