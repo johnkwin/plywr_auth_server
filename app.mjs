@@ -188,7 +188,7 @@ const getExistingSubscriptions = async (accessToken) => {
 const initializeEventHooks = async () => {
   try {
       const accessToken = await getAppAccessToken();
-      const callbackUrl = 'https://yourdomain.com/twitch/events';  // Replace with your actual callback URL
+      const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your actual callback URL
 
       await ensureSubscriptions(accessToken, callbackUrl);
 
