@@ -16,7 +16,7 @@ function isAuthenticated(req, res, next) {
 }
 
 // Utility function to get the broadcaster ID from the Twitch handle
-async function getBroadcasterId(accessToken) {
+export async function getBroadcasterId(accessToken) {
     try {
         const response = await axios.get('https://api.twitch.tv/helix/users', {
             headers: {
