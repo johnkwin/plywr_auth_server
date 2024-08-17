@@ -25,6 +25,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const stripe = Stripe('your-stripe-secret-key');
 const app = express();
+const TWITCH_MESSAGE_ID = 'Twitch-Eventsub-Message-Id'.toLowerCase();
+const TWITCH_MESSAGE_TIMESTAMP = 'Twitch-Eventsub-Message-Timestamp'.toLowerCase();
+const TWITCH_MESSAGE_SIGNATURE = 'Twitch-Eventsub-Message-Signature'.toLowerCase();
+const HMAC_PREFIX = 'sha256=';
+app.use(express.raw({ type: 'application/json' }));
 
 // HTTPS server options
 const options = {
@@ -125,34 +130,33 @@ app.post('/register', async (req, res) => {
 });
 
 // Twitch event routes
-app.post('/twitch/events', express.json(), (req, res) => {
+app.post('/twitch/events', (req, res) => {
   if (req.headers['twitch-eventsub-message-type'] === 'webhook_callback_verification') {
-    return res.status(200).send(req.body.challenge);
+      res.set('Content-Type', 'text/plain');
+      res.status(200).send(req.body.challenge);
+      return;
   }
+  const secret = TWITCH_EVENTSUB_SECRET;
+  const message = req.headers[TWITCH_MESSAGE_ID] + req.headers[TWITCH_MESSAGE_TIMESTAMP] + req.body;
+  const hmac = HMAC_PREFIX + crypto.createHmac('sha256', secret).update(message).digest('hex');
+  
+  // Compare HMAC signatures
+  if (crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(req.headers[TWITCH_MESSAGE_SIGNATURE]))) {
+      console.log('Signatures match');
+      
+      // Process the event here
+      const notification = JSON.parse(req.body);
+      if (notification.subscription.type === 'channel.subscribe') {
+          console.log(`New subscriber: ${notification.event.user_name}`);
+      } else if (notification.subscription.type === 'channel.subscription.end') {
+          console.log(`Subscription ended for: ${notification.event.user_name}`);
+      }
 
-  const messageId = req.headers['twitch-eventsub-message-id'];
-  const timestamp = req.headers['twitch-eventsub-message-timestamp'];
-  const signature = req.headers['twitch-eventsub-message-signature'];
-  const hmacMessage = messageId + timestamp + JSON.stringify(req.body);
-  const hmac = `sha256=${crypto.createHmac('sha256', TWITCH_EVENTSUB_SECRET).update(hmacMessage).digest('hex')}`;
-
-  if (hmac !== signature) {
-    return res.status(403).send('Forbidden');
+      res.sendStatus(204); // Acknowledge the event
+  } else {
+      console.log('403 - Invalid Signature');
+      res.sendStatus(403);
   }
-
-  const event = req.body.event;
-  switch (req.body.subscription.type) {
-    case 'channel.subscribe':
-      console.log('New subscriber:', event.user_name);
-      break;
-    case 'channel.subscription.end':
-      console.log('Subscription ended for:', event.user_name);
-      break;
-    default:
-      console.log('Unhandled event type:', req.body.subscription.type);
-  }
-
-  res.status(200).send('OK');
 });
 
 const getAppAccessToken = async () => {
