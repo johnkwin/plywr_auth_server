@@ -14,8 +14,8 @@ import path from 'path';
 import connectMongo from 'connect-mongo';
 import { setupWebSocket } from './websocket.mjs';
 import adminRoutes from './admin/routes.mjs';
-import userRoutes from './user/routes.mjs';
 import User from './models/User.mjs';
+import userRoutes, { getBroadcasterId } from './user/routes.mjs'; // Import getBroadcasterId
 import { DB_USER, DB_PASSWORD, DB_NAME, TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_HANDLE } from './config.mjs';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
@@ -168,48 +168,6 @@ const getAppAccessToken = async () => {
   return response.data.access_token;
 };
 
-const ensureSubscriptions = async (accessToken, callbackUrl) => {
-  const existingSubscriptions = await getExistingSubscriptions(accessToken);
-
-  const requiredEvents = ['channel.subscribe', 'channel.subscription.end'];
-
-  for (const event of requiredEvents) {
-      const existingSub = existingSubscriptions.find(sub => sub.type === event && sub.condition.broadcaster_user_id === TWITCH_BROADCASTER_ID);
-
-      if (!existingSub) {
-          await subscribeToEventSub(accessToken, event, callbackUrl);
-      } else {
-          console.log(`${event} subscription already exists.`);
-      }
-  }
-};
-
-const subscribeToEventSub = async (accessToken, type, callbackUrl) => {
-  try {
-      const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', {
-          type: type,
-          version: '1',
-          condition: {
-              broadcaster_user_id: TWITCH_BROADCASTER_ID
-          },
-          transport: {
-              method: 'webhook',
-              callback: callbackUrl,
-              secret: TWITCH_EVENTSUB_SECRET
-          }
-      }, {
-          headers: {
-              'Client-Id': TWITCH_CLIENT_ID,
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json'
-          }
-      });
-      console.log(`Subscribed to ${type} event: `, response.data);
-  } catch (error) {
-      console.error(`Error subscribing to ${type} event:`, error.response ? error.response.data : error.message);
-  }
-};
-
 const getExistingSubscriptions = async (accessToken) => {
   try {
       const response = await axios.get('https://api.twitch.tv/helix/eventsub/subscriptions', {
@@ -224,17 +182,62 @@ const getExistingSubscriptions = async (accessToken) => {
       return [];
   }
 };
-
+// Function to initialize Twitch EventSub subscriptions
 const initializeEventHooks = async () => {
   try {
-      const accessToken = await getAppAccessToken();
-      const callbackUrl = 'https://join-playware.com/twitch/events';
+    const accessToken = await getAppAccessToken();
+    const broadcasterId = await getBroadcasterId(accessToken); // Retrieve the broadcaster ID
+    const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your actual callback URL
 
-      await ensureSubscriptions(accessToken, callbackUrl);
+    await ensureSubscriptions(accessToken, broadcasterId, callbackUrl);
 
-      console.log('Twitch EventSub subscriptions ensured.');
+    console.log('Twitch EventSub subscriptions ensured.');
   } catch (error) {
-      console.error('Error during app initialization:', error);
+    console.error('Error during app initialization:', error);
+  }
+};
+
+// Function to subscribe to events
+const ensureSubscriptions = async (accessToken, broadcasterId, callbackUrl) => {
+  const existingSubscriptions = await getExistingSubscriptions(accessToken);
+
+  const requiredEvents = ['channel.subscribe', 'channel.subscription.end'];
+
+  for (const event of requiredEvents) {
+    const existingSub = existingSubscriptions.find(sub => sub.type === event && sub.condition.broadcaster_user_id === broadcasterId);
+
+    if (!existingSub) {
+      await subscribeToEventSub(accessToken, event, broadcasterId, callbackUrl);
+    } else {
+      console.log(`${event} subscription already exists.`);
+    }
+  }
+};
+
+// Function to subscribe to EventSub
+const subscribeToEventSub = async (accessToken, type, broadcasterId, callbackUrl) => {
+  try {
+    const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', {
+      type: type,
+      version: '1',
+      condition: {
+        broadcaster_user_id: broadcasterId
+      },
+      transport: {
+        method: 'webhook',
+        callback: callbackUrl,
+        secret: TWITCH_EVENTSUB_SECRET
+      }
+    }, {
+      headers: {
+        'Client-Id': TWITCH_CLIENT_ID,
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log(`Subscribed to ${type} event: `, response.data);
+  } catch (error) {
+    console.error(`Error subscribing to ${type} event:`, error.response ? error.response.data : error.message);
   }
 };
 
