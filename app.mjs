@@ -155,17 +155,18 @@ app.post('/twitch/events', express.json(), (req, res) => {
 });
 
 const getAppAccessToken = async () => {
-  const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
-      params: {
-          client_id: TWITCH_CLIENT_ID,
-          client_secret: TWITCH_CLIENT_SECRET,
-          grant_type: 'client_credentials'
-      },
-      headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-      }
-  });
-  return response.data.access_token;
+    const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
+        params: {
+            client_id: TWITCH_CLIENT_ID,
+            client_secret: TWITCH_CLIENT_SECRET,
+            grant_type: 'client_credentials',
+            scope: 'channel:read:subscriptions' // Ensure this scope is included
+        },
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    });
+    return response.data.access_token;
 };
 
 const getExistingSubscriptions = async (accessToken) => {
