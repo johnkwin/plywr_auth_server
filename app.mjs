@@ -18,6 +18,8 @@ import userRoutes from './user/routes.mjs';
 import User from './models/User.mjs';
 import { DB_USER, DB_PASSWORD, DB_NAME } from './config.mjs';
 import { fileURLToPath } from 'url';
+import axios from 'axios';
+import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,10 +80,6 @@ app.options('*', cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Express built-in middleware for JSON parsing (redundant with bodyParser, but good to keep if you plan to remove bodyParser later)
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 // Static files and view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -89,7 +87,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB connection
 const dbURI = `mongodb://${DB_USER}:${encodeURIComponent(DB_PASSWORD)}@127.0.0.1:27017/${DB_NAME}`;
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(dbURI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => {
     console.error('Failed to connect to MongoDB:', err.message);
@@ -118,18 +116,19 @@ app.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ email, password: hashedPassword });
     await user.save();
-    res.json({ message: 'User registered' }); // Send JSON response
+    res.json({ message: 'User registered' });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
     console.error(error);
   }
 });
-router.post('/twitch/events', express.json(), (req, res) => {
+
+// Twitch event routes
+app.post('/twitch/events', express.json(), (req, res) => {
   if (req.headers['twitch-eventsub-message-type'] === 'webhook_callback_verification') {
       return res.status(200).send(req.body.challenge);
   }
 
-  // Verify the request signature
   const messageId = req.headers['twitch-eventsub-message-id'];
   const timestamp = req.headers['twitch-eventsub-message-timestamp'];
   const signature = req.headers['twitch-eventsub-message-signature'];
@@ -140,16 +139,13 @@ router.post('/twitch/events', express.json(), (req, res) => {
       return res.status(403).send('Forbidden');
   }
 
-  // Process the event
   const event = req.body.event;
   switch (req.body.subscription.type) {
       case 'channel.subscribe':
           console.log('New subscriber:', event.user_name);
-          // Handle new subscription event
           break;
       case 'channel.subscription.end':
           console.log('Subscription ended for:', event.user_name);
-          // Handle subscription end event
           break;
       default:
           console.log('Unhandled event type:', req.body.subscription.type);
@@ -158,13 +154,6 @@ router.post('/twitch/events', express.json(), (req, res) => {
   res.status(200).send('OK');
 });
 
-router.post('/twitch/events', express.json(), (req, res) => {
-  if (req.headers['twitch-eventsub-message-type'] === 'webhook_callback_verification') {
-      return res.status(200).send(req.body.challenge);
-  }
-
-  // Process event
-});
 const getAppAccessToken = async () => {
   const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
       params: {
@@ -178,6 +167,7 @@ const getAppAccessToken = async () => {
   });
   return response.data.access_token;
 };
+
 const ensureSubscriptions = async (accessToken, callbackUrl) => {
   const existingSubscriptions = await getExistingSubscriptions(accessToken);
 
@@ -193,18 +183,7 @@ const ensureSubscriptions = async (accessToken, callbackUrl) => {
       }
   }
 };
-const initializeEventHooks = async () => {
-  try {
-      const accessToken = await getAppAccessToken();
-      const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your actual callback URL
 
-      await ensureSubscriptions(accessToken, callbackUrl);
-
-      console.log('Twitch EventSub subscriptions ensured.');
-  } catch (error) {
-      console.error('Error during app initialization:', error);
-  }
-};
 const subscribeToEventSub = async (accessToken, type, callbackUrl) => {
   try {
       const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', {
@@ -245,30 +224,37 @@ const getExistingSubscriptions = async (accessToken) => {
       return [];
   }
 };
+
+const initializeEventHooks = async () => {
+  try {
+      const accessToken = await getAppAccessToken();
+      const callbackUrl = 'https://join-playware.com/twitch/events';
+
+      await ensureSubscriptions(accessToken, callbackUrl);
+
+      console.log('Twitch EventSub subscriptions ensured.');
+  } catch (error) {
+      console.error('Error during app initialization:', error);
+  }
+};
+
+// Add your other routes and middleware here
+
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    console.log(bcrypt.hash(password, 10));
-    console.log(user.password);
     if (user && await bcrypt.compare(password, user.password)) {
-       // Clear any existing tokens
       user.tokens = [];
-
-      // Generate a new token
       const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
-
-      // Add the new token to the user's tokens array
       user.tokens.push({ token });
       await user.save();
-      console.log("Correct password.");
       res.json({ token });
     } else {
-      res.status(400).json({ message: 'Invalid credentials' }); // Send JSON response
+      res.status(400).json({ message: 'Invalid credentials' });
     }
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
-    console.error(error);
   }
 });
 
@@ -305,7 +291,6 @@ app.post('/logout', async (req, res) => {
       return res.status(401).json({ message: 'Invalid user' });
     }
 
-    // Remove the token
     user.tokens = user.tokens.filter(t => t.token !== token);
     await user.save();
 
@@ -337,7 +322,6 @@ app.post('/subscribe', async (req, res) => {
     res.json({ message: 'Subscription successful' });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
-    console.error(error);
   }
 });
 
@@ -347,6 +331,8 @@ app.get('/privacy', (req, res) => {
 
 app.use('/admin', adminRoutes);
 app.use('/user', userRoutes);
+
 initializeEventHooks();
+
 // Start server
 server.listen(3000, '0.0.0.0', () => console.log('Server running on port 3000'));
