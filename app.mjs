@@ -188,7 +188,7 @@ const getExistingSubscriptions = async (accessToken) => {
 const initializeEventHooks = async () => {
   try {
       const accessToken = await getAppAccessToken();
-      const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your actual callback URL
+      const callbackUrl = 'https://yourdomain.com/twitch/events';  // Replace with your actual callback URL
 
       await ensureSubscriptions(accessToken, callbackUrl);
 
@@ -216,29 +216,29 @@ const ensureSubscriptions = async (accessToken, broadcasterId, callbackUrl) => {
 };
 
 // Function to subscribe to EventSub
-const subscribeToEventSub = async (accessToken, type, broadcasterId, callbackUrl) => {
+const subscribeToEventSub = async (accessToken, type, callbackUrl) => {
   try {
-    const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', {
-      type: type,
-      version: '1',
-      condition: {
-        broadcaster_user_id: broadcasterId
-      },
-      transport: {
-        method: 'webhook',
-        callback: callbackUrl,
-        secret: TWITCH_EVENTSUB_SECRET
-      }
-    }, {
-      headers: {
-        'Client-Id': TWITCH_CLIENT_ID,
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    console.log(`Subscribed to ${type} event: `, response.data);
+      const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', {
+          type: type,
+          version: '1',
+          condition: {
+              broadcaster_user_id: await getBroadcasterId(accessToken)  // Assuming you use getBroadcasterId here
+          },
+          transport: {
+              method: 'webhook',
+              callback: callbackUrl,  // Ensure this is passed correctly
+              secret: TWITCH_EVENTSUB_SECRET
+          }
+      }, {
+          headers: {
+              'Client-Id': TWITCH_CLIENT_ID,
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json'
+          }
+      });
+      console.log(`Subscribed to ${type} event: `, response.data);
   } catch (error) {
-    console.error(`Error subscribing to ${type} event:`, error.response ? error.response.data : error.message);
+      console.error(`Error subscribing to ${type} event:`, error.response ? error.response.data : error.message);
   }
 };
 
