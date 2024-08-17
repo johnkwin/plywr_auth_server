@@ -15,7 +15,7 @@ import connectMongo from 'connect-mongo';
 import { setupWebSocket } from './websocket.mjs';
 import adminRoutes from './admin/routes.mjs';
 import User from './models/User.mjs';
-import userRoutes, { getBroadcasterId } from './user/routes.mjs'; // Import getBroadcasterId
+import userRoutes, { getBroadcasterId } from './user/routes.mjs';
 import { DB_USER, DB_PASSWORD, DB_NAME, TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_EVENTSUB_SECRET } from './config.mjs';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
@@ -28,12 +28,13 @@ const app = express();
 
 // HTTPS server options
 const options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/privkey.pem'), // Update with your key path
-  cert: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/fullchain.pem') // Update with your cert path
+  key: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/fullchain.pem')
 };
 
 // Create HTTPS server
 const server = https.createServer(options, app);
+
 // Setup WebSocket
 setupWebSocket(server);
 
@@ -126,7 +127,7 @@ app.post('/register', async (req, res) => {
 // Twitch event routes
 app.post('/twitch/events', express.json(), (req, res) => {
   if (req.headers['twitch-eventsub-message-type'] === 'webhook_callback_verification') {
-      return res.status(200).send(req.body.challenge);
+    return res.status(200).send(req.body.challenge);
   }
 
   const messageId = req.headers['twitch-eventsub-message-id'];
@@ -136,19 +137,19 @@ app.post('/twitch/events', express.json(), (req, res) => {
   const hmac = `sha256=${crypto.createHmac('sha256', TWITCH_EVENTSUB_SECRET).update(hmacMessage).digest('hex')}`;
 
   if (hmac !== signature) {
-      return res.status(403).send('Forbidden');
+    return res.status(403).send('Forbidden');
   }
 
   const event = req.body.event;
   switch (req.body.subscription.type) {
-      case 'channel.subscribe':
-          console.log('New subscriber:', event.user_name);
-          break;
-      case 'channel.subscription.end':
-          console.log('Subscription ended for:', event.user_name);
-          break;
-      default:
-          console.log('Unhandled event type:', req.body.subscription.type);
+    case 'channel.subscribe':
+      console.log('New subscriber:', event.user_name);
+      break;
+    case 'channel.subscription.end':
+      console.log('Subscription ended for:', event.user_name);
+      break;
+    default:
+      console.log('Unhandled event type:', req.body.subscription.type);
   }
 
   res.status(200).send('OK');
@@ -156,45 +157,46 @@ app.post('/twitch/events', express.json(), (req, res) => {
 
 const getAppAccessToken = async () => {
   const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
-      params: {
-          client_id: TWITCH_CLIENT_ID,
-          client_secret: TWITCH_CLIENT_SECRET,
-          grant_type: 'client_credentials',
-          scope: 'channel:read:subscriptions' // Add the required scope here
-      },
-      headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-      }
+    params: {
+      client_id: TWITCH_CLIENT_ID,
+      client_secret: TWITCH_CLIENT_SECRET,
+      grant_type: 'client_credentials',
+      scope: 'channel:read:subscriptions'
+    },
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   });
   return response.data.access_token;
 };
 
-
 const getExistingSubscriptions = async (accessToken) => {
   try {
-      const response = await axios.get('https://api.twitch.tv/helix/eventsub/subscriptions', {
-          headers: {
-              'Client-Id': TWITCH_CLIENT_ID,
-              'Authorization': `Bearer ${accessToken}`,
-          },
-      });
-      return response.data.data;
+    const response = await axios.get('https://api.twitch.tv/helix/eventsub/subscriptions', {
+      headers: {
+        'Client-Id': TWITCH_CLIENT_ID,
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+    return response.data.data;
   } catch (error) {
-      console.error('Error fetching existing subscriptions:', error);
-      return [];
+    console.error('Error fetching existing subscriptions:', error);
+    return [];
   }
 };
+
 // Function to initialize Twitch EventSub subscriptions
 const initializeEventHooks = async () => {
   try {
-      const accessToken = await getAppAccessToken();
-      const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your actual callback URL
+    const accessToken = await getAppAccessToken();
+    const callbackUrl = 'https://join-playware.com/twitch/events';
+    const broadcasterId = await getBroadcasterId(accessToken);
 
-      await ensureSubscriptions(accessToken, callbackUrl);
+    await ensureSubscriptions(accessToken, broadcasterId, callbackUrl);
 
-      console.log('Twitch EventSub subscriptions ensured.');
+    console.log('Twitch EventSub subscriptions ensured.');
   } catch (error) {
-      console.error('Error during app initialization:', error);
+    console.error('Error during app initialization:', error);
   }
 };
 
@@ -216,33 +218,33 @@ const ensureSubscriptions = async (accessToken, broadcasterId, callbackUrl) => {
 };
 
 // Function to subscribe to EventSub
-const subscribeToEventSub = async (accessToken, type, callbackUrl) => {
+const subscribeToEventSub = async (accessToken, type, broadcasterId, callbackUrl) => {
   try {
-      const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', {
-          type: type,
-          version: '1',
-          condition: {
-              broadcaster_user_id: await getBroadcasterId(accessToken)  // Assuming you use getBroadcasterId here
-          },
-          transport: {
-              method: 'webhook',
-              callback: callbackUrl,  // Ensure this is passed correctly
-              secret: TWITCH_EVENTSUB_SECRET
-          }
-      }, {
-          headers: {
-              'Client-Id': TWITCH_CLIENT_ID,
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json'
-          }
-      });
-      console.log(`Subscribed to ${type} event: `, response.data);
+    const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', {
+      type: type,
+      version: '1',
+      condition: {
+        broadcaster_user_id: broadcasterId
+      },
+      transport: {
+        method: 'webhook',
+        callback: callbackUrl,
+        secret: TWITCH_EVENTSUB_SECRET
+      }
+    }, {
+      headers: {
+        'Client-Id': TWITCH_CLIENT_ID,
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log(`Subscribed to ${type} event: `, response.data);
   } catch (error) {
-      console.error(`Error subscribing to ${type} event:`, error.response ? error.response.data : error.message);
+    console.error(`Error subscribing to ${type} event:`, error.response ? error.response.data : error.message);
   }
 };
 
-// Add your other routes and middleware here
+// Other routes and middleware
 
 app.post('/login', async (req, res) => {
   try {
@@ -267,7 +269,7 @@ app.post('/check-subscription', async (req, res) => {
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
-  
+
   try {
     const decoded = jwt.verify(token, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
     const user = await User.findById(decoded.userId);
@@ -282,7 +284,7 @@ app.post('/check-subscription', async (req, res) => {
 
 app.post('/logout', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
-  
+
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
@@ -336,6 +338,7 @@ app.get('/privacy', (req, res) => {
 app.use('/admin', adminRoutes);
 app.use('/user', userRoutes);
 
+// Initialize Twitch EventSub subscriptions
 initializeEventHooks();
 
 // Start server
