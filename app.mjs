@@ -155,19 +155,20 @@ app.post('/twitch/events', express.json(), (req, res) => {
 });
 
 const getAppAccessToken = async () => {
-    const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
-        params: {
-            client_id: TWITCH_CLIENT_ID,
-            client_secret: TWITCH_CLIENT_SECRET,
-            grant_type: 'client_credentials',
-            scope: 'channel:read:subscriptions' // Ensure this scope is included
-        },
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    });
-    return response.data.access_token;
+  const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
+      params: {
+          client_id: TWITCH_CLIENT_ID,
+          client_secret: TWITCH_CLIENT_SECRET,
+          grant_type: 'client_credentials',
+          scope: 'channel:read:subscriptions' // Add the required scope here
+      },
+      headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+      }
+  });
+  return response.data.access_token;
 };
+
 
 const getExistingSubscriptions = async (accessToken) => {
   try {
@@ -186,15 +187,14 @@ const getExistingSubscriptions = async (accessToken) => {
 // Function to initialize Twitch EventSub subscriptions
 const initializeEventHooks = async () => {
   try {
-    const accessToken = await getAppAccessToken();
-    const broadcasterId = await getBroadcasterId(accessToken); // Retrieve the broadcaster ID
-    const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your actual callback URL
+      const accessToken = await getAppAccessToken();
+      const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your actual callback URL
 
-    await ensureSubscriptions(accessToken, broadcasterId, callbackUrl);
+      await ensureSubscriptions(accessToken, callbackUrl);
 
-    console.log('Twitch EventSub subscriptions ensured.');
+      console.log('Twitch EventSub subscriptions ensured.');
   } catch (error) {
-    console.error('Error during app initialization:', error);
+      console.error('Error during app initialization:', error);
   }
 };
 
