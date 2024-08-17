@@ -116,7 +116,6 @@ router.get('/oauth/authorize', (req, res) => {
 
     res.redirect(authUrl);
 });
-
 // Check if the user is authorized and then direct to subscription or OAuth
 router.get('/subscribe/check', isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);
@@ -194,8 +193,8 @@ router.get('/check-subscription', isAuthenticated, async (req, res) => {
                 'Client-Id': TWITCH_CLIENT_ID
             },
             params: {
-                broadcaster_id: user.broadcasterId,
-                user_id: user.twitchUserId
+                broadcaster_id: user.broadcasterId,  // Correct broadcaster ID
+                user_id: user.twitchUserId           // Correct user ID
             }
         });
 
@@ -206,13 +205,25 @@ router.get('/check-subscription', isAuthenticated, async (req, res) => {
             await user.save();
             return res.json({ success: true });  // Return success if subscribed
         } else {
+            user.subscriptionStatus = 'inactive';
+            await user.save();
             return res.json({ success: false });  // Return failure if not subscribed
         }
     } catch (error) {
-        console.error('Error checking subscription status:', error);
-        return res.status(500).json({ success: false, message: 'Failed to check subscription status' });
+        if (error.response && error.response.status === 404) {
+            // User is not subscribed, handle this as a normal case
+            user.subscriptionStatus = 'inactive';
+            await user.save();
+            return res.json({ success: false });  // Return failure if not subscribed
+        } else {
+            console.error('Error checking subscription status:', error);
+            return res.status(500).json({ success: false, message: 'Failed to check subscription status' });
+        }
     }
 });
+
+
+
 
 router.get('/oauth', async (req, res) => {
     const { code, state } = req.query;
