@@ -1,4 +1,3 @@
-// User.mjs
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
@@ -8,11 +7,15 @@ const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { 
     type: String, 
-    required: function() { return this.isNew || this.isModified('password'); } 
+    required: function() { returnthis.isNew || this.isModified('password'); } 
   },
   subscriptionStatus: { type: String, default: 'inactive' },
   role: { type: String, default: 'user' },
   isAdmin: { type: Boolean, default: false },
+  twitchUserId: { type: String },  // Added field for Twitch User ID
+  twitchAccessToken: { type: String },  // Added field for Twitch Access Token
+  twitchRefreshToken: { type: String },  // Added field for Twitch Refresh Token
+  broadcasterId: { type: String },  // Added field for Twitch Broadcaster ID
   tokens: [{ 
     token: { type: String, required: true },
     createdAt: { type: Date, default: Date.now, expires: '1h' }  // Tokens expire in 1 hour
@@ -33,7 +36,7 @@ UserSchema.statics.updateUser = async function (id, updates) {
   if (typeof id === 'string' && mongoose.Types.ObjectId.isValid(id)) {
     id = new mongoose.Types.ObjectId(id);
   } else if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Error('Invalid User ID');
+    thrownewError('Invalid User ID');
   }
 
   if (updates.password) {
@@ -45,7 +48,7 @@ UserSchema.statics.updateUser = async function (id, updates) {
     delete updates.email;
   }
 
-  return this.findByIdAndUpdate(id, updates, { new: true });
+  returnthis.findByIdAndUpdate(id, updates, { new: true });
 };
 
 // Utility function to validate ObjectId

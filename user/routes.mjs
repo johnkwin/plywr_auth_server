@@ -179,6 +179,41 @@ router.get('/subscribe', isAuthenticated, async (req, res) => {
     const subscribeUrl = `https://twitch.tv/subs/${TWITCH_HANDLE}`;
     res.render('user/subscribe', { subscribeUrl, user, TWITCH_HANDLE });
 });
+router.get('/check-subscription', isAuthenticated, async (req, res) => {
+    const user = awaitUser.findById(req.session.userId);
+
+    if (!user.twitchAccessToken || !user.twitchUserId || !user.broadcasterId) {
+        return res.status(400).json({ success: false, message: 'User is not properly authenticated with Twitch' });
+    }
+
+    try {
+        const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
+            headers: {
+                'Authorization': `Bearer ${user.twitchAccessToken}`,
+                'Client-Id': TWITCH_CLIENT_ID
+            },
+            params: {
+                broadcaster_id: user.broadcasterId,
+                user_id: user.twitchUserId
+            }
+        });
+
+        const isSubscribed = subscriptionResponse.data.data.length > 0;
+
+        if (isSubscribed) {
+            user.subscriptionStatus = 'active';
+        } else {
+            user.subscriptionStatus = 'inactive';
+            req.flash('message', 'You are not subscribed to our Twitch channel. Please subscribe to gain full access.');
+        }
+
+        await user.save();
+        res.redirect('/user/dashboard');
+    } catch (error) {
+        console.error('Error checking subscription status:', error);
+        res.status(500).json({ success: false, message: 'Failed to check subscription status' });
+    }
+});
 
 router.get('/oauth', async (req, res) => {
     const { code, state } = req.query;
@@ -218,61 +253,23 @@ router.get('/oauth', async (req, res) => {
 
         const twitchUserId = userInfoResponse.data.data[0].id;
 
+        const user = awaitUser.findById(req.session.userId);
+        user.twitchUserId = twitchUserId;
+        user.twitchAccessToken = access_token;
+        user.twitchRefreshToken = refresh_token;
+
+        // Optionally, fetch and store the broadcaster ID
         const broadcasterId = await getBroadcasterId(access_token);
+        user.broadcasterId = broadcasterId;
 
-        try {
-            const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
-                headers: {
-                    'Authorization': `Bearer ${access_token}`,
-                    'Client-Id': TWITCH_CLIENT_ID
-                },
-                params: {
-                    broadcaster_id: broadcasterId,
-                    user_id: twitchUserId
-                }
-            });
+        await user.save();
 
-            const isSubscribed = subscriptionResponse.data.data.length > 0;
-
-            const user = await User.findById(req.session.userId);
-            user.twitchUserId = twitchUserId;
-            user.twitchAccessToken = access_token;
-            user.twitchRefreshToken = refresh_token;
-
-            if (isSubscribed) {
-                user.subscriptionStatus = 'active';
-                await user.save();
-                res.redirect('/user/dashboard');
-            } else {
-                user.subscriptionStatus = 'inactive';
-                await user.save();
-                req.flash('message', 'You are not subscribed to our Twitch channel. Please subscribe to gain full access.');
-                res.redirect('/user/subscribe');
-            }
-        } catch (subscriptionError) {
-            if (subscriptionError.response && subscriptionError.response.status === 404) {
-                // Handle the case where the user is not subscribed
-                const user = await User.findById(req.session.userId);
-                user.twitchUserId = twitchUserId;
-                user.twitchAccessToken = access_token;
-                user.twitchRefreshToken = refresh_token;
-                user.subscriptionStatus = 'inactive';
-                await user.save();
-
-                req.flash('message', 'You are not subscribed to our Twitch channel. Please subscribe to gain full access.');
-                res.redirect('/user/subscribe');
-            } else {
-                // Other unexpected errors
-                console.error('Error checking subscription status:', subscriptionError);
-                res.status(500).json({ success: false, message: 'Failed to check subscription status' });
-            }
-        }
+        res.redirect('/user/dashboard');
     } catch (error) {
         console.error('Error during OAuth process:', error);
         res.status(500).json({ success: false, message: 'Failed to complete OAuth process' });
     }
 });
-
 // Logout Route
 router.get('/logout', (req, res) => {
     req.session.destroy();
