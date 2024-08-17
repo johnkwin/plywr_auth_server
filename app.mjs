@@ -28,6 +28,12 @@ const app = express();
 const TWITCH_MESSAGE_ID = 'Twitch-Eventsub-Message-Id'.toLowerCase();
 const TWITCH_MESSAGE_TIMESTAMP = 'Twitch-Eventsub-Message-Timestamp'.toLowerCase();
 const TWITCH_MESSAGE_SIGNATURE = 'Twitch-Eventsub-Message-Signature'.toLowerCase();
+const MESSAGE_TYPE = 'Twitch-Eventsub-Message-Type'.toLowerCase();
+
+const MESSAGE_TYPE_VERIFICATION = 'webhook_callback_verification';
+const MESSAGE_TYPE_NOTIFICATION = 'notification';
+const MESSAGE_TYPE_REVOCATION = 'revocation';
+
 const HMAC_PREFIX = 'sha256=';
 app.use(express.raw({ type: 'application/json' }));
 
@@ -131,33 +137,51 @@ app.post('/register', async (req, res) => {
 
 // Twitch event routes
 app.post('/twitch/events', (req, res) => {
-  if (req.headers['twitch-eventsub-message-type'] === 'webhook_callback_verification') {
-      res.set('Content-Type', 'text/plain');
-      res.status(200).send(req.body.challenge);
-      return;
-  }
-  const secret = TWITCH_EVENTSUB_SECRET;
-  const message = req.headers[TWITCH_MESSAGE_ID] + req.headers[TWITCH_MESSAGE_TIMESTAMP] + req.body;
-  const hmac = HMAC_PREFIX + crypto.createHmac('sha256', secret).update(message).digest('hex');
-  
-  // Compare HMAC signatures
-  if (crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(req.headers[TWITCH_MESSAGE_SIGNATURE]))) {
-      console.log('Signatures match');
-      
-      // Process the event here
-      const notification = JSON.parse(req.body);
-      if (notification.subscription.type === 'channel.subscribe') {
-          console.log(`New subscriber: ${notification.event.user_name}`);
-      } else if (notification.subscription.type === 'channel.subscription.end') {
-          console.log(`Subscription ended for: ${notification.event.user_name}`);
-      }
+  const secret = TWITCH_EVENTSUB_SECRET;  // Replace with your actual secret
+  const message = getHmacMessage(req);
+  const hmac = HMAC_PREFIX + getHmac(secret, message);
 
-      res.sendStatus(204); // Acknowledge the event
+  if (verifyMessage(hmac, req.headers[TWITCH_MESSAGE_SIGNATURE])) {
+      console.log("Signatures match");
+
+      const notification = JSON.parse(req.body);
+
+      if (MESSAGE_TYPE_NOTIFICATION === req.headers[MESSAGE_TYPE]) {
+          console.log(`Event type: ${notification.subscription.type}`);
+          console.log(JSON.stringify(notification.event, null, 4));
+          res.sendStatus(204);
+      } else if (MESSAGE_TYPE_VERIFICATION === req.headers[MESSAGE_TYPE]) {
+          res.set('Content-Type', 'text/plain').status(200).send(notification.challenge);
+      } else if (MESSAGE_TYPE_REVOCATION === req.headers[MESSAGE_TYPE]) {
+          console.log(`${notification.subscription.type} notifications revoked!`);
+          console.log(`reason: ${notification.subscription.status}`);
+          console.log(`condition: ${JSON.stringify(notification.subscription.condition, null, 4)}`);
+          res.sendStatus(204);
+      } else {
+          console.log(`Unknown message type: ${req.headers[MESSAGE_TYPE]}`);
+          res.sendStatus(204);
+      }
   } else {
       console.log('403 - Invalid Signature');
       res.sendStatus(403);
   }
 });
+
+function getHmacMessage(request) {
+  return (request.headers[TWITCH_MESSAGE_ID] + 
+          request.headers[TWITCH_MESSAGE_TIMESTAMP] + 
+          request.body);
+}
+
+function getHmac(secret, message) {
+  return crypto.createHmac('sha256', secret)
+      .update(message)
+      .digest('hex');
+}
+
+function verifyMessage(hmac, verifySignature) {
+  return crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(verifySignature));
+}
 
 const getAppAccessToken = async () => {
   const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
