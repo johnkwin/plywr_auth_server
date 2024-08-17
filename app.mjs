@@ -247,41 +247,39 @@ const ensureSubscriptions = async (accessToken, broadcasterId, callbackUrl) => {
 
 // Function to subscribe to EventSub
 const subscribeToEventSub = async (accessToken, type, broadcasterId, callbackUrl) => {
-  try {
-      const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', {
-          type: type,
-          version: '1',
-          condition: {
-              broadcaster_user_id: broadcasterId  // Use the broadcaster ID
-          },
-          transport: {
-              method: 'webhook',
-              callback: callbackUrl,  // Ensure this is passed correctly
-              secret: TWITCH_EVENTSUB_SECRET
-          }
-      }, {
-          headers: {
-              'Client-Id': TWITCH_CLIENT_ID,
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json'
-          }
-      });
-      console.log(`Subscribed to ${type} event: `, response.data);
-  } catch (error) {
-      if (error.response) {
-          console.error(`Error subscribing to ${type} event:`, {
-              status: error.response.status,
-              statusText: error.response.statusText,
-              headers: error.response.headers,
-              data: error.response.data
-          });
-      } else if (error.request) {
-          console.error(`No response received for ${type} event subscription:`, error.request);
-      } else {
-          console.error(`Error setting up request for ${type} event:`, error.message);
-      }
-  }
+    const requestData = {
+        type: type,
+        version: '1',
+        condition: {
+            broadcaster_user_id: broadcasterId
+        },
+        transport: {
+            method: 'webhook',
+            callback: callbackUrl,
+            secret: TWITCH_EVENTSUB_SECRET
+        }
+    };
+
+    const requestHeaders = {
+        'Client-Id': TWITCH_CLIENT_ID,
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+    };
+
+    // Log the request data and headers
+    console.log('Request Data to Twitch:', JSON.stringify(requestData, null, 4));
+    console.log('Request Headers to Twitch:', JSON.stringify(requestHeaders, null, 4));
+
+    try {
+        const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', requestData, {
+            headers: requestHeaders
+        });
+        console.log(`Subscribed to ${type} event: `, response.data);
+    } catch (error) {
+        console.error(`Error subscribing to ${type} event:`, error.response ? error.response.data : error.message);
+    }
 };
+
 
 // Other routes and middleware
 
