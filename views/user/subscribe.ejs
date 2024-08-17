@@ -54,6 +54,29 @@
             background-color: #772ce8;
         }
     </style>
+    <script>
+        async function checkSubscription() {
+            try {
+                const response = await fetch('/user/check-subscription');
+                const data = await response.json();
+    
+                if (data.success) {
+                    // If the user is subscribed, redirect to the dashboard
+                    window.location.href = '/user/dashboard';
+                } else {
+                    // If not subscribed, check again after a few seconds
+                    setTimeout(checkSubscription, 5000); // Check every 5 seconds
+                }
+            } catch (error) {
+                console.error('Error checking subscription:', error);
+                // Optionally handle errors (e.g., retry after a delay)
+                setTimeout(checkSubscription, 5000); // Retry after a delay
+            }
+        }
+    
+        // Start checking the subscription status when the page loads
+        window.onload = checkSubscription;
+    </script>
 </head>
 <body>
     <div class="container">

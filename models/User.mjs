@@ -7,7 +7,7 @@ const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { 
     type: String, 
-    required: function() { returnthis.isNew || this.isModified('password'); } 
+    required: function() { return this.isNew || this.isModified('password'); } 
   },
   subscriptionStatus: { type: String, default: 'inactive' },
   role: { type: String, default: 'user' },
@@ -48,7 +48,7 @@ UserSchema.statics.updateUser = async function (id, updates) {
     delete updates.email;
   }
 
-  returnthis.findByIdAndUpdate(id, updates, { new: true });
+  return this.findByIdAndUpdate(id, updates, { new: true });
 };
 
 // Utility function to validate ObjectId

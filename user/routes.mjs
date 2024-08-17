@@ -170,8 +170,8 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
 
 router.get('/subscribe', isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);
-    
-    // Check if the user is already subscribed
+
+    // If the user is already subscribed, redirect to the dashboard
     if (user.subscriptionStatus === 'active') {
         return res.redirect('/user/dashboard');
     }
@@ -179,8 +179,9 @@ router.get('/subscribe', isAuthenticated, async (req, res) => {
     const subscribeUrl = `https://twitch.tv/subs/${TWITCH_HANDLE}`;
     res.render('user/subscribe', { subscribeUrl, user, TWITCH_HANDLE });
 });
+
 router.get('/check-subscription', isAuthenticated, async (req, res) => {
-    const user = awaitUser.findById(req.session.userId);
+    const user = await User.findById(req.session.userId);
 
     if (!user.twitchAccessToken || !user.twitchUserId || !user.broadcasterId) {
         return res.status(400).json({ success: false, message: 'User is not properly authenticated with Twitch' });
@@ -202,16 +203,14 @@ router.get('/check-subscription', isAuthenticated, async (req, res) => {
 
         if (isSubscribed) {
             user.subscriptionStatus = 'active';
+            await user.save();
+            return res.json({ success: true });  // Return success if subscribed
         } else {
-            user.subscriptionStatus = 'inactive';
-            req.flash('message', 'You are not subscribed to our Twitch channel. Please subscribe to gain full access.');
+            return res.json({ success: false });  // Return failure if not subscribed
         }
-
-        await user.save();
-        res.redirect('/user/dashboard');
     } catch (error) {
         console.error('Error checking subscription status:', error);
-        res.status(500).json({ success: false, message: 'Failed to check subscription status' });
+        return res.status(500).json({ success: false, message: 'Failed to check subscription status' });
     }
 });
 
@@ -253,7 +252,7 @@ router.get('/oauth', async (req, res) => {
 
         const twitchUserId = userInfoResponse.data.data[0].id;
 
-        const user = awaitUser.findById(req.session.userId);
+        const user = await User.findById(req.session.userId);
         user.twitchUserId = twitchUserId;
         user.twitchAccessToken = access_token;
         user.twitchRefreshToken = refresh_token;
