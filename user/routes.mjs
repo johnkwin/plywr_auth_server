@@ -42,12 +42,7 @@ router.get('/register', (req, res) => {
 
 router.post('/register', async (req, res) => {
     try {
-        // Manually parse the URL-encoded form data
-        const rawBody = req.body.toString('utf8');
-        const parsedBody = new URLSearchParams(rawBody);
-
-        const email = parsedBody.get('email');
-        const password = parsedBody.get('password');
+        const { email, password } = req.body;
 
         if (!email || !password) {
             req.flash('message', 'Email and password are required');
@@ -74,10 +69,11 @@ router.post('/register', async (req, res) => {
         req.session.userId = newUser._id;
         res.redirect('/user/dashboard');
     } catch (error) {
+        console.error('Error during registration:', error);
         res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
     }
 });
+
 
 
 router.get('/login', (req, res) => {
@@ -86,12 +82,7 @@ router.get('/login', (req, res) => {
 
 router.post('/login', async (req, res) => {
     try {
-        // Manually parse the URL-encoded form data
-        const rawBody = req.body.toString('utf8');
-        const parsedBody = new URLSearchParams(rawBody);
-
-        const email = parsedBody.get('email');
-        const password = parsedBody.get('password');
+        const { email, password } = req.body;
 
         if (!email || !password) {
             req.flash('message', 'Email and password are required');
@@ -115,10 +106,11 @@ router.post('/login', async (req, res) => {
             res.redirect('/user/login');
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
         console.error('Login error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
+
 
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);

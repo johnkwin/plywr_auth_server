@@ -36,7 +36,13 @@ const MESSAGE_TYPE_REVOCATION = 'revocation';
 
 const HMAC_PREFIX = 'sha256=';
 app.use(express.raw({ type: 'application/json' }));
-
+app.use((req, res, next) => {
+  if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+      const rawBody = req.body.toString('utf8');
+      req.body = Object.fromEntries(new URLSearchParams(rawBody));
+  }
+  next();
+});
 // HTTPS server options
 const options = {
   key: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/privkey.pem'),
