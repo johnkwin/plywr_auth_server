@@ -60,23 +60,25 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
         const { email, password, isAdmin, subscriptionStatus } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: 'Email and password are required' });
+        }
+
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({ success: false, message: 'Email already in use' });
         }
 
         const newUser = new User({
             email,
-            password,  // No need to hash here, the middleware will handle it
+            password,  // This will be hashed by the pre-save middleware
             isAdmin,
             subscriptionStatus
         });
         await newUser.save();
-        res.setHeader('Content-Type', 'application/json');
-        return res.json({ success: true, message: 'User created', user: newUser });
+        res.json({ success: true, message: 'User created', user: newUser });
     } catch (error) {
-        res.setHeader('Content-Type', 'application/json');
         res.status(500).json({ success: false, message: 'Server error' });
         console.error(error);
     }
@@ -86,23 +88,26 @@ router.patch('/update-user', isAuthenticated, async (req, res) => {
     try {
         const { id, email, password, isAdmin, subscriptionStatus } = req.body;
 
-        console.log('Update User ID:', id); // Debug log for ID
+        if (!id) {
+            return res.status(400).json({ success: false, message: 'User ID is required' });
+        }
 
-        const updates = { email, isAdmin, subscriptionStatus, password };
+        const updates = {};
+        if (email) updates.email = email;
+        if (password) updates.password = password;  // Will be hashed in the updateUser method
+        if (isAdmin !== undefined) updates.isAdmin = isAdmin;
+        if (subscriptionStatus) updates.subscriptionStatus = subscriptionStatus;
 
         const updatedUser = await User.updateUser(id, updates);
 
         if (!updatedUser) {
-            res.setHeader('Content-Type', 'application/json');
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        res.setHeader('Content-Type', 'application/json');
         res.json({ success: true, message: 'User updated', user: updatedUser });
     } catch (error) {
         console.error('Error updating user:', error);
-        res.setHeader('Content-Type', 'application/json');
-        res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 

@@ -220,9 +220,11 @@ const getExistingSubscriptions = async (accessToken) => {
       const existingSub = existingSubscriptions.find(sub => sub.type === event && sub.condition.broadcaster_user_id === broadcasterId);
   
       if (!existingSub) {
-        await subscribeToEventSub(accessToken, event, broadcasterId, callbackUrl);
+        //await subscribeToEventSub(accessToken, event, broadcasterId, callbackUrl);
+        console.log(`${event} subscription already exists.`);
       } else {
         console.log(`${event} subscription already exists.`);
+        subscribeToEventSub(accessToken, event, broadcasterId, callbackUrl);
       }
     }
   };

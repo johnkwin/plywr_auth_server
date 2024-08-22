@@ -36,7 +36,7 @@ UserSchema.statics.updateUser = async function (id, updates) {
   if (typeof id === 'string' && mongoose.Types.ObjectId.isValid(id)) {
     id = new mongoose.Types.ObjectId(id);
   } else if (!mongoose.Types.ObjectId.isValid(id)) {
-    thrownewError('Invalid User ID');
+    throw new Error('Invalid User ID');
   }
 
   if (updates.password) {
