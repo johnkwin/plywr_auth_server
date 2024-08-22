@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import crypto from 'crypto';
 import axios from 'axios';
 import User from '../models/User.mjs';
-import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_HANDLE } from '../config.mjs';
+import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_HANDLE, TWITCH_EVENTSUB_SECRET } from '../config.mjs';
 
 const router = express.Router();
 
