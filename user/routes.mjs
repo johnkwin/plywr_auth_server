@@ -372,7 +372,8 @@ router.get('/oauth', async (req, res) => {
         user.broadcasterId = broadcasterId;
         const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your callback URL
         const AppAccessToken = await getAppAccessToken();
-        await ensureSubscriptions(AppAccessToken, broadcasterId, callbackUrl);
+        const channelBroadcasterId = await getBroadcasterId(AppAccessToken);
+        await ensureSubscriptions(AppAccessToken, channelBroadcasterId, callbackUrl);
         await user.save();
 
         res.redirect('/user/dashboard');
