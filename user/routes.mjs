@@ -149,9 +149,10 @@ const handleSubscriptionRevocation = async (parsedMessage) => {
 };
 const handleSubscriptionNotification = async (parsedMessage) => {
     try {
-        const { subscription_type, event } = parsedMessage.metadata;
+        // Make sure you are correctly destructuring from the right object
+        const { subscription_type } = parsedMessage.metadata;
+        const { event } = parsedMessage.payload;  // Extract event from payload, not metadata
 
-        // Extra logging to see exactly where it fails
         console.log('subscription_type:', subscription_type);
         console.log('event before check:', event);
 
@@ -162,7 +163,7 @@ const handleSubscriptionNotification = async (parsedMessage) => {
 
         const userId = event.user_id;
         console.log('userId:', userId);  // Log userId to confirm it's being extracted
-        
+
         const user = await User.findOne({ twitchUserId: userId });
 
         if (user) {
@@ -181,6 +182,7 @@ const handleSubscriptionNotification = async (parsedMessage) => {
         console.error('Error handling subscription notification:', error);
     }
 };
+
 // Subscribe to events via WebSocket
 const subscribeToEvents = async (sessionId) => {
     try {
