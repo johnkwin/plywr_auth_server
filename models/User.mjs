@@ -29,7 +29,28 @@ UserSchema.pre('save', async function (next) {
   }
   next();
 });
+userSchema.statics.createUser = async function({ email, password, isAdmin = false, subscriptionStatus = 'inactive' }) {
+  // Check if the email is already in use
+  const existingUser = await this.findOne({ email });
+  if (existingUser) {
+      throw new Error('Email already in use');
+  }
 
+  // Hash the password
+  const hashedPassword = await bcrypt.hash(password, 12);
+
+  // Create the new user
+  const newUser = new this({
+      email,
+      password: hashedPassword,
+      isAdmin,
+      subscriptionStatus
+  });
+
+  // Save the new user
+  await newUser.save();
+  return newUser;
+};
 // Static method for conditional email update
 UserSchema.statics.updateUser = async function (id, updates) {
   // Convert the id to a valid ObjectId if it's a valid string

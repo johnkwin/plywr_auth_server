@@ -59,43 +59,24 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
-        // Manually parse the raw buffer into a JSON object
         const rawBody = req.body.toString('utf8');
         const parsedBody = JSON.parse(rawBody);
 
         const { email, password, isAdmin, subscriptionStatus } = parsedBody;
 
-        // Validate required fields
         if (!email || !password) {
             return res.status(400).json({ success: false, message: 'Email and password are required' });
         }
 
-        // Check if the email is already in use
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ success: false, message: 'Email already in use' });
-        }
-
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        // Create the new user
-        const newUser = new User({
-            email,
-            password: hashedPassword,
-            isAdmin: isAdmin || false,  // Default to false if not provided
-            subscriptionStatus: subscriptionStatus || 'inactive'  // Default to 'inactive' if not provided
-        });
-
-        // Save the new user
-        await newUser.save();
+        const newUser = await createUser({ email, password, isAdmin, subscriptionStatus });
 
         res.json({ success: true, message: 'User created successfully', user: newUser });
     } catch (error) {
         console.error('Error creating user:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: error.message });
     }
 });
+
 
 
 router.patch('/update-user', isAuthenticated, async (req, res) => {

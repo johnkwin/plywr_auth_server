@@ -49,28 +49,14 @@ router.post('/register', async (req, res) => {
             return res.redirect('/user/register');
         }
 
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            req.flash('message', 'Email already in use');
-            return res.redirect('/user/register');
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        const newUser = new User({
-            email,
-            password: hashedPassword,
-            isAdmin: false,
-            subscriptionStatus: 'inactive'
-        });
-
-        await newUser.save();
+        const newUser = await createUser({ email, password });
 
         req.session.userId = newUser._id;
         res.redirect('/user/dashboard');
     } catch (error) {
         console.error('Error during registration:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        req.flash('message', error.message);
+        res.redirect('/user/register');
     }
 });
 
