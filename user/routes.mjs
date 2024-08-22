@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import axios from 'axios';
 import WebSocket from 'ws';
 import User from '../models/User.mjs';
-import { loadTokens, refreshAccessToken } from './auth.mjs'; // Import the token handling functions
+import { loadTokens, refreshAccessToken } from '../auth.mjs'; // Import the token handling functions
 import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_HANDLE, TWITCH_EVENTSUB_SECRET } from '../config.mjs';
 
 const router = express.Router();
