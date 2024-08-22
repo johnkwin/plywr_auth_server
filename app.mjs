@@ -15,7 +15,7 @@ import connectMongo from 'connect-mongo';
 import { setupWebSocket } from './websocket.mjs';
 import adminRoutes from './admin/routes.mjs';
 import User from './models/User.mjs';
-import userRoutes, { getBroadcasterId } from './user/routes.mjs';
+import userRoutes, { initializeEventHooks  } from './user/routes.mjs';
 import { DB_USER, DB_PASSWORD, DB_NAME, TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_EVENTSUB_SECRET } from './config.mjs';
 import { fileURLToPath } from 'url';
 import axios from 'axios';

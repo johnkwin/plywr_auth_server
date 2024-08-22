@@ -183,19 +183,19 @@ const getExistingSubscriptions = async (accessToken) => {
   };
   
   // Function to initialize Twitch EventSub subscriptions
-  export async function initializeEventHooks(accessToken) {
+  export const initializeEventHooks = async () => {
     try {
-      const accessToken = await getAppAccessToken();
-      const callbackUrl = 'https://join-playware.com/twitch/events';
-      const broadcasterId = await getBroadcasterId(accessToken);
-  
-      await ensureSubscriptions(accessToken, broadcasterId, callbackUrl);
-  
-      console.log('Twitch EventSub subscriptions ensured.');
+        const accessToken = await getAppAccessToken();
+        const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your callback URL
+        const broadcasterId = await getBroadcasterId(accessToken);
+
+        await ensureSubscriptions(accessToken, broadcasterId, callbackUrl);
+
+        console.log('Twitch EventSub subscriptions ensured.');
     } catch (error) {
-      console.error('Error during app initialization:', error);
+        console.error('Error during app initialization:', error);
     }
-  };
+};
   
   // Function to subscribe to events
   const ensureSubscriptions = async (accessToken, broadcasterId, callbackUrl) => {
@@ -369,3 +369,4 @@ router.get('/logout', (req, res) => {
 });
 
 export default router;
+export { initializeEventHooks };
