@@ -59,7 +59,16 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
-        const { email, password, isAdmin, subscriptionStatus } = req.body;
+        // Manually parse the raw buffer into a JSON object
+        const rawBody = req.body.toString('utf8');
+        const parsedBody = JSON.parse(rawBody);
+
+        const { email, password, isAdmin, subscriptionStatus } = parsedBody;
+
+        // Validate required fields
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: 'Email and password are required' });
+        }
 
         // Check if the email is already in use
         const existingUser = await User.findOne({ email });
@@ -88,50 +97,39 @@ router.post('/user', isAuthenticated, async (req, res) => {
     }
 });
 
+
 router.patch('/update-user', isAuthenticated, async (req, res) => {
     try {
-        const { id, email, password, isAdmin, subscriptionStatus } = req.body;
+        // Manually parse the raw buffer into a JSON object
+        const rawBody = req.body.toString('utf8');
+        const parsedBody = JSON.parse(rawBody);
+
+        const { id, email, password, isAdmin, subscriptionStatus } = parsedBody;
 
         if (!id) {
             return res.status(400).json({ success: false, message: 'User ID is required' });
         }
 
-        // Find the user by ID
-        const user = await User.findById(id);
-        if (!user) {
+        // Proceed with the update logic
+        const updates = {};
+        if (email) updates.email = email;
+        if (password) updates.password = await bcrypt.hash(password, 12);  // Hash the new password
+        if (isAdmin !== undefined) updates.isAdmin = isAdmin;
+        if (subscriptionStatus) updates.subscriptionStatus = subscriptionStatus;
+
+        const updatedUser = await User.updateUser(id, updates);
+
+        if (!updatedUser) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        // Update fields if provided
-        if (email) {
-            const existingUser = await User.findOne({ email });
-            if (existingUser && existingUser._id.toString() !== id) {
-                return res.status(400).json({ success: false, message: 'Email already in use' });
-            }
-            user.email = email;
-        }
-
-        if (password) {
-            user.password = await bcrypt.hash(password, 12);  // Hash the new password
-        }
-
-        if (isAdmin !== undefined) {
-            user.isAdmin = isAdmin;
-        }
-
-        if (subscriptionStatus) {
-            user.subscriptionStatus = subscriptionStatus;
-        }
-
-        // Save the updated user
-        await user.save();
-
-        res.json({ success: true, message: 'User updated', user });
+        res.json({ success: true, message: 'User updated', user: updatedUser });
     } catch (error) {
         console.error('Error updating user:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
+
 
 
 router.get('/verify-password/:email', async (req, res) => {
