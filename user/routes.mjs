@@ -151,13 +151,18 @@ const handleSubscriptionNotification = async (parsedMessage) => {
     try {
         const { subscription_type, event } = parsedMessage.metadata;
 
-        // Check if the event object exists and has the required properties
+        // Extra logging to see exactly where it fails
+        console.log('subscription_type:', subscription_type);
+        console.log('event before check:', event);
+
         if (!event || !event.user_id) {
             console.error('Missing event data or user_id:', event);
-            return;  // Exit if the necessary data is not present
+            return;  // Exit the function early to avoid further errors
         }
 
         const userId = event.user_id;
+        console.log('userId:', userId);  // Log userId to confirm it's being extracted
+        
         const user = await User.findOne({ twitchUserId: userId });
 
         if (user) {
