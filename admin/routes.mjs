@@ -61,26 +61,30 @@ router.post('/user', isAuthenticated, async (req, res) => {
     try {
         const { email, password, isAdmin, subscriptionStatus } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({ success: false, message: 'Email and password are required' });
-        }
-
+        // Check if the email is already in use
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ success: false, message: 'Email already in use' });
         }
 
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        // Create the new user
         const newUser = new User({
             email,
-            password,  // This will be hashed by the pre-save middleware
-            isAdmin,
-            subscriptionStatus
+            password: hashedPassword,
+            isAdmin: isAdmin || false,  // Default to false if not provided
+            subscriptionStatus: subscriptionStatus || 'inactive'  // Default to 'inactive' if not provided
         });
+
+        // Save the new user
         await newUser.save();
-        res.json({ success: true, message: 'User created', user: newUser });
+
+        res.json({ success: true, message: 'User created successfully', user: newUser });
     } catch (error) {
+        console.error('Error creating user:', error);
         res.status(500).json({ success: false, message: 'Server error' });
-        console.error(error);
     }
 });
 
@@ -92,24 +96,43 @@ router.patch('/update-user', isAuthenticated, async (req, res) => {
             return res.status(400).json({ success: false, message: 'User ID is required' });
         }
 
-        const updates = {};
-        if (email) updates.email = email;
-        if (password) updates.password = password;  // Will be hashed in the updateUser method
-        if (isAdmin !== undefined) updates.isAdmin = isAdmin;
-        if (subscriptionStatus) updates.subscriptionStatus = subscriptionStatus;
-
-        const updatedUser = await User.updateUser(id, updates);
-
-        if (!updatedUser) {
+        // Find the user by ID
+        const user = await User.findById(id);
+        if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        res.json({ success: true, message: 'User updated', user: updatedUser });
+        // Update fields if provided
+        if (email) {
+            const existingUser = await User.findOne({ email });
+            if (existingUser && existingUser._id.toString() !== id) {
+                return res.status(400).json({ success: false, message: 'Email already in use' });
+            }
+            user.email = email;
+        }
+
+        if (password) {
+            user.password = await bcrypt.hash(password, 12);  // Hash the new password
+        }
+
+        if (isAdmin !== undefined) {
+            user.isAdmin = isAdmin;
+        }
+
+        if (subscriptionStatus) {
+            user.subscriptionStatus = subscriptionStatus;
+        }
+
+        // Save the updated user
+        await user.save();
+
+        res.json({ success: true, message: 'User updated', user });
     } catch (error) {
         console.error('Error updating user:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
+
 
 router.get('/verify-password/:email', async (req, res) => {
     try {
