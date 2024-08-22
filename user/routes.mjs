@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import axios from 'axios';
 import WebSocket from 'ws';
 import User from '../models/User.mjs';
+import { loadTokens, refreshAccessToken } from './auth.js'; // Import the token handling functions
 import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_HANDLE, TWITCH_EVENTSUB_SECRET } from '../config.mjs';
 
 const router = express.Router();
@@ -42,6 +43,8 @@ export const initializeWebSocketConnection = async () => {
         console.error('Error initializing WebSocket connection:', error);
     }
 };
+
+// Handle WebSocket messages
 const handleWebSocketMessage = (message) => {
     const parsedMessage = JSON.parse(message);
 
@@ -67,6 +70,57 @@ const handleWebSocketMessage = (message) => {
             break;
         default:
             console.log('Unknown WebSocket message type:', parsedMessage.metadata.message_type);
+    }
+};
+
+// Subscribe to events via WebSocket
+const subscribeToEvents = async (sessionId) => {
+    try {
+        let tokens = loadTokens();
+        if (!tokens || new Date() > new Date(tokens.obtained_at).getTime() + tokens.expires_in * 1000) {
+            tokens = await refreshAccessToken();
+        }
+
+        const broadcasterId = await getBroadcasterId(tokens.access_token);
+        const events = ['channel.subscribe', 'channel.subscription.end'];
+
+        for (const event of events) {
+            await subscribeToEventSub(tokens.access_token, event, broadcasterId, sessionId);
+        }
+
+        console.log('Subscribed to events via WebSocket.');
+    } catch (error) {
+        console.error('Error subscribing to events:', error);
+    }
+};
+
+// Subscribe to a specific event using EventSub
+const subscribeToEventSub = async (userAccessToken, type, broadcasterId, sessionId) => {
+    const requestData = {
+        type: type,
+        version: '1',
+        condition: {
+            broadcaster_user_id: broadcasterId
+        },
+        transport: {
+            method: 'websocket',
+            session_id: sessionId
+        }
+    };
+
+    const requestHeaders = {
+        'Client-Id': TWITCH_CLIENT_ID,
+        'Authorization': `Bearer ${userAccessToken}`, // Use the user access token here
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', requestData, {
+            headers: requestHeaders
+        });
+        console.log(`Subscribed to ${type} event: `, response.data);
+    } catch (error) {
+        console.error(`Error subscribing to ${type} event:`, error.response ? error.response.data : error.message);
     }
 };
 // Utility function to get the broadcaster ID from the Twitch handle
@@ -223,21 +277,6 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
         }
     }
 });
-
-const getExistingSubscriptions = async (accessToken) => {
-    try {
-      const response = await axios.get('https://api.twitch.tv/helix/eventsub/subscriptions', {
-        headers: {
-          'Client-Id': TWITCH_CLIENT_ID,
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching existing subscriptions:', error);
-      return [];
-    }
-  };
   const getAppAccessToken = async () => {
     const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
       params: {
@@ -252,50 +291,6 @@ const getExistingSubscriptions = async (accessToken) => {
     });
     return response.data.access_token;
   };
-  // Function to initialize Twitch EventSub subscriptions
-  const subscribeToEventSub = async (userAccessToken, type, broadcasterId, sessionId) => {
-    const requestData = {
-        type: type,
-        version: '1',
-        condition: {
-            broadcaster_user_id: broadcasterId
-        },
-        transport: {
-            method: 'websocket',
-            session_id: sessionId
-        }
-    };
-
-    const requestHeaders = {
-        'Client-Id': TWITCH_CLIENT_ID,
-        'Authorization': `Bearer ${userAccessToken}`, // Use the user access token here
-        'Content-Type': 'application/json'
-    };
-
-    try {
-        const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', requestData, {
-            headers: requestHeaders
-        });
-        console.log(`Subscribed to ${type} event: `, response.data);
-    } catch (error) {
-        console.error(`Error subscribing to ${type} event:`, error.response ? error.response.data : error.message);
-    }
-};
-const subscribeToEvents = async (sessionId) => {
-    try {
-        const accessToken = await getAppAccessToken();
-        const broadcasterId = await getBroadcasterId(accessToken, true);
-        const events = ['channel.subscribe', 'channel.subscription.end'];
-
-        for (const event of events) {
-            await subscribeToEventSub(accessToken, event, broadcasterId, sessionId);
-        }
-
-        console.log('Subscribed to events via WebSocket.');
-    } catch (error) {
-        console.error('Error subscribing to events:', error);
-    }
-};
 router.get('/subscribe', isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);
 

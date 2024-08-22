@@ -19,7 +19,7 @@ const options = {
 
 // Step 1: Authorization Endpoint
 app.get('/auth/twitch', (req, res) => {
-    const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}&redirect_uri=https://join-playware.com/auth/twitch/callback&response_type=code&scope=channel:read:subscriptions`;
+    const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}&redirect_uri=https://join-playware.com:3200/auth/twitch/callback&response_type=code&scope=channel:read:subscriptions`;
     res.redirect(authUrl);
 });
 
