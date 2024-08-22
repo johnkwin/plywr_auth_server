@@ -46,8 +46,24 @@ app.get('/auth/twitch/callback', async (req, res) => {
 
         const tokens = tokenResponse.data;
 
-        // Save the tokens in a JSON file
-        fs.writeFileSync(tokenStoragePath, JSON.stringify(tokens, null, 4));
+        // Fetch broadcaster information using the access token
+        const userInfoResponse = await axios.get('https://api.twitch.tv/helix/users', {
+            headers: {
+                'Authorization': `Bearer ${tokens.access_token}`,
+                'Client-Id': TWITCH_CLIENT_ID,
+            },
+        });
+
+        const broadcasterUserId = userInfoResponse.data.data[0].id;
+
+        // Save the tokens and additional information in a JSON file
+        const tokenData = {
+            ...tokens,
+            broadcaster_user_id: broadcasterUserId,
+            obtained_at: new Date().toISOString()
+        };
+        fs.writeFileSync(tokenStoragePath, JSON.stringify(tokenData, null, 4));
+
         res.send('Authorization successful. Tokens saved.');
     } catch (error) {
         console.error('Error fetching tokens:', error.response ? error.response.data : error.message);
@@ -64,6 +80,44 @@ const loadTokens = () => {
     return null;
 };
 
+// Helper function to refresh tokens
+const refreshAccessToken = async () => {
+    const tokens = loadTokens();
+    if (!tokens || !tokens.refresh_token) {
+        throw new Error('No refresh token available.');
+    }
+
+    try {
+        const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
+            params: {
+                client_id: TWITCH_CLIENT_ID,
+                client_secret: TWITCH_CLIENT_SECRET,
+                grant_type: 'refresh_token',
+                refresh_token: tokens.refresh_token,
+            },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
+
+        const newTokens = response.data;
+
+        // Update token data with new access token and expiration time
+        const updatedTokenData = {
+            ...tokens,
+            ...newTokens,
+            obtained_at: new Date().toISOString(),
+        };
+
+        fs.writeFileSync(tokenStoragePath, JSON.stringify(updatedTokenData, null, 4));
+        console.log('Access token refreshed and saved.');
+        return updatedTokenData;
+    } catch (error) {
+        console.error('Error refreshing access token:', error.response ? error.response.data : error.message);
+        throw new Error('Failed to refresh access token.');
+    }
+};
+
 // Create HTTPS server
 const server = https.createServer(options, app);
 
@@ -71,3 +125,5 @@ const server = https.createServer(options, app);
 server.listen(3200, () => {
     console.log('HTTPS Server running on port 3200');
 });
+
+export { loadTokens, refreshAccessToken };
