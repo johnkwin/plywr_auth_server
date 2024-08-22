@@ -181,7 +181,20 @@ const getExistingSubscriptions = async (accessToken) => {
       return [];
     }
   };
-  
+  const getAppAccessToken = async () => {
+    const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
+      params: {
+        client_id: TWITCH_CLIENT_ID,
+        client_secret: TWITCH_CLIENT_SECRET,
+        grant_type: 'client_credentials',
+        scope: 'channel:read:subscriptions'
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    return response.data.access_token;
+  };
   // Function to initialize Twitch EventSub subscriptions
   export const initializeEventHooks = async () => {
     try {
