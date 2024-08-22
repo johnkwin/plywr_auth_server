@@ -45,7 +45,7 @@ export const initializeWebSocketConnection = async () => {
 };
 
 // Handle WebSocket messages
-const handleWebSocketMessage = (message) => {
+const handleWebSocketMessage = async (message) => {
     const parsedMessage = JSON.parse(message);
 
     switch (parsedMessage.metadata.message_type) {
@@ -53,26 +53,120 @@ const handleWebSocketMessage = (message) => {
             console.log('WebSocket session initialized:', parsedMessage);
             subscribeToEvents(parsedMessage.payload.session.id);
             break;
+        case 'session_keepalive':
+            //console.log('Received keepalive message'); Too spammy, Dont log.
+            break;
         case 'notification':
             console.log('Received notification:', parsedMessage.payload.event);
-            // Process the event data as needed
-            break;
-        case 'session_keepalive':
-            console.log('Received keepalive message');
+            await handleSubscriptionNotification(parsedMessage);
             break;
         case 'session_reconnect':
             console.log('Reconnect required:', parsedMessage.payload.session.reconnect_url);
-            // Handle reconnection logic
+            await handleSessionReconnect(parsedMessage.payload.session.reconnect_url);
             break;
         case 'revocation':
             console.log('Subscription revoked:', parsedMessage.payload.subscription);
-            // Handle subscription revocation
+            await handleSubscriptionRevocation(parsedMessage);
             break;
         default:
             console.log('Unknown WebSocket message type:', parsedMessage.metadata.message_type);
     }
 };
+const handleSessionReconnect = async (reconnectUrl) => {
+    try {
+        // Reconnect to the new WebSocket URL
+        const newWs = new WebSocket(reconnectUrl);
 
+        newWs.on('open', () => {
+            console.log('WebSocket reconnected to new URL.');
+        });
+
+        newWs.on('message', (message) => {
+            handleWebSocketMessage(message);
+        });
+
+        newWs.on('close', () => {
+            console.log('New WebSocket connection closed.');
+        });
+
+        newWs.on('error', (error) => {
+            console.error('Error with new WebSocket connection:', error);
+        });
+
+        // Once the new connection is open, close the old WebSocket connection
+        newWs.on('open', () => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                console.log('Closing old WebSocket connection.');
+                ws.close();
+            }
+            // Replace the old WebSocket connection with the new one
+            ws = newWs;
+        });
+
+    } catch (error) {
+        console.error('Error during WebSocket reconnection:', error);
+    }
+};
+const handleSubscriptionRevocation = async (parsedMessage) => {
+    const { subscription } = parsedMessage.payload;
+    const broadcasterUserId = subscription.condition.broadcaster_user_id;
+
+    try {
+        const user = await User.findOne({ twitchUserId: broadcasterUserId });
+
+        if (user) {
+            // Check the revocation reason and log it
+            switch (subscription.status) {
+                case 'authorization_revoked':
+                    console.log(`Authorization revoked for user: ${user.email}`);
+                    break;
+                case 'user_removed':
+                    console.log(`User removed: ${user.email}`);
+                    break;
+                case 'version_removed':
+                    console.log(`Subscription version no longer supported for user: ${user.email}`);
+                    break;
+                default:
+                    console.log(`Unknown revocation reason for user: ${user.email}`);
+            }
+
+            // Update the user's subscription status to inactive
+            user.subscriptionStatus = 'inactive';
+            await user.save();
+
+            console.log(`User ${user.email}'s subscription status set to inactive due to revocation.`);
+        } else {
+            console.log(`User not found for Twitch ID: ${broadcasterUserId}`);
+        }
+    } catch (error) {
+        console.error('Error handling subscription revocation:', error);
+    }
+};
+const handleSubscriptionNotification = async (parsedMessage) => {
+    const { subscription_type, event } = parsedMessage.metadata;
+    const userId = event.user_id;
+
+    try {
+        const user = await User.findOne({ twitchUserId: userId });
+
+        if (user) {
+            // If the event is a subscription or unsubscription, update the user's subscription status
+            if (subscription_type === 'channel.subscribe') {
+                user.subscriptionStatus = 'active';
+                console.log(`User ${event.user_name} (ID: ${userId}) subscription status set to active.`);
+            } else if (subscription_type === 'channel.subscription.end') {
+                user.subscriptionStatus = 'inactive';
+                console.log(`User ${event.user_name} (ID: ${userId}) subscription status set to inactive.`);
+            }
+
+            await user.save();
+        } else {
+            console.log(`User not found for Twitch ID: ${userId}`);
+        }
+    } catch (error) {
+        console.error('Error handling subscription notification:', error);
+    }
+};
 // Subscribe to events via WebSocket
 const subscribeToEvents = async (sessionId) => {
     try {
