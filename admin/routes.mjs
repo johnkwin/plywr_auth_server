@@ -68,7 +68,7 @@ router.post('/user', isAuthenticated, async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email and password are required' });
         }
 
-        const newUser = await createUser({ email, password, isAdmin, subscriptionStatus });
+        const newUser = await User.createUser({ email, password, isAdmin, subscriptionStatus });
 
         res.json({ success: true, message: 'User created successfully', user: newUser });
     } catch (error) {

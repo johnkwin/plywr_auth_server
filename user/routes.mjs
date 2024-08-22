@@ -49,7 +49,7 @@ router.post('/register', async (req, res) => {
             return res.redirect('/user/register');
         }
 
-        const newUser = await createUser({ email, password });
+        const newUser = await User.createUser({ email, password });
 
         req.session.userId = newUser._id;
         res.redirect('/user/dashboard');
