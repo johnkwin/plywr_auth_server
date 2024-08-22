@@ -2,3 +2,7 @@ seperate actual activation from the oauth authorization to its own route
 handle redirect to auto-update the subscription when on the https://join-playware.com/user/subscribe page
 handle webhooks for unsubscribes as well as checking subscription status of users regularly in some manner
 clean up registration etc.
+
+
+
+I dont think the function for the getBroadcasterId is returning the correct ID we need to recheck the docs

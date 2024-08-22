@@ -22,9 +22,6 @@ export async function getBroadcasterId(accessToken) {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Client-Id': TWITCH_CLIENT_ID
-            },
-            params: {
-                login: TWITCH_HANDLE
             }
         });
 
@@ -372,7 +369,7 @@ router.get('/oauth', async (req, res) => {
         user.broadcasterId = broadcasterId;
         const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your callback URL
         const AppAccessToken = await getAppAccessToken();
-        await ensureSubscriptions(AppAccessToken, broadcasterId, callbackUrl);
+        await ensureSubscriptions(AppAccessToken, getBroadcasterId(AppAccessToken), callbackUrl);
         await user.save();
 
         res.redirect('/user/dashboard');
