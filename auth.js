@@ -72,7 +72,7 @@ app.get('/auth/twitch/callback', async (req, res) => {
 });
 
 // Helper function to load tokens
-const loadTokens = () => {
+export const loadTokens = () => {
     if (fs.existsSync(tokenStoragePath)) {
         const tokens = fs.readFileSync(tokenStoragePath);
         return JSON.parse(tokens);
@@ -81,7 +81,7 @@ const loadTokens = () => {
 };
 
 // Helper function to refresh tokens
-const refreshAccessToken = async () => {
+export const refreshAccessToken = async () => {
     const tokens = loadTokens();
     if (!tokens || !tokens.refresh_token) {
         throw new Error('No refresh token available.');
