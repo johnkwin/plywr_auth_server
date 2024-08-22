@@ -46,30 +46,35 @@ export const initializeWebSocketConnection = async () => {
 
 // Handle WebSocket messages
 const handleWebSocketMessage = async (message) => {
-    const parsedMessage = JSON.parse(message);
+    try {
+        const parsedMessage = JSON.parse(message);
+        console.log('WebSocket Message Parsed:', parsedMessage);
 
-    switch (parsedMessage.metadata.message_type) {
-        case 'session_welcome':
-            console.log('WebSocket session initialized:', parsedMessage);
-            subscribeToEvents(parsedMessage.payload.session.id);
-            break;
-        case 'session_keepalive':
-            //console.log('Received keepalive message'); Too spammy, Dont log.
-            break;
-        case 'notification':
-            console.log('Received notification:', parsedMessage.payload.event);
-            await handleSubscriptionNotification(parsedMessage);
-            break;
-        case 'session_reconnect':
-            console.log('Reconnect required:', parsedMessage.payload.session.reconnect_url);
-            await handleSessionReconnect(parsedMessage.payload.session.reconnect_url);
-            break;
-        case 'revocation':
-            console.log('Subscription revoked:', parsedMessage.payload.subscription);
-            await handleSubscriptionRevocation(parsedMessage);
-            break;
-        default:
-            console.log('Unknown WebSocket message type:', parsedMessage.metadata.message_type);
+        switch (parsedMessage.metadata.message_type) {
+            case 'session_welcome':
+                console.log('WebSocket session initialized:', parsedMessage);
+                subscribeToEvents(parsedMessage.payload.session.id);
+                break;
+            case 'session_keepalive':
+                //console.log('Received keepalive message'); Too spammy, Dont log.
+                break;
+            case 'notification':
+                console.log('Received notification:', parsedMessage.payload.event);
+                await handleSubscriptionNotification(parsedMessage);
+                break;
+            case 'session_reconnect':
+                console.log('Reconnect required:', parsedMessage.payload.session.reconnect_url);
+                await handleSessionReconnect(parsedMessage.payload.session.reconnect_url);
+                break;
+            case 'revocation':
+                console.log('Subscription revoked:', parsedMessage.payload.subscription);
+                await handleSubscriptionRevocation(parsedMessage);
+                break;
+            default:
+                console.log('Unknown WebSocket message type:', parsedMessage.metadata.message_type);
+        }
+    } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
     }
 };
 const handleSessionReconnect = async (reconnectUrl) => {
@@ -143,14 +148,19 @@ const handleSubscriptionRevocation = async (parsedMessage) => {
     }
 };
 const handleSubscriptionNotification = async (parsedMessage) => {
-    const { subscription_type, event } = parsedMessage.metadata;
-    const userId = event.user_id;
-
     try {
+        const { subscription_type, event } = parsedMessage.metadata;
+
+        // Check if the event object exists and has the required properties
+        if (!event || !event.user_id) {
+            console.error('Missing event data or user_id:', event);
+            return;  // Exit if the necessary data is not present
+        }
+
+        const userId = event.user_id;
         const user = await User.findOne({ twitchUserId: userId });
 
         if (user) {
-            // If the event is a subscription or unsubscription, update the user's subscription status
             if (subscription_type === 'channel.subscribe') {
                 user.subscriptionStatus = 'active';
                 console.log(`User ${event.user_name} (ID: ${userId}) subscription status set to active.`);
@@ -158,7 +168,6 @@ const handleSubscriptionNotification = async (parsedMessage) => {
                 user.subscriptionStatus = 'inactive';
                 console.log(`User ${event.user_name} (ID: ${userId}) subscription status set to inactive.`);
             }
-
             await user.save();
         } else {
             console.log(`User not found for Twitch ID: ${userId}`);
@@ -371,20 +380,20 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
         }
     }
 });
-  const getAppAccessToken = async () => {
+const getAppAccessToken = async () => {
     const response = await axios.post('https://id.twitch.tv/oauth2/token', null, {
-      params: {
-        client_id: TWITCH_CLIENT_ID,
-        client_secret: TWITCH_CLIENT_SECRET,
-        grant_type: 'client_credentials',
-        scope: 'channel:read:subscriptions'
-      },
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
+        params: {
+            client_id: TWITCH_CLIENT_ID,
+            client_secret: TWITCH_CLIENT_SECRET,
+            grant_type: 'client_credentials',
+            scope: 'channel:read:subscriptions'
+        },
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
     });
     return response.data.access_token;
-  };
+};
 router.get('/subscribe', isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);
 
@@ -491,7 +500,7 @@ router.get('/oauth', async (req, res) => {
         user.broadcasterId = broadcasterId;
         await user.save();
 
-        res.redirect('/user/dashboard');
+        res.redirect('/user/subscribe/check');
     } catch (error) {
         console.error('Error during OAuth process:', error);
         res.status(500).json({ success: false, message: 'Failed to complete OAuth process' });
