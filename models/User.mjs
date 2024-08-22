@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { SALT_ROUNDS } from '.config.mjs';
+import { SALT_ROUNDS } from '../config.mjs';
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
