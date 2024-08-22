@@ -136,7 +136,7 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
         return res.redirect(authUrl);
     } else {
         try {
-            const broadcasterId = await getBroadcasterId(user.twitchAccessToken, true);
+            const broadcasterId = await getBroadcasterId(user.twitchAccessToken);
             const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
                 headers: {
                     'Authorization': `Bearer ${user.twitchAccessToken}`,
@@ -368,11 +368,11 @@ router.get('/oauth', async (req, res) => {
         user.twitchRefreshToken = refresh_token;
 
         // Optionally, fetch and store the broadcaster ID
-        const broadcasterId = await getBroadcasterId(access_token, true);
+        const broadcasterId = await getBroadcasterId(access_token);
         user.broadcasterId = broadcasterId;
         const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your callback URL
         const AppAccessToken = await getAppAccessToken();
-        const channelBroadcasterId = await getBroadcasterId(AppAccessToken);
+        const channelBroadcasterId = await getBroadcasterId(AppAccessToken, true);
         await ensureSubscriptions(AppAccessToken, channelBroadcasterId, callbackUrl);
         await user.save();
 
