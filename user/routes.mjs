@@ -78,11 +78,15 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
+            console.log('User not found:', email);  // Log if user not found
             req.flash('message', 'Invalid credentials');
             return res.redirect('/user/login');
         }
 
+        console.log('Stored hashed password:', user.password);  // Log stored hashed password
+
         const isMatch = await bcrypt.compare(password, user.password);
+        console.log('Password comparison result:', isMatch);  // Log comparison result
 
         if (isMatch) {
             req.session.userId = user._id;
