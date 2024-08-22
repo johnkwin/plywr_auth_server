@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-
+import { SALT_ROUNDS } from './config.mjs';
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -22,10 +22,9 @@ const UserSchema = new Schema({
   }]
 });
 
-// Pre-save middleware for password hashing
 UserSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
+      this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
   }
   next();
 });
@@ -36,13 +35,10 @@ UserSchema.statics.createUser = async function({ email, password, isAdmin = fals
       throw new Error('Email already in use');
   }
 
-  // Hash the password
-  const hashedPassword = await bcrypt.hash(password, 12);
-
-  // Create the new user
+  // Create the new user (password will be hashed by pre-save middleware)
   const newUser = new this({
       email,
-      password: hashedPassword,
+      password,  // No need to hash here
       isAdmin,
       subscriptionStatus
   });
@@ -51,24 +47,15 @@ UserSchema.statics.createUser = async function({ email, password, isAdmin = fals
   await newUser.save();
   return newUser;
 };
-// Static method for conditional email update
+
 UserSchema.statics.updateUser = async function (id, updates) {
-  // Convert the id to a valid ObjectId if it's a valid string
   if (typeof id === 'string' && mongoose.Types.ObjectId.isValid(id)) {
-    id = new mongoose.Types.ObjectId(id);
+      id = new mongoose.Types.ObjectId(id);
   } else if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Error('Invalid User ID');
+      throw new Error('Invalid User ID');
   }
 
-  if (updates.password) {
-    updates.password = await bcrypt.hash(updates.password, 10);
-  }
-
-  // Remove email from updates if it's not provided
-  if (!updates.email) {
-    delete updates.email;
-  }
-
+  // Password will be hashed by pre-save middleware if it is modified
   return this.findByIdAndUpdate(id, updates, { new: true });
 };
 
