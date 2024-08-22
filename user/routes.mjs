@@ -167,6 +167,87 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
     }
 });
 
+const getExistingSubscriptions = async (accessToken) => {
+    try {
+      const response = await axios.get('https://api.twitch.tv/helix/eventsub/subscriptions', {
+        headers: {
+          'Client-Id': TWITCH_CLIENT_ID,
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching existing subscriptions:', error);
+      return [];
+    }
+  };
+  
+  // Function to initialize Twitch EventSub subscriptions
+  export async function initializeEventHooks(accessToken) {
+    try {
+      const accessToken = await getAppAccessToken();
+      const callbackUrl = 'https://join-playware.com/twitch/events';
+      const broadcasterId = await getBroadcasterId(accessToken);
+  
+      await ensureSubscriptions(accessToken, broadcasterId, callbackUrl);
+  
+      console.log('Twitch EventSub subscriptions ensured.');
+    } catch (error) {
+      console.error('Error during app initialization:', error);
+    }
+  };
+  
+  // Function to subscribe to events
+  const ensureSubscriptions = async (accessToken, broadcasterId, callbackUrl) => {
+    const existingSubscriptions = await getExistingSubscriptions(accessToken);
+  
+    const requiredEvents = ['channel.subscribe', 'channel.subscription.end'];
+  
+    for (const event of requiredEvents) {
+      const existingSub = existingSubscriptions.find(sub => sub.type === event && sub.condition.broadcaster_user_id === broadcasterId);
+  
+      if (!existingSub) {
+        await subscribeToEventSub(accessToken, event, broadcasterId, callbackUrl);
+      } else {
+        console.log(`${event} subscription already exists.`);
+      }
+    }
+  };
+  
+  // Function to subscribe to EventSub
+  const subscribeToEventSub = async (accessToken, type, broadcasterId, callbackUrl) => {
+      const requestData = {
+          type: type,
+          version: '1',
+          condition: {
+              broadcaster_user_id: broadcasterId
+          },
+          transport: {
+              method: 'webhook',
+              callback: callbackUrl,
+              secret: TWITCH_EVENTSUB_SECRET
+          }
+      };
+  
+      const requestHeaders = {
+          'Client-Id': TWITCH_CLIENT_ID,
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+      };
+  
+      // Log the request data and headers
+      console.log('Request Data to Twitch:', JSON.stringify(requestData, null, 4));
+      console.log('Request Headers to Twitch:', JSON.stringify(requestHeaders, null, 4));
+  
+      try {
+          const response = await axios.post('https://api.twitch.tv/helix/eventsub/subscriptions', requestData, {
+              headers: requestHeaders
+          });
+          console.log(`Subscribed to ${type} event: `, response.data);
+      } catch (error) {
+          console.error(`Error subscribing to ${type} event:`, error.response ? error.response.data : error.message);
+      }
+  };
 router.get('/subscribe', isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);
 
@@ -271,7 +352,8 @@ router.get('/oauth', async (req, res) => {
         // Optionally, fetch and store the broadcaster ID
         const broadcasterId = await getBroadcasterId(access_token);
         user.broadcasterId = broadcasterId;
-
+        const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your callback URL
+        await ensureSubscriptions(access_token, broadcasterId, callbackUrl);
         await user.save();
 
         res.redirect('/user/dashboard');
