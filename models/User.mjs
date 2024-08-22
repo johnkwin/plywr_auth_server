@@ -29,7 +29,7 @@ UserSchema.pre('save', async function (next) {
   }
   next();
 });
-userSchema.statics.createUser = async function({ email, password, isAdmin = false, subscriptionStatus = 'inactive' }) {
+UserSchema.statics.createUser = async function({ email, password, isAdmin = false, subscriptionStatus = 'inactive' }) {
   // Check if the email is already in use
   const existingUser = await this.findOne({ email });
   if (existingUser) {
