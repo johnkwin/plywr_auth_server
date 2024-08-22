@@ -143,7 +143,7 @@ app.post('/register', async (req, res) => {
 
 // Twitch event routes
 app.post('/twitch/events', (req, res) => {
-  const secret = TWITCH_EVENTSUB_SECRET;  // Replace with your actual secret
+  const secret = TWITCH_CLIENT_SECRET;  // Replace with your actual secret
   const message = getHmacMessage(req);
   const hmac = HMAC_PREFIX + getHmac(secret, message);
 

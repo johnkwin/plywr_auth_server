@@ -243,7 +243,7 @@ const getExistingSubscriptions = async (accessToken) => {
           transport: {
               method: 'webhook',
               callback: callbackUrl,
-              secret: TWITCH_EVENTSUB_SECRET
+              secret: TWITCH_CLIENT_SECRET
           }
       };
   
@@ -371,7 +371,7 @@ router.get('/oauth', async (req, res) => {
         const broadcasterId = await getBroadcasterId(access_token);
         user.broadcasterId = broadcasterId;
         const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your callback URL
-        await ensureSubscriptions(TWITCH_CLIENT_SECRET, getBroadcasterId(access_token), callbackUrl);
+        await ensureSubscriptions(access_token, getBroadcasterId(access_token), callbackUrl);
         await user.save();
 
         res.redirect('/user/dashboard');
