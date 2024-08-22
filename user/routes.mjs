@@ -120,7 +120,6 @@ router.post('/login', async (req, res) => {
     }
 });
 
-
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);
     res.render('user/dashboard', { user });
