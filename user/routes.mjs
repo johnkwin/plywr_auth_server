@@ -42,7 +42,17 @@ router.get('/register', (req, res) => {
 
 router.post('/register', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        // Manually parse the URL-encoded form data
+        const rawBody = req.body.toString('utf8');
+        const parsedBody = new URLSearchParams(rawBody);
+
+        const email = parsedBody.get('email');
+        const password = parsedBody.get('password');
+
+        if (!email || !password) {
+            req.flash('message', 'Email and password are required');
+            return res.redirect('/user/register');
+        }
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -69,13 +79,24 @@ router.post('/register', async (req, res) => {
     }
 });
 
+
 router.get('/login', (req, res) => {
     res.render('user/login', { message: req.flash('message') });
 });
 
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        // Manually parse the URL-encoded form data
+        const rawBody = req.body.toString('utf8');
+        const parsedBody = new URLSearchParams(rawBody);
+
+        const email = parsedBody.get('email');
+        const password = parsedBody.get('password');
+
+        if (!email || !password) {
+            req.flash('message', 'Email and password are required');
+            return res.redirect('/user/login');
+        }
 
         const user = await User.findOne({ email });
 
@@ -98,6 +119,7 @@ router.post('/login', async (req, res) => {
         console.error('Login error:', error);
     }
 });
+
 
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     const user = await User.findById(req.session.userId);
