@@ -16,18 +16,21 @@ function isAuthenticated(req, res, next) {
 }
 
 // Utility function to get the broadcaster ID from the Twitch handle
-export async function getBroadcasterId(accessToken) {
+export async function getBroadcasterId(accessToken, isApp = false) {
     try {
+        const params = isApp ? { login: TWITCH_HANDLE } : {};
+
         const response = await axios.get('https://api.twitch.tv/helix/users', {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Client-Id': TWITCH_CLIENT_ID
-            }
+            },
+            params
         });
 
         return response.data.data[0].id;
     } catch (error) {
-        console.error('Error getting broadcaster ID:', error);
+        console.error('Error getting broadcaster ID:', error.response ? error.response.data : error.message);
         throw error;
     }
 }
@@ -133,7 +136,7 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
         return res.redirect(authUrl);
     } else {
         try {
-            const broadcasterId = await getBroadcasterId(user.twitchAccessToken);
+            const broadcasterId = await getBroadcasterId(user.twitchAccessToken, true);
             const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
                 headers: {
                     'Authorization': `Bearer ${user.twitchAccessToken}`,
@@ -200,7 +203,7 @@ const getExistingSubscriptions = async (accessToken) => {
     try {
         const accessToken = await getAppAccessToken();
         const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your callback URL
-        const broadcasterId = await getBroadcasterId(accessToken);
+        const broadcasterId = await getBroadcasterId(accessToken, true);
 
         await ensureSubscriptions(accessToken, broadcasterId, callbackUrl);
 
@@ -365,7 +368,7 @@ router.get('/oauth', async (req, res) => {
         user.twitchRefreshToken = refresh_token;
 
         // Optionally, fetch and store the broadcaster ID
-        const broadcasterId = await getBroadcasterId(access_token);
+        const broadcasterId = await getBroadcasterId(access_token, true);
         user.broadcasterId = broadcasterId;
         const callbackUrl = 'https://join-playware.com/twitch/events';  // Replace with your callback URL
         const AppAccessToken = await getAppAccessToken();
