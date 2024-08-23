@@ -19,18 +19,50 @@
 
         .dashboard-container {
             background-color: #2b2b2b;
-            padding: 40px;
+            padding: 60px 20px 40px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             text-align: center;
             max-width: 400px;
             width: 100%;
+            position: relative;
         }
 
-        .dashboard-container h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
+        .dashboard-header {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            width: 100%;
+            background-color: #333;
+            padding: 15px;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: 20px;
             color: #fff;
+            flex: 1;
+            text-align: left;
+        }
+
+        .logout-button {
+            color: #ffffff;
+            background-color: #e74c3c;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
         }
 
         .alert {
@@ -40,6 +72,7 @@
             font-size: 14px;
             color: #ffffff;
             background-color: #e74c3c;
+            display: none;  /* Hidden by default */
         }
 
         .subscribe-button {
@@ -67,26 +100,14 @@
             background-color: #772ce8;
         }
 
-        .logout-button {
-            display: block;
-            margin-top: 20px;
-            color: #ffffff;
-            background-color: #e74c3c;
-            padding: 10px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-
-        .logout-button:hover {
-            background-color: #c0392b;
-        }
-
         /* Media Queries for Responsiveness */
         @media (max-width: 480px) {
             .dashboard-container {
-                padding: 20px;
+                padding: 60px 10px 20px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 18px;
             }
 
             .subscribe-button,
@@ -100,12 +121,18 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <h1>Welcome, <%= user.email %></h1>
+        <div class="dashboard-header">
+            <h1>Welcome, <%= user.email %></h1>
+            <a href="/user/logout" class="logout-button">Logout</a>
+        </div>
+        
         <% if (message) { %>
             <div class="alert alert-danger">
                 <%= message %>
             </div>
         <% } %>
+
+        <!-- Conditionally render the Subscribe Free button if subscription is inactive -->
         <% if (user.subscriptionStatus === 'inactive') { %>
             <a href="/user/subscribe/check" class="subscribe-button">
                 <span class="crown-icon">👑</span> Subscribe Free
@@ -113,8 +140,14 @@
         <% } else { %>
             <p>Your subscription is active.</p>
         <% } %>
-
-        <a href="/user/logout" class="logout-button">Logout</a>
     </div>
+
+    <script>
+        // Show the alert if there's a message
+        const alert = document.querySelector('.alert');
+        if (alert && alert.textContent.trim() !== '') {
+            alert.style.display = 'block';
+        }
+    </script>
 </body>
 </html>
