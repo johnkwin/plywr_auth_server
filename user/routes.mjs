@@ -48,7 +48,7 @@ export const initializeWebSocketConnection = async () => {
 const handleWebSocketMessage = async (message) => {
     try {
         const parsedMessage = JSON.parse(message);
-        console.log('WebSocket Message Parsed:', parsedMessage);
+        //console.log('WebSocket Message Parsed:', parsedMessage);
 
         switch (parsedMessage.metadata.message_type) {
             case 'session_welcome':
@@ -149,9 +149,8 @@ const handleSubscriptionRevocation = async (parsedMessage) => {
 };
 const handleSubscriptionNotification = async (parsedMessage) => {
     try {
-        // Make sure you are correctly destructuring from the right object
         const { subscription_type } = parsedMessage.metadata;
-        const { event } = parsedMessage.payload;  // Extract event from payload, not metadata
+        const { event } = parsedMessage.payload;
 
         console.log('subscription_type:', subscription_type);
         console.log('event before check:', event);
@@ -164,6 +163,7 @@ const handleSubscriptionNotification = async (parsedMessage) => {
         const userId = event.user_id;
         console.log('userId:', userId);  // Log userId to confirm it's being extracted
 
+        // Search for the user in the database using the twitchUserId
         const user = await User.findOne({ twitchUserId: userId });
 
         if (user) {
@@ -456,9 +456,6 @@ router.get('/check-subscription', isAuthenticated, async (req, res) => {
     }
 });
 
-
-
-
 router.get('/oauth', async (req, res) => {
     const { code, state } = req.query;
 
@@ -497,6 +494,15 @@ router.get('/oauth', async (req, res) => {
 
         const twitchUserId = userInfoResponse.data.data[0].id;
 
+        // Check if the twitchUserId is already linked to another account
+        const existingUser = await User.findOne({ twitchUserId });
+        if (existingUser) {
+            const message = `This Twitch account is already linked to another user with email: ${existingUser.email}.`;
+            console.error(message);
+            req.flash('message', message);
+            return res.redirect('/user/dashboard');
+        }
+
         const user = await User.findById(req.session.userId);
         user.twitchUserId = twitchUserId;
         user.twitchAccessToken = access_token;
@@ -510,9 +516,11 @@ router.get('/oauth', async (req, res) => {
         res.redirect('/user/subscribe/check');
     } catch (error) {
         console.error('Error during OAuth process:', error);
-        res.status(500).json({ success: false, message: 'Failed to complete OAuth process' });
+        req.flash('message', 'Failed to complete OAuth process.');
+        res.redirect('/user/dashboard');
     }
 });
+
 // Logout Route
 router.get('/logout', (req, res) => {
     req.session.destroy();

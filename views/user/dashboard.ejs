@@ -31,7 +31,11 @@
 <body>
     <div class="dashboard-container">
         <h1>Welcome, <%= user.email %></h1>
-
+        <% if (message) { %>
+            <div class="alert alert-danger">
+                <%= message %>
+            </div>
+        <% } %>
         <!-- Conditionally render the Subscribe Free button if subscription is inactive -->
         <% if (user.subscriptionStatus === 'inactive') { %>
             <a href="/user/subscribe/check" class="subscribe-button">
