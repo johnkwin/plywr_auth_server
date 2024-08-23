@@ -5,34 +5,6 @@
     <title>User Login</title>
     <link rel="stylesheet" href="/css/styles.css">
     <style>
-/* Media Queries for Mobile Devices */
-@media (max-width: 480px) {
-    /* Adjusting the container to occupy more of the screen */
-    .login-container, .register-container {
-        padding: 20px 10px;
-        margin: 0 10px;
-        box-shadow: none;
-        max-width: none;
-        width: 90%; /* Use more of the screen width */
-    }
-
-    /* Adjust font sizes and padding */
-    .login-form input, .register-form input,
-    .login-form button, .register-form button {
-        font-size: 16px;
-        padding: 10px;
-    }
-
-    .login-container h2, .register-container h2 {
-        font-size: 22px;
-        margin-bottom: 20px;
-    }
-
-    /* Hide any non-essential elements if needed */
-    .some-extra-element {
-        display: none; /* Hide on mobile */
-    }
-}
         /* General Styles */
 body {
     background-color: #1f1f1f;
@@ -44,7 +16,36 @@ body {
     height: 100vh;
     margin: 0;
 }
+/* Fullscreen Login Container for Mobile */
+@media (max-width: 480px) {
+    body {
+        justify-content: flex-start; /* Align content to the top */
+    }
 
+    .login-container, .register-container {
+        padding: 20px 10px;
+        margin: 0;
+        width: 100%;
+        height: 100vh;
+        max-width: none;
+        box-shadow: none; /* Remove shadow to maximize space */
+        border-radius: 0; /* Remove border radius for full-screen effect */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .login-form input, .register-form input,
+    .login-form button, .register-form button {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .login-container h2, .register-container h2 {
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+}
 .login-container, .register-container {
     background-color: #2b2b2b;
     padding: 40px 30px;
