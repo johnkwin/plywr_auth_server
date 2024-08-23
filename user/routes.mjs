@@ -321,9 +321,17 @@ router.post('/login', async (req, res) => {
 
 
 router.get('/dashboard', isAuthenticated, async (req, res) => {
-    const user = await User.findById(req.session.userId);
-    res.render('user/dashboard', { user });
+    try {
+        const user = await User.findById(req.session.userId);
+        const message = req.flash('message');  // Retrieve the message from flash
+        res.render('user/dashboard', { user, message });
+    } catch (error) {
+        console.error('Error loading dashboard:', error);
+        req.flash('message', 'Failed to load the dashboard.');
+        res.redirect('/user/login');
+    }
 });
+
 
 router.get('/oauth/authorize', (req, res) => {
     const clientId = TWITCH_CLIENT_ID;
