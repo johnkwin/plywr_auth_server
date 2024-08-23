@@ -5,6 +5,34 @@
     <title>User Login</title>
     <link rel="stylesheet" href="/css/styles.css">
     <style>
+/* Media Queries for Mobile Devices */
+@media (max-width: 480px) {
+    /* Adjusting the container to occupy more of the screen */
+    .login-container, .register-container {
+        padding: 20px 10px;
+        margin: 0 10px;
+        box-shadow: none;
+        max-width: none;
+        width: 90%; /* Use more of the screen width */
+    }
+
+    /* Adjust font sizes and padding */
+    .login-form input, .register-form input,
+    .login-form button, .register-form button {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .login-container h2, .register-container h2 {
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+
+    /* Hide any non-essential elements if needed */
+    .some-extra-element {
+        display: none; /* Hide on mobile */
+    }
+}
         /* General Styles */
 body {
     background-color: #1f1f1f;
@@ -109,23 +137,6 @@ body {
 
 .login-container a:hover, .register-container a:hover {
     text-decoration: underline;
-}
-
-/* Media Queries for Responsiveness */
-@media (max-width: 480px) {
-    .login-container, .register-container {
-        padding: 20px 15px;
-    }
-
-    .login-form input, .register-form input,
-    .login-form button, .register-form button {
-        font-size: 16px;
-        padding: 10px;
-    }
-
-    .login-container h2, .register-container h2 {
-        font-size: 24px;
-    }
 }
 
     </style>
