@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>User Dashboard</title>
+    <title>User Login</title>
     <link rel="stylesheet" href="/css/styles.css">
     <style>
         /* General Styles */
@@ -17,104 +17,128 @@
             margin: 0;
         }
 
-        .dashboard-container {
+        .login-container {
             background-color: #2b2b2b;
-            padding: 40px;
+            padding: 40px 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             text-align: center;
-            max-width: 400px;
             width: 100%;
+            max-width: 400px;
         }
 
-        .dashboard-container h1 {
-            font-size: 24px;
+        .login-container h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        .error-message {
+            background-color: #e74c3c;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            display: none;  /* Hidden by default */
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .login-form label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            text-align: left;
+            width: 100%;
+            color: #ffffff;
+        }
+
+        .login-form input {
+            font-size: 18px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #333;
             color: #fff;
         }
 
-        .alert {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #ffffff;
-            background-color: #e74c3c;
-        }
-
-        .subscribe-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .login-form button {
             background-color: #9146FF;
             color: #ffffff;
-            font-weight: bold;
-            font-size: 16px;
+            font-size: 18px;
             padding: 12px 24px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            text-decoration: none;
+            width: 100%;
             transition: background-color 0.3s;
         }
 
-        .subscribe-button .crown-icon {
-            margin-right: 8px;
-            font-size: 20px;
-        }
-
-        .subscribe-button:hover {
+        .login-form button:hover {
             background-color: #772ce8;
         }
 
-        .logout-button {
-            display: block;
+        .login-container p {
             margin-top: 20px;
+            font-size: 14px;
             color: #ffffff;
-            background-color: #e74c3c;
-            padding: 10px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s;
         }
 
-        .logout-button:hover {
-            background-color: #c0392b;
+        .login-container a {
+            color: #9146FF;
+            text-decoration: none;
+        }
+
+        .login-container a:hover {
+            text-decoration: underline;
         }
 
         /* Media Queries for Responsiveness */
         @media (max-width: 480px) {
-            .dashboard-container {
-                padding: 20px;
+            .login-container {
+                padding: 20px 15px;
             }
 
-            .subscribe-button,
-            .logout-button {
-                width: 100%;
-                padding: 12px;
-                font-size: 14px;
+            .login-form input,
+            .login-form button {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            .login-container h2 {
+                font-size: 24px;
             }
         }
     </style>
 </head>
-<body>
-    <div class="dashboard-container">
-        <h1>Welcome, <%= user.email %></h1>
+<body class="login-page">
+    <div class="login-container">
+        <h2>User Login</h2>
         <% if (message) { %>
-            <div class="alert alert-danger">
-                <%= message %>
-            </div>
+            <p class="error-message"><%= message %></p>
         <% } %>
-        <% if (user.subscriptionStatus === 'inactive') { %>
-            <a href="/user/subscribe/check" class="subscribe-button">
-                <span class="crown-icon">👑</span> Subscribe Free
-            </a>
-        <% } else { %>
-            <p>Your subscription is active.</p>
-        <% } %>
-
-        <a href="/user/logout" class="logout-button">Logout</a>
+        <form action="/user/login" method="POST" class="login-form">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="/user/register">Register here</a>.</p>
     </div>
+
+    <script>
+        // Show the error message if there's a message
+        const errorMessage = document.querySelector('.error-message');
+        if (errorMessage && errorMessage.textContent.trim() !== '') {
+            errorMessage.style.display = 'block';
+        }
+    </script>
 </body>
 </html>
