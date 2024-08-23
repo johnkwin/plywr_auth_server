@@ -4,6 +4,130 @@
     <meta charset="UTF-8">
     <title>User Registration</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* General Styles */
+        body {
+            background-color: #1f1f1f;
+            color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .register-container {
+            background-color: #2b2b2b;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .register-container h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        .error-message {
+            background-color: #e74c3c;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;  /* Hidden by default */
+        }
+
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .register-form label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            text-align: left;
+            width: 100%;
+            color: #ffffff;
+        }
+
+        .register-form input {
+            font-size: 18px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #333;  /* Dark background color */
+            color: #f5f5f5;  /* Lighter text color for better readability */
+            caret-color: #ffffff;  /* White caret color */
+        }
+
+        .register-form input::placeholder {
+            color: #999;  /* Darker text for placeholder */
+        }
+
+        .register-form input:focus {
+            background-color: #444;  /* Slightly lighter background on focus */
+            color: #ffffff;  /* Ensure text color remains light on focus */
+            outline: none;  /* Remove the default outline */
+            box-shadow: 0 0 5px rgba(145, 70, 255, 0.5);  /* Add a subtle glow to indicate focus */
+        }
+
+        .register-form button {
+            background-color: #9146FF;
+            color: #ffffff;
+            font-size: 18px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .register-form button:hover {
+            background-color: #772ce8;
+        }
+
+        .register-container p {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .register-container a {
+            color: #9146FF;
+            text-decoration: none;
+        }
+
+        .register-container a:hover {
+            text-decoration: underline;
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 20px 15px;
+            }
+
+            .register-form input,
+            .register-form button {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            .register-container h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body class="register-page">
     <div class="register-container">
@@ -13,12 +137,20 @@
         <% } %>
         <form action="/user/register" method="POST" class="register-form">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
             <button type="submit">Register</button>
         </form>
         <p>Already have an account? <a href="/user/login">Login here</a>.</p>
     </div>
+
+    <script>
+        // Show the error message if there's a message
+        const errorMessage = document.querySelector('.error-message');
+        if (errorMessage && errorMessage.textContent.trim() !== '') {
+            errorMessage.style.display = 'block';
+        }
+    </script>
 </body>
 </html>

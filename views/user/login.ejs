@@ -64,8 +64,20 @@
             border: none;
             width: 100%;
             box-sizing: border-box;
-            background-color: #333;
-            color: #fff;
+            background-color: #333;  /* Dark background color */
+            color: #f5f5f5;  /* Lighter text color for better readability */
+            caret-color: #ffffff;  /* White caret color */
+        }
+
+        .login-form input::placeholder {
+            color: #999;  /* Darker text for placeholder */
+        }
+
+        .login-form input:focus {
+            background-color: #444;  /* Slightly lighter background on focus */
+            color: #ffffff;  /* Ensure text color remains light on focus */
+            outline: none;  /* Remove the default outline */
+            box-shadow: 0 0 5px rgba(145, 70, 255, 0.5);  /* Add a subtle glow to indicate focus */
         }
 
         .login-form button {
@@ -125,9 +137,9 @@
         <% } %>
         <form action="/user/login" method="POST" class="login-form">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
             <button type="submit">Login</button>
         </form>
         <p>Don't have an account? <a href="/user/register">Register here</a>.</p>
