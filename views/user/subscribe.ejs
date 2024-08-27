@@ -53,11 +53,27 @@
         .subscribe-button:hover {
             background-color: #772ce8;
         }
+
+        .alert {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #ffffff;
+            background-color: #e74c3c;
+            display: none;  /* Hidden by default */
+        }
     </style>
     <script>
     window.onload = function() {
         console.log('Page loaded, starting subscription check...');
         checkSubscription();
+
+        // Show the alert if there's a message
+        const alert = document.querySelector('.alert');
+        if (alert && alert.textContent.trim() !== '') {
+            alert.style.display = 'block';
+        }
     };
     
     async function checkSubscription() {
@@ -84,9 +100,14 @@
 </head>
 <body>
     <div class="container">
+        <% if (message) { %>
+            <div class="alert">
+                <%= message %>
+            </div>
+        <% } %>
         <h1>Subscribe to <%= TWITCH_HANDLE %>'s Twitch Channel</h1>
         <p>You need to subscribe to gain full access to our site features. Once you have subscribed, you will be redirected...</p>
-        <a href="<%= subscribeUrl %>" target="_blank" class="button">
+        <a href="<%= subscribeUrl %>" target="_blank" class="subscribe-button">
             Subscribe Now on Twitch
         </a>
     </div>
