@@ -363,12 +363,7 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
         return res.redirect(authUrl);
     } else {
         try {
-            let tokens = loadTokens();
-            if (!tokens || new Date() > new Date(tokens.obtained_at).getTime() + tokens.expires_in * 1000) {
-                tokens = await refreshAccessToken();
-            }
-            const broadcasterId = await getBroadcasterId(tokens.access_token);
-            console.log(`Broadcaster ID: ${broadcasterId}`);
+            const broadcasterId = await getBroadcasterId(user.twitchAccessToken);
             const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
                 headers: {
                     'Authorization': `Bearer ${user.twitchAccessToken}`,
@@ -379,7 +374,6 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
                     user_id: user.twitchUserId
                 }
             });
-            console.log(`User ID: ${user.twitchUserId}`);
             console.log('User subscription status:', subscriptionResponse);
             const isSubscribed = subscriptionResponse.data.data.length > 0;
 
@@ -429,28 +423,28 @@ router.get('/subscribe', isAuthenticated, async (req, res) => {
 });
 
 router.get('/check-subscription', isAuthenticated, async (req, res) => {
-    console.log('Route /check-subscription reached');
     try {
         const user = await User.findById(req.session.userId);
 
         if (!user || !user.twitchAccessToken || !user.twitchUserId || !user.broadcasterId) {
-            console.log('User is not properly authenticated with Twitch');
             return res.status(400).json({ success: false, message: 'User is not properly authenticated with Twitch' });
         }
+        let tokens = loadTokens();
+        if (!tokens || new Date() > new Date(tokens.obtained_at).getTime() + tokens.expires_in * 1000) {
+            tokens = await refreshAccessToken();
+        }
 
-        console.log('Making request to Twitch API...');
+        const broadcasterId = await getBroadcasterId(tokens.access_token);
         const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
             headers: {
                 'Authorization': `Bearer ${user.twitchAccessToken}`,
                 'Client-Id': TWITCH_CLIENT_ID
             },
             params: {
-                broadcaster_id: user.broadcasterId,  // Correct broadcaster ID
+                broadcaster_id: broadcasterId,  // Correct broadcaster ID
                 user_id: user.twitchUserId           // Correct user ID
             }
         });
-
-        console.log('Twitch API response:', subscriptionResponse.data);
 
         const isSubscribed = subscriptionResponse.data.data && subscriptionResponse.data.data.length > 0;
 
@@ -460,23 +454,22 @@ router.get('/check-subscription', isAuthenticated, async (req, res) => {
 
         return res.json({ success: isSubscribed });
     } catch (error) {
-        console.error('Error checking subscription status:', error);
         if (error.response && error.response.status === 404) {
-            console.log('User is not subscribed');
+            // User is not subscribed, treat it as a normal case
             const user = await User.findById(req.session.userId);
             user.subscriptionStatus = 'inactive';
             await user.save();
             return res.json({ success: false });
         } else if (error.response && error.response.status === 401) {
+            // Handle invalid or expired token
             console.error('Twitch token is invalid or expired:', error.response.data);
             return res.status(401).json({ success: false, message: 'Twitch token is invalid or expired' });
         } else {
-            console.error('Unexpected error:', error);
+            console.error('Error checking subscription status:', error);
             return res.status(500).json({ success: false, message: 'Failed to check subscription status' });
         }
     }
 });
-
 
 router.get('/oauth', async (req, res) => {
     const { code, state } = req.query;
