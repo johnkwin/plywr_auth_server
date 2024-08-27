@@ -374,7 +374,7 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
                     user_id: user.twitchUserId
                 }
             });
-            console('User subscription status:', subscriptionResponse.data.data);
+            console.log('User subscription status:', subscriptionResponse.data.data);
             const isSubscribed = subscriptionResponse.data.data.length > 0;
 
             if (isSubscribed) {
@@ -442,7 +442,7 @@ router.get('/check-subscription', isAuthenticated, async (req, res) => {
         });
 
         const isSubscribed = subscriptionResponse.data.data.length > 0;
-        console('User subscription status:', subscriptionResponse);
+        console.log('User subscription status:', subscriptionResponse);
         if (isSubscribed) {
             user.subscriptionStatus = 'active';
             await user.save();
