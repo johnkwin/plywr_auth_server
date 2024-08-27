@@ -324,6 +324,13 @@ router.post('/login', async (req, res) => {
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
         const user = await User.findById(req.session.userId);
+
+        if (!user) {
+            // User has been deleted or does not exist
+            req.flash('message', 'User not found. Please log in again.');
+            return res.redirect('/user/login');
+        }
+        
         const message = req.flash('message');  // Retrieve the message from flash
         res.render('user/dashboard', { user, message });
     } catch (error) {
