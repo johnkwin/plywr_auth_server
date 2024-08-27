@@ -442,7 +442,7 @@ router.get('/check-subscription', isAuthenticated, async (req, res) => {
         });
 
         const isSubscribed = subscriptionResponse.data.data.length > 0;
-
+        console('User subscription status:', subscriptionResponse);
         if (isSubscribed) {
             user.subscriptionStatus = 'active';
             await user.save();
