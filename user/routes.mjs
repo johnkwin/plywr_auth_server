@@ -175,6 +175,8 @@ const handleSubscriptionNotification = async (parsedMessage) => {
                 console.log(`User ${event.user_name} - Email: ${user.email} (ID: ${userId}) subscription status set to inactive.`);
             }
             await user.save();
+            console.log('Updated User:');
+            console.log(user);
         } else {
             console.log(`User not found for Twitch ID: ${userId}`);
         }
