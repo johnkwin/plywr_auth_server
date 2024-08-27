@@ -423,13 +423,16 @@ router.get('/subscribe', isAuthenticated, async (req, res) => {
 });
 
 router.get('/check-subscription', isAuthenticated, async (req, res) => {
+    console.log('Route /check-subscription reached');
     try {
         const user = await User.findById(req.session.userId);
 
         if (!user || !user.twitchAccessToken || !user.twitchUserId || !user.broadcasterId) {
+            console.log('User is not properly authenticated with Twitch');
             return res.status(400).json({ success: false, message: 'User is not properly authenticated with Twitch' });
         }
 
+        console.log('Making request to Twitch API...');
         const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
             headers: {
                 'Authorization': `Bearer ${user.twitchAccessToken}`,
@@ -441,6 +444,8 @@ router.get('/check-subscription', isAuthenticated, async (req, res) => {
             }
         });
 
+        console.log('Twitch API response:', subscriptionResponse.data);
+
         const isSubscribed = subscriptionResponse.data.data && subscriptionResponse.data.data.length > 0;
 
         // Update user's subscription status based on the response
@@ -449,22 +454,23 @@ router.get('/check-subscription', isAuthenticated, async (req, res) => {
 
         return res.json({ success: isSubscribed });
     } catch (error) {
+        console.error('Error checking subscription status:', error);
         if (error.response && error.response.status === 404) {
-            // User is not subscribed, treat it as a normal case
+            console.log('User is not subscribed');
             const user = await User.findById(req.session.userId);
             user.subscriptionStatus = 'inactive';
             await user.save();
             return res.json({ success: false });
         } else if (error.response && error.response.status === 401) {
-            // Handle invalid or expired token
             console.error('Twitch token is invalid or expired:', error.response.data);
             return res.status(401).json({ success: false, message: 'Twitch token is invalid or expired' });
         } else {
-            console.error('Error checking subscription status:', error);
+            console.error('Unexpected error:', error);
             return res.status(500).json({ success: false, message: 'Failed to check subscription status' });
         }
     }
 });
+
 
 router.get('/oauth', async (req, res) => {
     const { code, state } = req.query;
