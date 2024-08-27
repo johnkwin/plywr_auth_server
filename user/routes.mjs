@@ -165,14 +165,14 @@ const handleSubscriptionNotification = async (parsedMessage) => {
 
         // Search for the user in the database using the twitchUserId
         const user = await User.findOne({ twitchUserId: userId });
-
+        console.log(user);
         if (user) {
             if (subscription_type === 'channel.subscribe') {
                 user.subscriptionStatus = 'active';
-                console.log(`User ${event.user_name} (ID: ${userId}) subscription status set to active.`);
+                console.log(`User ${event.user_name} - Email: ${user.email} (ID: ${userId}) subscription status set to active.`);
             } else if (subscription_type === 'channel.subscription.end') {
                 user.subscriptionStatus = 'inactive';
-                console.log(`User ${event.user_name} (ID: ${userId}) subscription status set to inactive.`);
+                console.log(`User ${event.user_name} - Email: ${user.email} (ID: ${userId}) subscription status set to inactive.`);
             }
             await user.save();
         } else {
