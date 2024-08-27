@@ -374,7 +374,7 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
                     user_id: user.twitchUserId
                 }
             });
-            console.log('User subscription status:', subscriptionResponse.data.data);
+            console.log('User subscription status:', subscriptionResponse);
             const isSubscribed = subscriptionResponse.data.data.length > 0;
 
             if (isSubscribed) {
@@ -423,13 +423,13 @@ router.get('/subscribe', isAuthenticated, async (req, res) => {
 });
 
 router.get('/check-subscription', isAuthenticated, async (req, res) => {
-    const user = await User.findById(req.session.userId);
-
-    if (!user.twitchAccessToken || !user.twitchUserId || !user.broadcasterId) {
-        return res.status(400).json({ success: false, message: 'User is not properly authenticated with Twitch' });
-    }
-
     try {
+        const user = await User.findById(req.session.userId);
+
+        if (!user || !user.twitchAccessToken || !user.twitchUserId || !user.broadcasterId) {
+            return res.status(400).json({ success: false, message: 'User is not properly authenticated with Twitch' });
+        }
+
         const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
             headers: {
                 'Authorization': `Bearer ${user.twitchAccessToken}`,
@@ -441,23 +441,24 @@ router.get('/check-subscription', isAuthenticated, async (req, res) => {
             }
         });
 
-        const isSubscribed = subscriptionResponse.data.data.length > 0;
-        console.log('User subscription status:', subscriptionResponse);
-        if (isSubscribed) {
-            user.subscriptionStatus = 'active';
-            await user.save();
-            return res.json({ success: true });  // Return success if subscribed
-        } else {
-            user.subscriptionStatus = 'inactive';
-            await user.save();
-            return res.json({ success: false });  // Return failure if not subscribed
-        }
+        const isSubscribed = subscriptionResponse.data.data && subscriptionResponse.data.data.length > 0;
+
+        // Update user's subscription status based on the response
+        user.subscriptionStatus = isSubscribed ? 'active' : 'inactive';
+        await user.save();
+
+        return res.json({ success: isSubscribed });
     } catch (error) {
         if (error.response && error.response.status === 404) {
-            // User is not subscribed, handle this as a normal case
+            // User is not subscribed, treat it as a normal case
+            const user = await User.findById(req.session.userId);
             user.subscriptionStatus = 'inactive';
             await user.save();
-            return res.json({ success: false });  // Return failure if not subscribed
+            return res.json({ success: false });
+        } else if (error.response && error.response.status === 401) {
+            // Handle invalid or expired token
+            console.error('Twitch token is invalid or expired:', error.response.data);
+            return res.status(401).json({ success: false, message: 'Twitch token is invalid or expired' });
         } else {
             console.error('Error checking subscription status:', error);
             return res.status(500).json({ success: false, message: 'Failed to check subscription status' });
