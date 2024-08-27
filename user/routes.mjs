@@ -419,8 +419,11 @@ router.get('/subscribe', isAuthenticated, async (req, res) => {
     }
 
     const subscribeUrl = `https://twitch.tv/subs/${TWITCH_HANDLE}`;
-    res.render('user/subscribe', { subscribeUrl, user, TWITCH_HANDLE });
+    const message = req.flash('message'); // Retrieve the message from flash
+    
+    res.render('user/subscribe', { subscribeUrl, user, TWITCH_HANDLE, message });
 });
+
 
 router.get('/check-subscription', isAuthenticated, async (req, res) => {
     try {
