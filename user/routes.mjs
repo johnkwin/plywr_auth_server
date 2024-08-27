@@ -366,7 +366,7 @@ router.get('/subscribe/check', isAuthenticated, async (req, res) => {
             const broadcasterId = await getBroadcasterId(user.twitchAccessToken);
             const subscriptionResponse = await axios.get('https://api.twitch.tv/helix/subscriptions/user', {
                 headers: {
-                    'Authorization': `Bearer ${user.twitchAccessToken}`,
+                    'Authorization': `Bearer ${tokens.access_token}`,
                     'Client-Id': TWITCH_CLIENT_ID
                 },
                 params: {
