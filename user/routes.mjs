@@ -237,11 +237,17 @@ const subscribeToEventSub = async (userAccessToken, type, broadcasterId, session
 // Utility function to get the broadcaster ID from the Twitch handle
 export async function getBroadcasterId(accessToken, isApp = false) {
     try {
+        let tokens = loadTokens();
+        if (!tokens || new Date() > new Date(tokens.obtained_at).getTime() + tokens.expires_in * 1000) {
+            console.log('Access token expired, refreshing...');
+            tokens = await refreshAccessToken();
+        }
+
         const params = isApp ? { login: TWITCH_HANDLE } : {};
 
         const response = await axios.get('https://api.twitch.tv/helix/users', {
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
+                'Authorization': `Bearer ${tokens.access_token}`,
                 'Client-Id': TWITCH_CLIENT_ID
             },
             params
@@ -249,10 +255,18 @@ export async function getBroadcasterId(accessToken, isApp = false) {
 
         return response.data.data[0].id;
     } catch (error) {
-        console.error('Error getting broadcaster ID:', error.response ? error.response.data : error.message);
-        throw error;
+        if (error.response && error.response.status === 401) {
+            console.error('Invalid OAuth token, attempting to refresh...');
+            tokens = await refreshAccessToken();
+            // Retry the request with the refreshed token
+            return getBroadcasterId(tokens.access_token, isApp);
+        } else {
+            console.error('Error getting broadcaster ID:', error.response ? error.response.data : error.message);
+            throw error;
+        }
     }
 }
+
 
 // User Registration Page
 router.get('/register', (req, res) => {
