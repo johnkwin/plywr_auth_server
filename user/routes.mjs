@@ -123,6 +123,7 @@ const handleSubscriptionRevocation = async (parsedMessage) => {
             // Check the revocation reason and log it
             switch (subscription.status) {
                 case 'authorization_revoked':
+                    await handleAuthorizationRevocation(parsedMessage);
                     console.log(`Authorization revoked for user: ${user.email}`);
                     break;
                 case 'user_removed':
@@ -145,6 +146,31 @@ const handleSubscriptionRevocation = async (parsedMessage) => {
         }
     } catch (error) {
         console.error('Error handling subscription revocation:', error);
+    }
+};
+const handleAuthorizationRevocation = async (parsedMessage) => {
+    const { subscription } = parsedMessage.payload;
+    const clientId = subscription.condition.client_id;
+    const userId = subscription.condition.user_id;
+
+    try {
+        const user = await User.findOne({ twitchUserId: userId });
+
+        if (user) {
+            console.log(`Authorization revoked for user: ${user.email}`);
+            user.twitchAccessToken = null;
+            user.twitchRefreshToken = null;
+            user.subscriptionStatus = 'inactive';
+            await user.save();
+
+            // Notify the user to re-authenticate
+            // For example, set a flash message or trigger an email
+            console.log(`User ${user.email} needs to re-authenticate.`);
+        } else {
+            console.log(`User not found for Twitch ID: ${userId}`);
+        }
+    } catch (error) {
+        console.error('Error handling authorization revocation:', error);
     }
 };
 const handleSubscriptionNotification = async (parsedMessage) => {
