@@ -219,7 +219,7 @@ const subscribeToEvents = async (sessionId) => {
         }
 
         const broadcasterId = await getBroadcasterId(tokens.access_token);
-        const events = ['channel.subscribe', 'channel.subscription.end'];
+        const events = ['channel.subscribe', 'channel.subscription.end', 'authorization.revoke'];
 
         for (const event of events) {
             await subscribeToEventSub(tokens.access_token, event, broadcasterId, sessionId);
