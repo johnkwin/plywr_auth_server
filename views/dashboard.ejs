@@ -8,31 +8,39 @@
 </head>
 <body class="dashboard-page">
     <div class="dashboard-container">
-        <div class="header-container">
-            <a href="/admin/logout" class="logout-button">Logout</a>
-            <h2>Admin Dashboard</h2>
-            <div class="user-search">
-                <label for="searchUsers">Search Users</label>
-                <input type="text" id="searchUsers" placeholder="Search users...">
-            </div>
-            <label for="newUserForm">Create New User</label>
-            <div id="newUserForm">
-                <input type="email" id="newUserEmail" placeholder="New User Email">
-                <input type="password" id="newUserPassword" placeholder="Password">
-                <button id="newUserAdmin" class="toggle-button off">Off</button>
-                <select id="newUserSubscriptionStatus">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
-                <button id="saveNewUser">Save User</button>
-            </div>
+        <a href="/admin/logout" class="logout-button">Logout</a>
+        <h2>Admin Dashboard</h2>
+
+        <div class="user-search">
+            <label for="searchUsers">Search Users</label>
+            <input type="text" id="searchUsers" placeholder="Search users...">
+        </div>
+        <label for="newUserForm">Create New User</label>
+        <div id="newUserForm">
+            <input type="email" id="newUserEmail" placeholder="New User Email">
+            <input type="password" id="newUserPassword" placeholder="Password">
+            <button id="newUserAdmin" class="toggle-button off">Off</button>
+            <select id="newUserSubscriptionStatus">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            <button id="saveNewUser">Save User</button>
         </div>
         <div class="user-list-container">
-            <div class="user-list-scroll">
-                <div id="userList" class="user-list">
-                    <!-- User cards will be dynamically added here -->
-                </div>
-            </div>
+            <table class="user-list-table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>Admin</th>
+                        <th>Subscription Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userList">
+                    <!-- User rows will be dynamically added here -->
+                </tbody>
+            </table>
         </div>
     </div>
     <script src="/js/admin.js"></script>

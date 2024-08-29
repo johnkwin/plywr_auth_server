@@ -113,10 +113,17 @@ button:hover,
 }
 
 .logout-button {
-    position: absolute;
+    position: fixed;
     top: 10px;
     right: 10px;
+    padding: 8px 16px;
     background-color: #e74c3c;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 100;
+    transition: background-color 0.3s ease;
 }
 
 .logout-button:hover {
@@ -184,7 +191,37 @@ input:focus {
     z-index: 10;
     padding-bottom: 15px;
 }
+/* Create New User Form - Cleaner Button Appearance */
+#newUserForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
 
+#newUserForm input,
+#newUserForm select,
+#newUserForm button {
+    font-size: 16px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #333;
+    color: #f5f5f5;
+}
+
+#newUserForm button {
+    background-color: #9146FF;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#newUserForm button:hover {
+    background-color: #772ce8;
+}
 /* User List Scroll Container */
 .user-list-container {
     overflow-x: scroll;
@@ -219,18 +256,28 @@ input:focus {
     width: 100%;
 }
 
-/* Adjustments for Smaller Screens */
 @media (max-width: 768px) {
-    .user-list-item {
-        width: 250px;
+    .dashboard-container {
+        padding: 20px 10px;
+        max-width: none;
+        box-shadow: none;
+        border-radius: 0;
     }
 
-    .header-container {
-        padding: 10px;
+    h2 {
+        font-size: 22px;
     }
 
-    .user-list-container {
-        margin-top: 10px;
+    .user-list-table th,
+    .user-list-table td {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    #newUserForm input,
+    #newUserForm button {
+        padding: 8px;
+        font-size: 14px;
     }
 }
 
