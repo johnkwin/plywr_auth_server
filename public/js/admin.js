@@ -70,39 +70,36 @@ document.addEventListener('DOMContentLoaded', function () {
         if (query.trim() === '') {
             userList.innerHTML = '';
             newUserForm.style.display = 'flex';
-            userTable.style.display = 'none'; // Hide the table
             return;
         }
-
+    
         fetch(`/admin/search-users?q=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(users => {
                 userList.innerHTML = '';
                 if (users.length === 0) {
-                    userTable.style.display = 'none'; // Show the table if users are found
-                } else {
-                    userTable.style.display = 'table'; // Show the table if users are found
-
-
-                    users.forEach(user => {
-                        const row = document.createElement('tr');
-                        row.className = 'user-list-item';
-                        row.dataset.userid = user._id;
-
-                        row.innerHTML = `
-                        <td><input type="text" value="${user.email}"></td>
-                        <td><input type="password" data-userid="${user._id}" value="" placeholder="Update Password"></td>
-                        <td><button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button></td>
-                        <td><select data-userid="${user._id}">
+                    return;
+                }
+    
+                users.forEach(user => {
+                    const userCard = document.createElement('div');
+                    userCard.className = 'user-list-item';
+                    userCard.dataset.userid = user._id;
+    
+                    userCard.innerHTML = `
+                        <input type="text" value="${user.email}">
+                        <input type="password" data-userid="${user._id}" value="" placeholder="Update Password">
+                        <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
+                        <select data-userid="${user._id}">
                             <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
                             <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
                             <option value="delete" class="delete-option">Delete</option>
-                        </select></td>
-                        <td><button class="confirm-changes-button" style="display: none;">Confirm Changes</button></td>
+                        </select>
+                        <button class="confirm-changes-button" style="display: none;">Confirm Changes</button>
                     `;
-                        userList.appendChild(row);
-                    });
-                }
+    
+                    userList.appendChild(userCard);
+                });
             })
             .catch(error => console.error('Error searching users:', error));
     }
