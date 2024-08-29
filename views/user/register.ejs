@@ -3,130 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <title>User Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="manifest" href="/manifest.json">
     <style>
         /* General Styles */
-body {
-    background-color: #1f1f1f;
-    color: #f5f5f5;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
+        body {
+            background-color: #1f1f1f;
+            color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
 
-.login-container, .register-container {
-    background-color: #2b2b2b;
-    padding: 40px 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
-}
+        .login-container, .register-container {
+            background-color: #2b2b2b;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
 
-.login-container h2, .register-container h2 {
-    font-size: 28px;
-    margin-bottom: 30px;
-    color: #ffffff;
-}
+        .login-container h2, .register-container h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
 
-.error-message {
-    background-color: #e74c3c;
-    color: #ffffff;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: none;  /* Hidden by default */
-}
+        .error-message {
+            background-color: #e74c3c;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;  /* Hidden by default */
+        }
 
-.login-form, .register-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        .login-form, .register-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-.login-form label, .register-form label {
-    font-size: 16px;
-    margin-bottom: 5px;
-    text-align: left;
-    width: 100%;
-    color: #ffffff;
-}
+        .login-form label, .register-form label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            text-align: left;
+            width: 100%;
+            color: #ffffff;
+        }
 
-.login-form input, .register-form input {
-    font-size: 18px;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: none;
-    width: 100%;
-    box-sizing: border-box;
-    background-color: #333;  /* Set the dark background color */
-    color: #f5f5f5;  /* Lighter text color */
-    caret-color: #ffffff;  /* White caret color */
-}
+        .login-form input, .register-form input {
+            font-size: 18px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #333;  /* Set the dark background color */
+            color: #f5f5f5;  /* Lighter text color */
+            caret-color: #ffffff;  /* White caret color */
+        }
 
-.login-form input::placeholder, .register-form input::placeholder {
-    color: #999;  /* Darker text for placeholder */
-}
+        .login-form input::placeholder, .register-form input::placeholder {
+            color: #999;  /* Darker text for placeholder */
+        }
 
-.login-form input:focus, .register-form input:focus {
-    background-color: #333;  /* Ensure background color remains consistent on focus */
-    color: #ffffff;  /* Ensure text color remains light on focus */
-    outline: none;  /* Remove the default outline */
-    box-shadow: 0 0 5px rgba(145, 70, 255, 0.5);  /* Add a subtle glow to indicate focus */
-}
+        .login-form input:focus, .register-form input:focus {
+            background-color: #333;  /* Ensure background color remains consistent on focus */
+            color: #ffffff;  /* Ensure text color remains light on focus */
+            outline: none;  /* Remove the default outline */
+            box-shadow: 0 0 5px rgba(145, 70, 255, 0.5);  /* Add a subtle glow to indicate focus */
+        }
 
-.login-form button, .register-form button {
-    background-color: #9146FF;
-    color: #ffffff;
-    font-size: 18px;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s;
-}
+        .login-form button, .register-form button {
+            background-color: #9146FF;
+            color: #ffffff;
+            font-size: 18px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
 
-.login-form button:hover, .register-form button:hover {
-    background-color: #772ce8;
-}
+        .login-form button:hover, .register-form button:hover {
+            background-color: #772ce8;
+        }
 
-.login-container p, .register-container p {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #ffffff;
-}
+        .login-container p, .register-container p {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #ffffff;
+        }
 
-.login-container a, .register-container a {
-    color: #9146FF;
-    text-decoration: none;
-}
+        .login-container a, .register-container a {
+            color: #9146FF;
+            text-decoration: none;
+        }
 
-.login-container a:hover, .register-container a:hover {
-    text-decoration: underline;
-}
+        .login-container a:hover, .register-container a:hover {
+            text-decoration: underline;
+        }
 
-/* Media Queries for Responsiveness */
-@media (max-width: 480px) {
-    .login-container, .register-container {
-        padding: 20px 15px;
-    }
+        /* Media Queries for Responsiveness */
+        @media (max-width: 480px) {
+            .login-container, .register-container {
+                padding: 20px 15px;
+            }
 
-    .login-form input, .register-form input,
-    .login-form button, .register-form button {
-        font-size: 16px;
-        padding: 10px;
-    }
+            .login-form input, .register-form input,
+            .login-form button, .register-form button {
+                font-size: 16px;
+                padding: 10px;
+            }
 
-    .login-container h2, .register-container h2 {
-        font-size: 24px;
-    }
-}
+            .login-container h2, .register-container h2 {
+                font-size: 24px;
+            }
+        }
+
+        /* Fullscreen Mobile Experience */
+        @media (max-width: 480px) and (orientation: portrait) {
+            body {
+                height: 100vh;
+                max-height: 100vh;
+                overflow-y: hidden;
+            }
+        }
 
     </style>
 </head>
