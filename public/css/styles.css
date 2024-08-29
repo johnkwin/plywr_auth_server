@@ -36,205 +36,147 @@ body {
     padding: 0;
 }
 
+/* Base Styles */
 body {
+    background-color: #1f1f1f;
+    color: #f5f5f5;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: #d3d3d3; /* Light gray background */
+    overflow-x: hidden;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-select {
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    display: flex;
-}
-
-button {
-    top: 10px;
-    right: 10px;
-    padding: 10px;
-    color: #333; /* Darker gray text */
-    text-decoration: none;
-    border-radius: 5px;
+/* Containers */
+.container, 
+.dashboard-container, 
+.login-container, 
+.register-container {
+    background-color: #2b2b2b;
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
-    cursor: pointer;
-}
-
-#newUserForm,
-.login-form {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    /* Add margin for spacing */
-}
-
-.dashboard-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     width: 100%;
-    height: 100%;
-}
-
-.login-container,
-.dashboard-container {
-    background: #f0f0f0; /* Light background */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    max-width: 400px;
     position: relative;
 }
 
-h2 {
-    margin-bottom: 20px;
+.dashboard-header {
+    position: absolute;
+    top: -30px;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    padding: 15px;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.dashboard-header h1 {
+    margin: 0;
+    font-size: 20px;
+    color: #fff;
+    flex: 1;
+    text-align: left;
+}
+
+/* Headings */
+h1, h2 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #ffffff;
+}
+
+/* Buttons */
+button,
+.logout-button, 
+.subscribe-button {
+    background-color: #9146FF;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+}
+
+button:hover,
+.logout-button:hover, 
+.subscribe-button:hover {
+    background-color: #772ce8;
 }
 
 .logout-button {
     position: absolute;
     top: 10px;
     right: 10px;
-    padding: 10px;
-    background: #dc3545;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    text-align: center;
-    cursor: pointer;
+    background-color: #e74c3c;
 }
 
 .logout-button:hover {
-    background: #c82333;
+    background-color: #c0392b;
 }
 
-.user-search,
-.new-user-form {
-    width: 100%;
-    margin-bottom: 20px;
-}
-
+/* Forms */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+.login-form input,
+.register-form input,
 .user-search input,
 .new-user-form input[type="email"],
 .new-user-form input[type="password"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-}
-
-.new-user-form .new-user-options,
-.user-list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.new-user-form .toggle-button,
-.user-list-item .toggle-button {
-    flex: 1;
-    padding: 10px;
-    color: #333; /* Darker gray text */
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-}
-
-.new-user-form .toggle-button.off,
-.user-list-item .toggle-button.off {
-    background: #b0b0b0; /* Lighter gray */
-}
-
-.new-user-form .toggle-button.active,
-.user-list-item .toggle-button.active {
-    background: #28a745;
-}
-
-.new-user-form select,
-.user-list-item select {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.new-user-form button,
-.user-list-item .confirm-changes-button {
-    width: 100%;
-    padding: 10px;
-    color: #019c09;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.new-user-form button:hover,
-.user-list-item .confirm-changes-button:hover {
-    background: #12f50a; /* Darker gray */
-}
-
-.user-list-container {
-    margin-top: 20px;
-    position: relative;
-    /* Ensure the container is the relative reference point */
-    width: 65%;
-}
-
-.user-list {
-    width: 100%;
-    list-style-type: none;
-    padding: 0;
-}
-
-.user-list-header {
-    background: #e0e0e0; /* Light gray */
-    font-weight: bold;
-}
-
-.user-list-item {
-    padding: 10px 0;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
     width: 100%;
     box-sizing: border-box;
-    background: #f9f9f9; /* Light background for items */
+    background-color: #333;
+    color: #f5f5f5;
+    caret-color: #ffffff;
 }
 
-.user-list-item input,
-.user-list-item select {
-    flex: 2;
-    padding: 8px;
+input::placeholder {
+    color: #999;
 }
 
-.user-list-item .toggle-button,
-.user-list-item .confirm-changes-button {
-    flex: 1;
-    padding: 8px 10px;
-    background: #7a7a7a; /* Light gray button */
-    color: #333; /* Darker gray text */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
+input:focus {
+    background-color: #333;
+    color: #ffffff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(145, 70, 255, 0.5);
 }
 
-.user-list-item .confirm-changes-button.confirm-deletion {
-    background: #ff6b6b;
+/* Error Messages */
+.error-message {
+    background-color: #e74c3c;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none; /* Hidden by default */
 }
 
+/* Alerts */
+.alert {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: white;
+    background-color: #e74c3c;
+    display: none; /* Hidden by default */
+}
+
+/* Lists and Tables */
 .user-list-table {
     width: 100%;
     border-collapse: collapse;
@@ -247,89 +189,65 @@ h2 {
     width: 25%;
     padding: 10px;
     text-align: center;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #aaa; /* Light gray border */
-    background-color: #eaeaea; /* Light background for cells */
+    border: 1px solid #aaa;
+    background-color: #eaeaea;
 }
 
 .user-list-table th {
-    background-color: #d0d0d0; /* Slightly darker for header */
+    background-color: #d0d0d0;
     font-weight: bold;
 }
 
-.user-list-table td input[type="text"],
-.user-list-table td input[type="password"],
-.user-list-table td button,
-.user-list-table td select {
-    padding: 8px;
-    margin: 2px;
-    border-radius: 4px;
-    background: #f0f0f0; /* Light input background */
-    color: #333; /* Darker gray text */
-    width: 100%;
+.user-list-item {
+    padding: 10px 0;
     align-items: center;
-    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f9f9f9;
 }
 
-.user-list-table td input[type="text"]:focus,
-.user-list-table td input[type="password"]:focus {
-    border-color: #007bff;
-    outline: none;
-}
-
-.user-list-table td .toggle-button {
-    border: none;
-    background-color: #007bff;
-    color: #fff;
-}
-
-.user-list-table td .toggle-button.active {
-    background-color: #28a745;
-}
-
-.user-list-table td .toggle-button.off {
-    background-color: #ff6b6b;
-}
-/* Ensure these styles are added to your external CSS file */
-
-/* Add this to manage responsive design for mobile experience */
+/* Mobile and Responsive Design */
 @media (max-width: 480px) {
     body {
+        justify-content: flex-start;
         height: 100vh;
         max-height: 100vh;
-        justify-content: flex-start; /* Align content to the top */
         padding: 10px;
     }
 
-    .login-container,
-    .dashboard-container {
-        padding: 20px;
-        max-width: none;
-        height: 100vh;
-        border-radius: 0;
-        box-shadow: none;
-        overflow-y: auto;
-    }
-
-    h2 {
-        font-size: 20px;
-    }
-
-    .login-form label,
-    .login-form input,
-    .login-form button,
-    .user-search input,
-    #newUserForm input,
-    #newUserForm select,
-    #newUserForm button,
-    .user-list-table th,
-    .user-list-table td {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    .logout-button {
+    .container, 
+    .dashboard-container, 
+    .login-container, 
+    .register-container {
+        padding: 20px 10px;
         width: 100%;
+        height: 100vh;
+        max-width: none;
+        box-shadow: none;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .dashboard-header {
+        top: 0;
+        border-radius: 0;
+        padding: 20px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 18px;
+    }
+
+    input,
+    button {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    h1, h2 {
+        font-size: 22px;
+        margin-bottom: 20px;
     }
 }
