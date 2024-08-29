@@ -176,38 +176,38 @@ input:focus {
     display: none; /* Hidden by default */
 }
 
-/* Lists and Tables */
 .user-list-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+    display: block;
+    overflow-x: auto;
+}
+
+.user-list-table thead {
     display: none;
 }
 
-.user-list-table th,
-.user-list-table td {
-    width: 25%;
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #aaa;
-    background-color: #eaeaea;
+.user-list-table tr {
+    display: block;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc;
 }
 
-.user-list-table th {
-    background-color: #d0d0d0;
+.user-list-table td {
+    display: block;
+    text-align: right;
+    font-size: 14px;
+    border: none;
+    padding: 8px 10px;
+}
+
+.user-list-table td:before {
+    content: attr(data-label);
+    float: left;
     font-weight: bold;
 }
 
-.user-list-item {
-    padding: 10px 0;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background: #f9f9f9;
-}
-
 /* Mobile and Responsive Design */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     body {
         justify-content: flex-start;
         height: 100vh;
