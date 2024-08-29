@@ -13,6 +13,7 @@
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
+            overflow-x: hidden;
         }
 
         .container {
@@ -62,6 +63,39 @@
             color: #ffffff;
             background-color: #e74c3c;
             display: none;  /* Hidden by default */
+        }
+
+        /* Media Queries for Fullscreen Mobile Experience */
+        @media (max-width: 480px) {
+            body {
+                height: 100vh;
+                max-height: 100vh;
+                justify-content: flex-start; /* Align content to the top */
+            }
+
+            .container {
+                padding: 20px;
+                max-width: none;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            p {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .subscribe-button {
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
         }
     </style>
     <script>

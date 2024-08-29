@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>User Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="manifest" href="/manifest.json">
     <style>
         /* General Styles */
         body {
@@ -15,6 +17,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow-x: hidden;
         }
 
         .dashboard-container {
@@ -100,10 +103,27 @@
             background-color: #772ce8;
         }
 
-        /* Media Queries for Responsiveness */
+        /* Media Queries for Fullscreen Mobile Experience */
         @media (max-width: 480px) {
+            body {
+                justify-content: flex-start; /* Align content to the top */
+                height: 100vh;
+                max-height: 100vh;
+                overflow-y: hidden;
+            }
+
             .dashboard-container {
                 padding: 60px 10px 20px;
+                max-width: none;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .dashboard-header {
+                top: 0;
+                border-radius: 0;
+                padding: 20px;
             }
 
             .dashboard-header h1 {

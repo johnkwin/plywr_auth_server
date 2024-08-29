@@ -291,3 +291,45 @@ h2 {
 .user-list-table td .toggle-button.off {
     background-color: #ff6b6b;
 }
+/* Ensure these styles are added to your external CSS file */
+
+/* Add this to manage responsive design for mobile experience */
+@media (max-width: 480px) {
+    body {
+        height: 100vh;
+        max-height: 100vh;
+        justify-content: flex-start; /* Align content to the top */
+        padding: 10px;
+    }
+
+    .login-container,
+    .dashboard-container {
+        padding: 20px;
+        max-width: none;
+        height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+        overflow-y: auto;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .login-form label,
+    .login-form input,
+    .login-form button,
+    .user-search input,
+    #newUserForm input,
+    #newUserForm select,
+    #newUserForm button,
+    .user-list-table th,
+    .user-list-table td {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .logout-button {
+        width: 100%;
+    }
+}
