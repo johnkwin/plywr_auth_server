@@ -320,6 +320,16 @@ input:focus {
         font-size: 16px;
         padding: 10px;
     }
+    
+    .dashboard-container {
+        padding: 15px;
+    }
+
+    #newUserForm input,
+    #newUserForm button {
+        padding: 6px;
+        font-size: 14px;
+    }
 
     h1, h2 {
         font-size: 22px;
