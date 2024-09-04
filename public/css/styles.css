@@ -540,12 +540,10 @@ input:focus {
 .user-list-item input[type="text"],
 .user-list-item input[type="password"] {
     min-width: 50%; /* Ensure the input field doesn't get too small */
-    max-width: 90%; /* Set a maximum width to prevent it from breaking out of the card */
+    transition: width 0.2s ease; /* Smooth transition when resizing */
     padding: 10px;
     box-sizing: border-box;
-    overflow: hidden; /* Prevent content from overflowing */
-    white-space: nowrap; /* Ensure text doesn’t wrap */
-    text-overflow: ellipsis; /* Show ellipsis if the text is too long */
+    overflow: hidden;
 }
 @media (max-width: 768px) {
     .dashboard-container {
