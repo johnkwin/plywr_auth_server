@@ -25,10 +25,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function resizeInput(event) {
         const input = event.target;
         if (input.tagName === 'INPUT') {
-            const newWidth = Math.max(getTextWidth(input) + 20, 150); // Add some padding, min width 150px
+            const newWidth = Math.min(Math.max(getTextWidth(input) + 20, 150), input.parentElement.offsetWidth * 0.9); // Calculate width, limit to 90% of the parent container
             input.style.width = `${newWidth}px`;
         }
     }
+    
 
     // Function to reset input width on blur
     function resetInput(event) {

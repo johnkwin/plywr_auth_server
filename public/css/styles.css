@@ -539,12 +539,14 @@ input:focus {
 }
 .user-list-item input[type="text"],
 .user-list-item input[type="password"] {
-    width: 150px; /* Base width for the input fields */
-    max-width: 100%; /* Ensure it doesn't grow too large */
-    transition: width 0.2s ease; /* Smooth transition when resizing */
+    width: 150px; /* Default base width */
+    max-width: 90%; /* Limit the width to 90% of the container to keep it within bounds */
+    transition: width 0.2s ease; /* Smooth transition for resizing */
     padding: 10px;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: hidden; /* Prevent text overflow */
+    white-space: nowrap; /* Prevent text from wrapping */
+    text-overflow: ellipsis; /* Show ellipsis if the text overflows */
 }
 @media (max-width: 768px) {
     .dashboard-container {
