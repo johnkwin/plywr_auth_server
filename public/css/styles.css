@@ -493,6 +493,7 @@ input:focus {
 .user-list-container {
     max-height: 500px; /* Define the max height */
     overflow-y: auto;  /* Make the container scrollable */
+    padding-right: 10px;  /* Add space between the scrollbar and the user cards */
     scrollbar-width: thin;  /* For Firefox */
     scrollbar-color: #9146FF transparent;  /* Scrollbar color for Firefox */
 }
@@ -511,7 +512,6 @@ input:focus {
 .user-list-container::-webkit-scrollbar-thumb {
     background-color: #9146FF; /* Color of the scrollbar thumb */
     border-radius: 10px; /* Rounded corners for the thumb */
-    border: 1px solid transparent; /* Optional: adding a border */
 }
 
 /* Hover effect to slightly darken the thumb for a smoother feel */
