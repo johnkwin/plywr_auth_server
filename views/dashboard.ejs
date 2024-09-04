@@ -32,6 +32,22 @@
             </div>
         </div>
     </div>
+    <script>
+    document.querySelectorAll('.user-list-item input').forEach(input => {
+        input.addEventListener('focus', function () {
+            this.style.width = `${this.scrollWidth}px`; // Adjust width to fit content
+            this.style.transition = 'width 0.2s ease'; // Smooth transition
+        });
+    
+        input.addEventListener('input', function () {
+            this.style.width = `${this.scrollWidth}px`; // Dynamically adjust width as user types
+        });
+    
+        input.addEventListener('blur', function () {
+            this.style.width = ''; // Reset width to default when focus is lost
+        });
+    });
+    </script>
     <script src="/js/admin.js"></script>
 </body>
 </html>
