@@ -27,20 +27,9 @@
             <button id="saveNewUser">Save User</button>
         </div>
         <div class="user-list-container">
-            <table class="user-list-table">
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Password</th>
-                        <th>Admin</th>
-                        <th>Subscription Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="userList">
-                    <!-- User rows will be dynamically added here -->
-                </tbody>
-            </table>
+            <div id="userList" class="user-list">
+                <!-- User blocks will be appended here via JS -->
+            </div>
         </div>
     </div>
     <script src="/js/admin.js"></script>
