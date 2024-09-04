@@ -85,19 +85,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     const userCard = document.createElement('div');
                     userCard.className = 'user-list-item';
                     userCard.dataset.userid = user._id;
-    
+                
                     userCard.innerHTML = `
-                        <input type="text" value="${user.email}">
-                        <input type="password" data-userid="${user._id}" value="" placeholder="Update Password">
-                        <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
-                        <select data-userid="${user._id}">
-                            <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
-                            <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
-                            <option value="delete" class="delete-option">Delete</option>
-                        </select>
-                        <button class="confirm-changes-button" style="display: none;">Confirm Changes</button>
+                        <div class="user-list-item-row">
+                            <input type="text" value="${user.email}" placeholder="Email">
+                            <input type="password" data-userid="${user._id}" value="" placeholder="Update Password">
+                        </div>
+                        <div class="user-list-item-row">
+                            <select data-userid="${user._id}">
+                                <option value="active" ${user.subscriptionStatus === 'active' ? 'selected' : ''}>Active</option>
+                                <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
+                                <option value="delete" class="delete-option">Delete</option>
+                            </select>
+                            <button class="confirm-changes-button" style="display: none;">Confirm Changes</button>
+                        </div>
                     `;
-    
+                
                     userList.appendChild(userCard);
                 });
             })
