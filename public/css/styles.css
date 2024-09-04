@@ -531,14 +531,20 @@ input:focus {
     }
 }
 
-.user-list-item input[type="text"],
-.user-list-item input[type="password"],
+
 .user-list-item select,
 .user-list-item button {
     margin-bottom: 10px;
     width: 100%;
 }
-
+.user-list-item input[type="text"],
+.user-list-item input[type="password"],
+.user-list-item input {
+    width: 150px; /* Base width for the input fields */
+    transition: width 0.2s ease; /* Smooth transition when resizing */
+    padding: 10px;
+    box-sizing: border-box;
+}
 @media (max-width: 768px) {
     .dashboard-container {
         padding: 20px 10px;
