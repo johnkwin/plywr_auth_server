@@ -8,11 +8,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserAdmin = document.getElementById('newUserAdmin');
     const newUserSubscriptionStatus = document.getElementById('newUserSubscriptionStatus');
 
+    // Function to calculate text width dynamically
+    function getTextWidth(input) {
+        const span = document.createElement('span');
+        span.style.visibility = 'hidden';
+        span.style.whiteSpace = 'pre';
+        span.style.font = window.getComputedStyle(input).font; // Match the font styles
+        span.textContent = input.value || input.placeholder; // Use either value or placeholder
+        document.body.appendChild(span);
+        const width = span.getBoundingClientRect().width;
+        document.body.removeChild(span);
+        return width;
+    }
+
     // Function to resize input on focus and input events
     function resizeInput(event) {
         const input = event.target;
         if (input.tagName === 'INPUT') {
-            input.style.width = `${input.scrollWidth + 20}px`;
+            const newWidth = Math.max(getTextWidth(input) + 20, 150); // Add some padding, min width 150px
+            input.style.width = `${newWidth}px`;
         }
     }
 
