@@ -541,9 +541,11 @@ input:focus {
 .user-list-item input[type="password"],
 .user-list-item input {
     width: 150px; /* Base width for the input fields */
+    max-width: 400px; /* Maximum width to prevent too much stretching */
     transition: width 0.2s ease; /* Smooth transition when resizing */
     padding: 10px;
     box-sizing: border-box;
+    overflow: hidden;
 }
 @media (max-width: 768px) {
     .dashboard-container {
