@@ -538,10 +538,9 @@ input:focus {
     width: 100%;
 }
 .user-list-item input[type="text"],
-.user-list-item input[type="password"],
-.user-list-item input {
+.user-list-item input[type="password"] {
     width: 150px; /* Base width for the input fields */
-    max-width: 400px; /* Maximum width to prevent too much stretching */
+    max-width: 100%; /* Ensure it doesn't grow too large */
     transition: width 0.2s ease; /* Smooth transition when resizing */
     padding: 10px;
     box-sizing: border-box;

@@ -7,7 +7,28 @@ document.addEventListener('DOMContentLoaded', function () {
     const newUserForm = document.getElementById('newUserForm');
     const newUserAdmin = document.getElementById('newUserAdmin');
     const newUserSubscriptionStatus = document.getElementById('newUserSubscriptionStatus');
-    const userTable = document.querySelector('.user-list-table');
+
+    // Function to resize input on focus and input events
+    function resizeInput(event) {
+        const input = event.target;
+        if (input.tagName === 'INPUT') {
+            input.style.width = `${input.scrollWidth + 20}px`;
+        }
+    }
+
+    // Function to reset input width on blur
+    function resetInput(event) {
+        const input = event.target;
+        if (input.tagName === 'INPUT') {
+            input.style.width = '150px'; // Reset width when focus is lost
+        }
+    }
+
+    // Apply event delegation for inputs in userList
+    userList.addEventListener('focus', resizeInput, true); // Listen for focus events
+    userList.addEventListener('input', resizeInput, true); // Listen for input events
+    userList.addEventListener('blur', resetInput, true);   // Listen for blur events
+
 
     if (searchUsers) {
         searchUsers.addEventListener('input', handleSearch);
