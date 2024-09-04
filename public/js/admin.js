@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function resetInput(event) {
         const input = event.target;
         if (input.tagName === 'INPUT') {
-            input.style.width = '150px'; // Reset width when focus is lost
+            input.style.width = '50%'; // Reset width when focus is lost
         }
     }
 

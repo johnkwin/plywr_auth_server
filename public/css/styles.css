@@ -539,14 +539,13 @@ input:focus {
 }
 .user-list-item input[type="text"],
 .user-list-item input[type="password"] {
-    width: 150px; /* Default base width */
-    max-width: 90%; /* Limit the width to 90% of the container to keep it within bounds */
-    transition: width 0.2s ease; /* Smooth transition for resizing */
+    min-width: 50%; /* Ensure the input field doesn't get too small */
+    max-width: 90%; /* Set a maximum width to prevent it from breaking out of the card */
     padding: 10px;
     box-sizing: border-box;
-    overflow: hidden; /* Prevent text overflow */
-    white-space: nowrap; /* Prevent text from wrapping */
-    text-overflow: ellipsis; /* Show ellipsis if the text overflows */
+    overflow: hidden; /* Prevent content from overflowing */
+    white-space: nowrap; /* Ensure text doesn’t wrap */
+    text-overflow: ellipsis; /* Show ellipsis if the text is too long */
 }
 @media (max-width: 768px) {
     .dashboard-container {
