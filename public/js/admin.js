@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function resetInput(event) {
         const input = event.target;
         if (input.tagName === 'INPUT') {
-            input.style.width = '50%'; // Reset width when focus is lost
+            input.style.width = ''; // Clear the inline width, reverting to the default behavior
         }
     }
 
@@ -133,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
                                 <option value="delete" class="delete-option">Delete</option>
                             </select>
+                            <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
                             <button class="confirm-changes-button" style="display: none;">Confirm Changes</button>
                         </div>
                     `;

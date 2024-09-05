@@ -539,7 +539,6 @@ input:focus {
 }
 .user-list-item input[type="text"],
 .user-list-item input[type="password"] {
-    min-width: 50%; /* Ensure the input field doesn't get too small */
     transition: width 0.2s ease; /* Smooth transition when resizing */
     padding: 10px;
     box-sizing: border-box;
