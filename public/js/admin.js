@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function resizeInput(event) {
         const input = event.target;
         if (input.tagName === 'INPUT') {
-            const newWidth = getTextWidth(input) + 20; // Calculate width, limit to 90% of the parent container
+            const newWidth = getTextWidth(input) + 35; // Calculate width, limit to 90% of the parent container
             input.style.width = `${newWidth}px`;
         }
     }
@@ -133,7 +133,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <option value="inactive" ${user.subscriptionStatus === 'inactive' ? 'selected' : ''}>Inactive</option>
                                 <option value="delete" class="delete-option">Delete</option>
                             </select>
+                            </div>
                             <button class="toggle-button ${user.isAdmin ? 'active' : 'off'}">${user.isAdmin ? 'On' : 'Off'}</button>
+                        <div class="user-list-item-row">
                             <button class="confirm-changes-button" style="display: none;">Confirm Changes</button>
                         </div>
                     `;
