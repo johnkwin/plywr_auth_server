@@ -35,7 +35,7 @@ const MESSAGE_TYPE_NOTIFICATION = 'notification';
 const MESSAGE_TYPE_REVOCATION = 'revocation';
 
 const HMAC_PREFIX = 'sha256=';
-app.use(express.raw({ type: 'application/json' }));
+
 app.use((req, res, next) => {
   if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
       const rawBody = req.body.toString('utf8');
@@ -142,7 +142,7 @@ app.post('/register', async (req, res) => {
 });
 
 // Twitch event routes
-app.post('/twitch/events', (req, res) => {
+app.post('/twitch/events', express.raw({ type: 'application/json' }), (req, res) => {
   const secret = TWITCH_EVENTSUB_SECRET;  // Replace with your actual secret
   const message = getHmacMessage(req);
   const hmac = HMAC_PREFIX + getHmac(secret, message);
@@ -194,6 +194,8 @@ function verifyMessage(hmac, verifySignature) {
 
 app.post('/login', async (req, res) => {
   try {
+
+    console.log('Received request body:', req.body);
     const { email, password } = req.body;
 
     console.log('Login attempt:', { email });  // Log the login attempt (no password for security)
