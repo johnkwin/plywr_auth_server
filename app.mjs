@@ -195,23 +195,36 @@ function verifyMessage(hmac, verifySignature) {
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    console.log('Login attempt:', { email });  // Log the login attempt (no password for security)
+
     const user = await User.findOne({ email });
-    if (user && await bcrypt.compare(password, user.password)) {
-      user.tokens = [];  // Clear previous tokens
-      const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
-      user.tokens.push({ token });
-      await user.save();
+    console.log('Found user:', user);  // Log if user is found or not
+
+    if (user) {
       console.log('Stored hashed password:', user.password);  // Log stored hashed password
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        console.log('Password comparison result:', isMatch);  // Log comparison result
-      res.json({ token });
+      const isMatch = await bcrypt.compare(password, user.password);
+      console.log('Password comparison result:', isMatch);  // Log comparison result
+
+      if (isMatch) {
+        user.tokens = [];  // Clear previous tokens
+        const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+        user.tokens.push({ token });
+        await user.save();
+        console.log('Generated token:', token);  // Log generated token
+        res.json({ token });
+      } else {
+        console.log('Invalid password for user:', email);  // Log invalid password attempt
+        res.status(400).json({ message: 'Invalid credentials' });
+      }
     } else {
+      console.log('User not found:', email);  // Log if user is not found
       res.status(400).json({ message: 'Invalid credentials' });
     }
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
-    console.error(error);
   }
 });
 
