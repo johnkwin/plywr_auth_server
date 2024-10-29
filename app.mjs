@@ -197,16 +197,21 @@ app.post('/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (user && await bcrypt.compare(password, user.password)) {
-      user.tokens = [];
+      user.tokens = [];  // Clear previous tokens
       const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
       user.tokens.push({ token });
       await user.save();
+      console.log('Stored hashed password:', user.password);  // Log stored hashed password
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log('Password comparison result:', isMatch);  // Log comparison result
       res.json({ token });
     } else {
       res.status(400).json({ message: 'Invalid credentials' });
     }
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
+    console.error(error);
   }
 });
 
