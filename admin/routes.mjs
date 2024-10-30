@@ -20,6 +20,7 @@ function isAuthenticated(req, res, next) {
 router.get('/login', (req, res) => {
     res.render('login', { message: req.flash('message') });
 });
+
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -30,9 +31,8 @@ router.post('/login', async (req, res) => {
         console.log('Found admin:', admin);
 
         if (admin) {
-            // Check password comparison
             const isMatch = await bcrypt.compare(password, admin.password);
-            console.log('Password match:', isMatch); // Log if password matches
+            console.log('Password match:', isMatch);
 
             if (isMatch) {
                 req.session.userId = admin._id;
@@ -59,18 +59,14 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
-        const rawBody = req.body.toString('utf8');
-        //const parsedBody = JSON.parse(rawBody);
-
-        //const { email, password, isAdmin, subscriptionStatus } = parsedBody;
-        const { email, password, isAdmin, subscriptionStatus } = req.body;
+        const parsedBody = Buffer.isBuffer(req.body) ? JSON.parse(req.body.toString('utf8')) : req.body;
+        const { email, password, isAdmin, subscriptionStatus } = parsedBody;
 
         if (!email || !password) {
             return res.status(400).json({ success: false, message: 'Email and password are required' });
         }
 
         const newUser = await User.createUser({ email, password, isAdmin, subscriptionStatus });
-
         res.json({ success: true, message: 'User created successfully', user: newUser });
     } catch (error) {
         console.error('Error creating user:', error);
@@ -82,20 +78,16 @@ router.post('/user', isAuthenticated, async (req, res) => {
 
 router.patch('/update-user', isAuthenticated, async (req, res) => {
     try {
-        // Manually parse the raw buffer into a JSON object
-        const rawBody = req.body.toString('utf8');
-        //const parsedBody = JSON.parse(rawBody);
-
-        const { email, password, isAdmin, subscriptionStatus } = req.body;
+        const parsedBody = Buffer.isBuffer(req.body) ? JSON.parse(req.body.toString('utf8')) : req.body;
+        const { id, email, password, isAdmin, subscriptionStatus } = parsedBody;
 
         if (!id) {
             return res.status(400).json({ success: false, message: 'User ID is required' });
         }
 
-        // Proceed with the update logic
         const updates = {};
         if (email) updates.email = email;
-        if (password) updates.password = await bcrypt.hash(password, 12);  // Hash the new password
+        if (password) updates.password = await bcrypt.hash(password, 12);
         if (isAdmin !== undefined) updates.isAdmin = isAdmin;
         if (subscriptionStatus) updates.subscriptionStatus = subscriptionStatus;
 
