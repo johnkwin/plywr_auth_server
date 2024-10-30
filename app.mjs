@@ -95,10 +95,9 @@ app.use(cors({
 app.options('*', cors());
 
 // Body parsers
-//app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.raw({ type: 'application/json' }));
 // Static files and view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -302,7 +301,7 @@ app.get('/privacy', (req, res) => {
   res.sendFile(new URL('./views/privacy.html', import.meta.url).pathname);
 });
 
-app.use('/admin',  adminRoutes);
+app.use('/admin', adminRoutes);
 app.use('/user', userRoutes);
 
 // Initialize Twitch EventSub subscriptions

@@ -9,6 +9,7 @@ import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET } from '../config.mjs';
 
 const router = express.Router();
 
+
 function isAuthenticated(req, res, next) {
     if (req.session.userId) {
         return next();
