@@ -35,7 +35,7 @@ const MESSAGE_TYPE_NOTIFICATION = 'notification';
 const MESSAGE_TYPE_REVOCATION = 'revocation';
 
 const HMAC_PREFIX = 'sha256=';
-
+express.raw({ type: 'application/json' });
 app.use((req, res, next) => {
   if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
       const rawBody = req.body.toString('utf8');
@@ -48,7 +48,6 @@ const options = {
   key: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/privkey.pem'),
   cert: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/fullchain.pem')
 };
-express.raw({ type: 'application/json' });
 // Create HTTPS server
 const server = https.createServer(options, app);
 
