@@ -43,6 +43,10 @@ app.use((req, res, next) => {
   }
   next();
 });
+app.use((req, res, next) => {
+  console.log('Body:', req.body); // Logs undefined if not parsed correctly
+  next();
+});
 // HTTPS server options
 const options = {
   key: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/privkey.pem'),

@@ -20,10 +20,6 @@ function isAuthenticated(req, res, next) {
 router.get('/login', (req, res) => {
     res.render('login', { message: req.flash('message') });
 });
-app.use((req, res, next) => {
-    console.log('Body:', req.body); // Logs undefined if not parsed correctly
-    next();
-  });
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
