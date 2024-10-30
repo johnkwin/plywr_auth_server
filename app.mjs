@@ -35,19 +35,12 @@ const MESSAGE_TYPE_NOTIFICATION = 'notification';
 const MESSAGE_TYPE_REVOCATION = 'revocation';
 
 const HMAC_PREFIX = 'sha256=';
-express.raw({ type: 'application/json' });
-app.use((req, res, next) => {
-  if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
-      const rawBody = req.body.toString('utf8');
-      req.body = Object.fromEntries(new URLSearchParams(rawBody));
-  }
-  next();
-});
 // HTTPS server options
 const options = {
   key: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/privkey.pem'),
   cert: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/fullchain.pem')
 };
+
 // Create HTTPS server
 const server = https.createServer(options, app);
 
@@ -97,6 +90,14 @@ app.options('*', cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use((req, res, next) => {
+  if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+      const rawBody = req.body.toString('utf8');
+      req.body = Object.fromEntries(new URLSearchParams(rawBody));
+  }
+  next();
+});
+
 // Static files and view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -141,7 +142,7 @@ app.post('/register', async (req, res) => {
 });
 
 // Twitch event routes
-app.post('/twitch/events', express.raw({ type: 'application/json' }), (req, res) => {
+app.post('/twitch/events', (req, res) => {
   const secret = TWITCH_EVENTSUB_SECRET;  // Replace with your actual secret
   const message = getHmacMessage(req);
   const hmac = HMAC_PREFIX + getHmac(secret, message);
@@ -193,38 +194,18 @@ function verifyMessage(hmac, verifySignature) {
 
 app.post('/login', async (req, res) => {
   try {
-
-    console.log('Received request body:', req.body);
     const { email, password } = req.body;
-
-    console.log('Login attempt:', { email });  // Log the login attempt (no password for security)
-
     const user = await User.findOne({ email });
-    console.log('Found user:', user);  // Log if user is found or not
-
-    if (user) {
-      console.log('Stored hashed password:', user.password);  // Log stored hashed password
-
-      const isMatch = await bcrypt.compare(password, user.password);
-      console.log('Password comparison result:', isMatch);  // Log comparison result
-
-      if (isMatch) {
-        user.tokens = [];  // Clear previous tokens
-        const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
-        user.tokens.push({ token });
-        await user.save();
-        console.log('Generated token:', token);  // Log generated token
-        res.json({ token });
-      } else {
-        console.log('Invalid password for user:', email);  // Log invalid password attempt
-        res.status(400).json({ message: 'Invalid credentials' });
-      }
+    if (user && await bcrypt.compare(password, user.password)) {
+      user.tokens = [];
+      const token = jwt.sign({ userId: user._id }, 'PSh0JzhGxz6AC0yimgHVUXXVzvM3DGb5');
+      user.tokens.push({ token });
+      await user.save();
+      res.json({ token });
     } else {
-      console.log('User not found:', email);  // Log if user is not found
       res.status(400).json({ message: 'Invalid credentials' });
     }
   } catch (error) {
-    console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -300,7 +281,7 @@ app.get('/privacy', (req, res) => {
   res.sendFile(new URL('./views/privacy.html', import.meta.url).pathname);
 });
 
-app.use('/admin', bodyParser.json(), adminRoutes);
+app.use('/admin', adminRoutes);
 app.use('/user', userRoutes);
 
 // Initialize Twitch EventSub subscriptions
