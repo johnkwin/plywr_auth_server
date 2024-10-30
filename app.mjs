@@ -48,7 +48,7 @@ const options = {
   key: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/privkey.pem'),
   cert: fs.readFileSync('/etc/letsencrypt/live/join-playware.com/fullchain.pem')
 };
-
+express.raw({ type: 'application/json' });
 // Create HTTPS server
 const server = https.createServer(options, app);
 
