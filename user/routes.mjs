@@ -299,7 +299,7 @@ router.get('/register', (req, res) => {
     res.render('./user/register', { message: req.flash('message') });
 });
 
-router.post('/register', async (req, res) => {
+router.post('/register', express.raw({ type: 'application/json' }), async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -325,7 +325,7 @@ router.get('/login', (req, res) => {
     res.render('user/login', { message: req.flash('message') });
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', express.raw({ type: 'application/json' }), async (req, res) => {
     try {
         const { email, password } = req.body;
 
