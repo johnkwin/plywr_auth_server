@@ -8,7 +8,8 @@ import { notifyClient } from '../websocket.mjs';
 import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET } from '../config.mjs';
 
 const router = express.Router();
-
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({ extended: true }));
 
 function isAuthenticated(req, res, next) {
     if (req.session.userId) {

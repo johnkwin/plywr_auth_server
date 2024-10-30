@@ -87,9 +87,7 @@ app.use(cors({
 app.options('*', cors());
 
 // Body parsers
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
+express.raw({ type: 'application/json' });
 /*app.use((req, res, next) => {
   if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
       const rawBody = req.body.toString('utf8');
@@ -280,7 +278,6 @@ app.post('/subscribe', async (req, res) => {
 app.get('/privacy', (req, res) => {
   res.sendFile(new URL('./views/privacy.html', import.meta.url).pathname);
 });
-
 app.use('/admin', adminRoutes);
 app.use('/user', userRoutes);
 
