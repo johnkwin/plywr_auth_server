@@ -88,13 +88,13 @@ app.options('*', cors());
 
 // Body parsers
 
-app.use((req, res, next) => {
+/*app.use((req, res, next) => {
   if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
       const rawBody = req.body.toString('utf8');
       req.body = Object.fromEntries(new URLSearchParams(rawBody));
   }
   next();
-});
+});*/
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
