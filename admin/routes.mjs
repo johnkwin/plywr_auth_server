@@ -60,9 +60,10 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 router.post('/user', isAuthenticated, async (req, res) => {
     try {
         const rawBody = req.body.toString('utf8');
-        const parsedBody = JSON.parse(rawBody);
+        //const parsedBody = JSON.parse(rawBody);
 
-        const { email, password, isAdmin, subscriptionStatus } = parsedBody;
+        //const { email, password, isAdmin, subscriptionStatus } = parsedBody;
+        const { email, password, isAdmin, subscriptionStatus } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({ success: false, message: 'Email and password are required' });
@@ -83,9 +84,9 @@ router.patch('/update-user', isAuthenticated, async (req, res) => {
     try {
         // Manually parse the raw buffer into a JSON object
         const rawBody = req.body.toString('utf8');
-        const parsedBody = JSON.parse(rawBody);
+        //const parsedBody = JSON.parse(rawBody);
 
-        const { id, email, password, isAdmin, subscriptionStatus } = parsedBody;
+        const { email, password, isAdmin, subscriptionStatus } = req.body;
 
         if (!id) {
             return res.status(400).json({ success: false, message: 'User ID is required' });

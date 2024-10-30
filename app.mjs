@@ -301,7 +301,7 @@ app.get('/privacy', (req, res) => {
   res.sendFile(new URL('./views/privacy.html', import.meta.url).pathname);
 });
 
-app.use('/admin', adminRoutes);
+app.use('/admin', bodyParser.json(), adminRoutes);
 app.use('/user', userRoutes);
 
 // Initialize Twitch EventSub subscriptions
