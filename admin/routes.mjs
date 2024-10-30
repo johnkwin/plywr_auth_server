@@ -7,6 +7,8 @@ import crypto from 'crypto';
 import { notifyClient } from '../websocket.mjs';
 import { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET } from '../config.mjs';
 
+import bodyParser from 'body-parser';
+
 const router = express.Router();
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
