@@ -87,14 +87,17 @@ app.use(cors({
 app.options('*', cors());
 
 // Body parsers
-express.raw({ type: 'application/json' });
-/*app.use((req, res, next) => {
+
+app.use((req, res, next) => {
   if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
       const rawBody = req.body.toString('utf8');
       req.body = Object.fromEntries(new URLSearchParams(rawBody));
   }
   next();
-});*/
+});
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Static files and view engine
 app.set('view engine', 'ejs');
@@ -278,6 +281,7 @@ app.post('/subscribe', async (req, res) => {
 app.get('/privacy', (req, res) => {
   res.sendFile(new URL('./views/privacy.html', import.meta.url).pathname);
 });
+express.raw({ type: 'application/json' });
 app.use('/admin', adminRoutes);
 
 app.use(bodyParser.json());
