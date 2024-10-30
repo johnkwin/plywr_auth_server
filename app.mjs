@@ -190,13 +190,7 @@ function verifyMessage(hmac, verifySignature) {
 
 // Other routes and middleware
 
-app.post('/login', app.use((req, res, next) => {
-  if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
-      const rawBody = req.body.toString('utf8');
-      req.body = Object.fromEntries(new URLSearchParams(rawBody));
-  }
-  next();
-}), async (req, res) => {
+app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
