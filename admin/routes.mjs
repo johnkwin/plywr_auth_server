@@ -30,7 +30,7 @@ router.post('/login', async (req, res) => {
 
         console.log('Login attempt:', { email, password });
 
-        const admin = await User.findOne({ email: email, isAdmin: true });
+        const admin = await User.findOne({ email: email.toLowerCase(), isAdmin: true });
         console.log('Found admin:', admin);
 
         if (admin) {
@@ -123,7 +123,7 @@ router.get('/verify-password/:email', async (req, res) => {
 });
 
 router.get('/search-users', isAuthenticated, async (req, res) => {
-    const query = req.query.q;
+    const query = req.query.q.toLowerCase();
     try {
         const users = await User.find({
             email: { $regex: query, $options: 'i' }

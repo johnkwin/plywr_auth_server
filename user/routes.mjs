@@ -334,7 +334,7 @@ router.post('/login', async (req, res) => {
             return res.redirect('/user/login');
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.toLowerCase() });
 
         if (!user) {
             console.log('User not found:', email);  // Log if user not found

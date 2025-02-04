@@ -4,7 +4,7 @@ import { SALT_ROUNDS } from '../config.mjs';
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
-  email: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true, lowercase: true },
   password: { 
     type: String, 
     required: function() { return this.isNew || this.isModified('password'); } 
@@ -30,6 +30,8 @@ UserSchema.pre('save', async function (next) {
 });
 UserSchema.statics.createUser = async function({ email, password, isAdmin = false, subscriptionStatus = 'inactive' }) {
   // Check if the email is already in use
+  email = email.toLowerCase();
+  
   const existingUser = await this.findOne({ email });
   if (existingUser) {
       throw new Error('Email already in use');
